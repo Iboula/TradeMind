@@ -1,8 +1,11 @@
+using TradeMind.Modules.Knowledge.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
+builder.Services.AddKnowledgeModule();
 
 var app = builder.Build();
 
@@ -24,6 +27,8 @@ app.MapGroup("/api/trading-journal")
 app.MapGroup("/api/risk-management")
     .WithTags("Risk Management")
     .MapGet("/status", () => Results.Ok(new { module = "RiskManagement", status = "available" }));
+
+app.MapKnowledgeEndpoints();
 
 app.Run();
 
