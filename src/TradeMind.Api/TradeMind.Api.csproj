@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../Modules/TradingJournal/TradeMind.Modules.TradingJournal.Application/TradeMind.Modules.TradingJournal.Application.csproj" />
+    <ProjectReference Include="../Modules/RiskManagement/TradeMind.Modules.RiskManagement.Application/TradeMind.Modules.RiskManagement.Application.csproj" />
+  </ItemGroup>
+</Project>
