@@ -7,9 +7,13 @@
     <Project Path="src/Modules/TradingJournal/TradeMind.Modules.TradingJournal.Application/TradeMind.Modules.TradingJournal.Application.csproj" />
     <Project Path="src/Modules/RiskManagement/TradeMind.Modules.RiskManagement.Domain/TradeMind.Modules.RiskManagement.Domain.csproj" />
     <Project Path="src/Modules/RiskManagement/TradeMind.Modules.RiskManagement.Application/TradeMind.Modules.RiskManagement.Application.csproj" />
+    <Project Path="src/Modules/Knowledge/TradeMind.Modules.Knowledge.Domain/TradeMind.Modules.Knowledge.Domain.csproj" />
+    <Project Path="src/Modules/Knowledge/TradeMind.Modules.Knowledge.Application/TradeMind.Modules.Knowledge.Application.csproj" />
+    <Project Path="src/Modules/Knowledge/TradeMind.Modules.Knowledge.Infrastructure/TradeMind.Modules.Knowledge.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TradeMind.Architecture.Tests/TradeMind.Architecture.Tests.csproj" />
     <Project Path="tests/TradeMind.Modules.TradingJournal.UnitTests/TradeMind.Modules.TradingJournal.UnitTests.csproj" />
+    <Project Path="tests/TradeMind.Modules.Knowledge.UnitTests/TradeMind.Modules.Knowledge.UnitTests.csproj" />
   </Folder>
 </Solution>
