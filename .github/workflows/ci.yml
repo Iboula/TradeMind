@@ -2,12 +2,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - agent/**
+    branches: [ main, agent/** ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -15,20 +12,32 @@ permissions:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: trademind
+          POSTGRES_USER: trademind
+          POSTGRES_PASSWORD: trademind
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U trademind -d trademind"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ConnectionStrings__KnowledgeHub: Host=localhost;Port=5432;Database=trademind;Username=trademind;Password=trademind
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
-
       - name: Restore
         run: dotnet restore TradeMind.slnx
-
       - name: Build
         run: dotnet build TradeMind.slnx --configuration Release --no-restore
-
       - name: Test
         run: dotnet test TradeMind.slnx --configuration Release --no-build --logger "trx;LogFileName=test-results.trx"
