@@ -99,16 +99,16 @@ public sealed class PostgreSqlKnowledgeSourceRepository(KnowledgeHubDbContext db
         {
             await using var command = connection.CreateCommand();
             command.CommandText = """
-                SELECT s.id,
-                       s.title,
-                       f.id,
-                       f.sequence,
-                       f.content,
-                       1 - (f.embedding <=> CAST(@embedding AS vector)) AS score
+                SELECT s."Id",
+                       s."Title",
+                       f."Id",
+                       f."Sequence",
+                       f."Content",
+                       1 - (f."Embedding" <=> CAST(@embedding AS vector)) AS score
                 FROM knowledge_fragments f
-                INNER JOIN knowledge_sources s ON s.id = f.knowledge_source_id
-                WHERE s.status = 'Ready'
-                ORDER BY f.embedding <=> CAST(@embedding AS vector)
+                INNER JOIN knowledge_sources s ON s."Id" = f."KnowledgeSourceId"
+                WHERE s."Status" = 'Ready'
+                ORDER BY f."Embedding" <=> CAST(@embedding AS vector)
                 LIMIT @limit;
                 """;
 

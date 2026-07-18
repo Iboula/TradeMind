@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pgvector.EntityFrameworkCore;
 using TradeMind.KnowledgeHub.Application;
 using TradeMind.KnowledgeHub.Domain;
 
@@ -165,7 +166,10 @@ public static class DependencyInjection
 
         services.AddDbContext<KnowledgeHubDbContext>(options =>
             options.UseNpgsql(connectionString, npgsql =>
-                npgsql.MigrationsAssembly(typeof(KnowledgeHubDbContext).Assembly.FullName)));
+            {
+                npgsql.MigrationsAssembly(typeof(KnowledgeHubDbContext).Assembly.FullName);
+                npgsql.UseVector();
+            }));
 
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<IFragmenter>(_ => new SlidingWindowFragmenter());
