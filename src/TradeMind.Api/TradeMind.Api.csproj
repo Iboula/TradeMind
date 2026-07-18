@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj" />
+    <ProjectReference Include="../TradeMind.KnowledgeHub.Infrastructure/TradeMind.KnowledgeHub.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
