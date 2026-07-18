@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../TradeMind.Modules.TradingJournal.Domain/TradeMind.Modules.TradingJournal.Domain.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/TradeMind.BuildingBlocks.Application/TradeMind.BuildingBlocks.Application.csproj" />
+  </ItemGroup>
+</Project>

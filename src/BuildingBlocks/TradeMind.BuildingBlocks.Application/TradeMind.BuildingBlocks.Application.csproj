@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../TradeMind.BuildingBlocks.Domain/TradeMind.BuildingBlocks.Domain.csproj" />
+  </ItemGroup>
+</Project>

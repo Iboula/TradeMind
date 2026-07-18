@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TradeMind.Api/TradeMind.Api.csproj" />
+    <Project Path="src/BuildingBlocks/TradeMind.BuildingBlocks.Domain/TradeMind.BuildingBlocks.Domain.csproj" />
+    <Project Path="src/BuildingBlocks/TradeMind.BuildingBlocks.Application/TradeMind.BuildingBlocks.Application.csproj" />
+    <Project Path="src/Modules/TradingJournal/TradeMind.Modules.TradingJournal.Domain/TradeMind.Modules.TradingJournal.Domain.csproj" />
+    <Project Path="src/Modules/TradingJournal/TradeMind.Modules.TradingJournal.Application/TradeMind.Modules.TradingJournal.Application.csproj" />
+    <Project Path="src/Modules/RiskManagement/TradeMind.Modules.RiskManagement.Domain/TradeMind.Modules.RiskManagement.Domain.csproj" />
+    <Project Path="src/Modules/RiskManagement/TradeMind.Modules.RiskManagement.Application/TradeMind.Modules.RiskManagement.Application.csproj" />
+    <Project Path="src/Modules/KnowledgeHub/TradeMind.Modules.KnowledgeHub.Domain/TradeMind.Modules.KnowledgeHub.Domain.csproj" />
+    <Project Path="src/Modules/KnowledgeHub/TradeMind.Modules.KnowledgeHub.Application/TradeMind.Modules.KnowledgeHub.Application.csproj" />
+    <Project Path="src/Modules/KnowledgeHub/TradeMind.Modules.KnowledgeHub.Infrastructure/TradeMind.Modules.KnowledgeHub.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TradeMind.Architecture.Tests/TradeMind.Architecture.Tests.csproj" />
+    <Project Path="tests/TradeMind.Modules.TradingJournal.UnitTests/TradeMind.Modules.TradingJournal.UnitTests.csproj" />
+    <Project Path="tests/TradeMind.Modules.KnowledgeHub.UnitTests/TradeMind.Modules.KnowledgeHub.UnitTests.csproj" />
+    <Project Path="tests/TradeMind.Api.IntegrationTests/TradeMind.Api.IntegrationTests.csproj" />
+  </Folder>
+</Solution>
