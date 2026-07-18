@@ -2,29 +2,43 @@ using TradeMind.Modules.Knowledge.Domain;
 
 namespace TradeMind.Modules.Knowledge.UnitTests;
 
-public sealed class KnowledgeDocumentTests
+public sealed class KnowledgeSourceTests
 {
     [Fact]
-    public void Create_ValidInput_RaisesCreatedEvent()
+    public void Import_ValidInput_RaisesImportedEvent()
     {
         var now = DateTimeOffset.UtcNow;
 
-        var document = KnowledgeDocument.Create("Trading plan", "manual.pdf", now);
+        var source = KnowledgeSource.Import("Trading plan", "text/plain", now);
 
-        Assert.Equal(KnowledgeDocumentStatus.Pending, document.Status);
-        Assert.Contains(document.DomainEvents, domainEvent => domainEvent is KnowledgeDocumentCreated);
+        Assert.Equal(KnowledgeSourceStatus.Imported, source.Status);
+        Assert.Contains(source.DomainEvents, domainEvent => domainEvent is KnowledgeSourceImported);
     }
 
     [Fact]
-    public void ReplaceChunks_IgnoresBlankChunks_AndMarksDocumentIndexed()
+    public void ReplaceFragments_AssignsEmbeddings_AndMarksSourceIndexed()
     {
-        var document = KnowledgeDocument.Create("Trading plan", "manual.pdf", DateTimeOffset.UtcNow);
+        var source = KnowledgeSource.Import("Trading plan", "text/plain", DateTimeOffset.UtcNow);
 
-        document.ReplaceChunks([" First ", " ", "Second"], DateTimeOffset.UtcNow);
+        source.ReplaceFragments(
+            ["First", "Second"],
+            [new float[] { 1f, 0f }, new float[] { 0f, 1f }],
+            DateTimeOffset.UtcNow);
 
-        Assert.Equal(KnowledgeDocumentStatus.Indexed, document.Status);
-        Assert.Equal(2, document.Chunks.Count);
-        Assert.Equal("First", document.Chunks.First().Content);
-        Assert.Contains(document.DomainEvents, domainEvent => domainEvent is KnowledgeDocumentIndexed);
+        Assert.Equal(KnowledgeSourceStatus.Indexed, source.Status);
+        Assert.Equal(2, source.Fragments.Count);
+        Assert.All(source.Fragments, fragment => Assert.NotEmpty(fragment.Embedding.Vector));
+        Assert.Contains(source.DomainEvents, domainEvent => domainEvent is KnowledgeSourceIndexed);
+    }
+
+    [Fact]
+    public void ReplaceFragments_WithDifferentEmbeddingCount_Throws()
+    {
+        var source = KnowledgeSource.Import("Trading plan", "text/plain", DateTimeOffset.UtcNow);
+
+        Assert.Throws<ArgumentException>(() => source.ReplaceFragments(
+            ["First", "Second"],
+            [new float[] { 1f, 0f }],
+            DateTimeOffset.UtcNow));
     }
 }
