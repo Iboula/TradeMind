@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradeMind.KnowledgeHub.Application;
 using TradeMind.KnowledgeHub.Domain;
@@ -154,12 +156,21 @@ public sealed class InMemoryKnowledgeSourceRepository : IKnowledgeSourceReposito
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddKnowledgeHub(this IServiceCollection services)
+    public static IServiceCollection AddKnowledgeHub(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("KnowledgeHub")
+            ?? throw new InvalidOperationException("Connection string 'KnowledgeHub' is required.");
+
+        services.AddDbContext<KnowledgeHubDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsql =>
+                npgsql.MigrationsAssembly(typeof(KnowledgeHubDbContext).Assembly.FullName)));
+
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<IFragmenter>(_ => new SlidingWindowFragmenter());
         services.AddSingleton<IEmbeddingGenerator, DeterministicEmbeddingGenerator>();
-        services.AddSingleton<IKnowledgeSourceRepository, InMemoryKnowledgeSourceRepository>();
+        services.AddScoped<IKnowledgeSourceRepository, PostgreSqlKnowledgeSourceRepository>();
         services.AddScoped<KnowledgeHubService>();
         return services;
     }
