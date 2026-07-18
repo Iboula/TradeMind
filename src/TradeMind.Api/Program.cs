@@ -1,19 +1,17 @@
-using TradeMind.Modules.Knowledge.Infrastructure;
+using TradeMind.Modules.KnowledgeHub.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
-builder.Services.AddKnowledgeModule(builder.Configuration);
+builder.Services.AddKnowledgeHub(builder.Configuration);
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapOpenApi();
 app.MapHealthChecks("/health");
-
-await app.Services.ApplyKnowledgeMigrationsAsync();
 
 app.MapGet("/", () => Results.Ok(new
 {
@@ -30,7 +28,8 @@ app.MapGroup("/api/risk-management")
     .WithTags("Risk Management")
     .MapGet("/status", () => Results.Ok(new { module = "RiskManagement", status = "available" }));
 
-app.MapKnowledgeEndpoints();
+await app.ApplyKnowledgeHubMigrationsAsync();
+app.MapKnowledgeHubEndpoints();
 
 app.Run();
 
