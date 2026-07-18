@@ -5,13 +5,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
-builder.Services.AddKnowledgeModule();
+builder.Services.AddKnowledgeModule(builder.Configuration);
 
 var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapOpenApi();
 app.MapHealthChecks("/health");
+
+await app.Services.ApplyKnowledgeMigrationsAsync();
 
 app.MapGet("/", () => Results.Ok(new
 {
