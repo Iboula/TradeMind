@@ -1,53 +1,41 @@
-using System.Collections.Concurrent;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TradeMind.Modules.Knowledge.Application;
-using TradeMind.Modules.Knowledge.Domain;
 
 namespace TradeMind.Modules.Knowledge.Infrastructure;
 
 public static class KnowledgeModule
 {
-    public static IServiceCollection AddKnowledgeModule(this IServiceCollection services)
+    public static IServiceCollection AddKnowledgeModule(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
-        services.AddSingleton<InMemoryKnowledgeStore>();
-        services.AddSingleton<IKnowledgeDocumentRepository>(sp => sp.GetRequiredService<InMemoryKnowledgeStore>());
-        services.AddSingleton<IKnowledgeUnitOfWork>(sp => sp.GetRequiredService<InMemoryKnowledgeStore>());
+        var connectionString = configuration.GetConnectionString("KnowledgeDatabase")
+            ?? throw new InvalidOperationException("Connection string 'KnowledgeDatabase' is required.");
+
+        services.AddDbContext<KnowledgeDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsql => npgsql.UseVector()));
+
+        services.AddScoped<IKnowledgeSourceRepository, KnowledgeSourceRepository>();
+        services.AddScoped<IKnowledgeUnitOfWork>(provider => provider.GetRequiredService<KnowledgeDbContext>());
+        services.AddScoped<IKnowledgeImporter, TxtKnowledgeImporter>();
+        services.AddScoped<ITextExtractor, PlainTextExtractor>();
+        services.AddSingleton<IFragmenter, SlidingWindowFragmenter>();
+        services.AddSingleton<IEmbeddingGenerator, FakeEmbeddingGenerator>();
+        services.AddScoped<IKnowledgeIndexer, DatabaseKnowledgeIndexer>();
+        services.AddScoped<IKnowledgeSearcher, PgvectorKnowledgeSearcher>();
         services.AddSingleton<IKnowledgeClock, SystemKnowledgeClock>();
-        services.AddScoped<KnowledgeService>();
+        services.AddScoped<KnowledgeHubService>();
         return services;
     }
-}
 
-internal sealed class InMemoryKnowledgeStore : IKnowledgeDocumentRepository, IKnowledgeUnitOfWork
-{
-    private readonly ConcurrentDictionary<Guid, KnowledgeDocument> _documents = new();
-
-    public Task AddAsync(KnowledgeDocument document, CancellationToken cancellationToken)
+    public static async Task ApplyKnowledgeMigrationsAsync(
+        this IServiceProvider services,
+        CancellationToken cancellationToken = default)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (!_documents.TryAdd(document.Id, document))
-        {
-            throw new InvalidOperationException($"Knowledge document '{document.Id}' already exists.");
-        }
-
-        return Task.CompletedTask;
+        await using var scope = services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<KnowledgeDbContext>();
+        await context.Database.MigrateAsync(cancellationToken);
     }
-
-    public Task<KnowledgeDocument?> GetAsync(Guid id, CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        _documents.TryGetValue(id, out var document);
-        return Task.FromResult(document);
-    }
-
-    public Task SaveChangesAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        return Task.CompletedTask;
-    }
-}
-
-internal sealed class SystemKnowledgeClock : IKnowledgeClock
-{
-    public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
 }
