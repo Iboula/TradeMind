@@ -1,4 +1,5 @@
 using TradeMind.Modules.KnowledgeHub.Domain;
+using Xunit;
 
 namespace TradeMind.Modules.KnowledgeHub.UnitTests;
 
