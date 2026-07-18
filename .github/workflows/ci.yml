@@ -15,8 +15,14 @@ jobs:
         with:
           dotnet-version: 9.0.x
       - name: Restore
-        run: dotnet restore TradeMind.sln --verbosity quiet
+        run: dotnet restore TradeMind.sln --verbosity minimal
       - name: Build
-        run: dotnet build TradeMind.sln --configuration Release --no-restore --verbosity quiet
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet build TradeMind.sln --configuration Release --no-restore --verbosity minimal 2>&1 | tee build.log
       - name: Test
-        run: dotnet test TradeMind.sln --configuration Release --no-build --verbosity quiet
+        shell: bash
+        run: |
+          set -o pipefail
+          dotnet test TradeMind.sln --configuration Release --no-build --verbosity minimal 2>&1 | tee test.log
