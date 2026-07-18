@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Domain", "src/TradeMind.KnowledgeHub.Domain/TradeMind.KnowledgeHub.Domain.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Application", "src/TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Infrastructure", "src/TradeMind.KnowledgeHub.Infrastructure/TradeMind.KnowledgeHub.Infrastructure.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D103}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api", "src/TradeMind.Api/TradeMind.Api.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D104}"
+EndProject
+Global
+  GlobalSection(SolutionConfigurationPlatforms) = preSolution
+    Debug|Any CPU = Debug|Any CPU
+    Release|Any CPU = Release|Any CPU
+  EndGlobalSection
+  GlobalSection(ProjectConfigurationPlatforms) = postSolution
+    {A5D7E105-1B33-41D9-9879-514E82A0D101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D101}.Release|Any CPU.Build.0 = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D102}.Release|Any CPU.Build.0 = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D103}.Release|Any CPU.Build.0 = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D104}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D104}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D104}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D104}.Release|Any CPU.Build.0 = Release|Any CPU
+  EndGlobalSection
+EndGlobal
