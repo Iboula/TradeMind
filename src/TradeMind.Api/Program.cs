@@ -1,13 +1,20 @@
+using Microsoft.EntityFrameworkCore;
 using TradeMind.KnowledgeHub.Application;
 using TradeMind.KnowledgeHub.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
-builder.Services.AddKnowledgeHub();
+builder.Services.AddKnowledgeHub(builder.Configuration);
 
 var app = builder.Build();
 app.UseExceptionHandler();
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeHubDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
 
 if (app.Environment.IsDevelopment())
 {
