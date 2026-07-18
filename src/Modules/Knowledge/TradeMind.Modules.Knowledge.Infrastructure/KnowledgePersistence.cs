@@ -49,13 +49,10 @@ internal sealed class KnowledgeDbContext(DbContextOptions<KnowledgeDbContext> op
             builder.Property(entity => entity.Vector)
                 .HasColumnType($"vector({FakeEmbeddingGenerator.VectorDimensions})")
                 .IsRequired();
-            builder.HasIndex(entity => entity.Vector)
-                .HasMethod("hnsw")
-                .HasOperators("vector_cosine_ops");
         });
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken) =>
+    async Task IKnowledgeUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken) =>
         await base.SaveChangesAsync(cancellationToken);
 }
 
@@ -127,7 +124,6 @@ internal sealed class PgvectorKnowledgeSearcher(
 
         return await context.Fragments
             .AsNoTracking()
-            .Where(fragment => fragment.Embedding != null)
             .OrderBy(fragment => fragment.Embedding.Vector.CosineDistance(queryVector))
             .Take(limit)
             .Select(fragment => new KnowledgeSearchResult(
