@@ -62,6 +62,8 @@ dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
 
 The API expects a `ConnectionStrings:KnowledgeHub` connection string. Local development may use appsettings, user secrets, environment variables, or Docker Compose defaults. Real secrets must not be committed.
 
+AI provider configuration lives under the `AI` section. The checked-in OpenAI API key value is intentionally empty. Use environment variable `AI__OpenAI__ApiKey`, user secrets, or a future secret store for real credentials.
+
 ## Migrations
 
 EF Core migrations live in the Infrastructure project for the module they support. A schema change must be represented by a migration and covered by tests when it affects behavior.

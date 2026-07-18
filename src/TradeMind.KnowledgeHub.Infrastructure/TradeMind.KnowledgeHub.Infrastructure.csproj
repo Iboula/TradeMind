@@ -12,5 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="../TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj" />
     <ProjectReference Include="../TradeMind.KnowledgeHub.Domain/TradeMind.KnowledgeHub.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Abstractions\TradeMind.AI.Abstractions.csproj" />
   </ItemGroup>
 </Project>

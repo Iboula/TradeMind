@@ -14,6 +14,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.IntegrationTests", "tests/TradeMind.KnowledgeHub.IntegrationTests/TradeMind.KnowledgeHub.IntegrationTests.csproj", "{7F233C19-E537-43F7-A344-DA9A5ECD1B48}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Abstractions", "src/TradeMind.AI.Abstractions/TradeMind.AI.Abstractions.csproj", "{047F1EC1-5A79-4F05-8F32-D38A9EA0A528}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Infrastructure", "src/TradeMind.AI.Infrastructure/TradeMind.AI.Infrastructure.csproj", "{FC744E2E-6428-42D5-910A-8A85CF4A3A38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tests", "tests/TradeMind.AI.Tests/TradeMind.AI.Tests.csproj", "{CCA20B18-BEF5-4650-A704-A3291C588D87}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -44,5 +50,17 @@ Global
     {7F233C19-E537-43F7-A344-DA9A5ECD1B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {7F233C19-E537-43F7-A344-DA9A5ECD1B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {7F233C19-E537-43F7-A344-DA9A5ECD1B48}.Release|Any CPU.Build.0 = Release|Any CPU
+    {047F1EC1-5A79-4F05-8F32-D38A9EA0A528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {047F1EC1-5A79-4F05-8F32-D38A9EA0A528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {047F1EC1-5A79-4F05-8F32-D38A9EA0A528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {047F1EC1-5A79-4F05-8F32-D38A9EA0A528}.Release|Any CPU.Build.0 = Release|Any CPU
+    {FC744E2E-6428-42D5-910A-8A85CF4A3A38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {FC744E2E-6428-42D5-910A-8A85CF4A3A38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {FC744E2E-6428-42D5-910A-8A85CF4A3A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {FC744E2E-6428-42D5-910A-8A85CF4A3A38}.Release|Any CPU.Build.0 = Release|Any CPU
+    {CCA20B18-BEF5-4650-A704-A3291C588D87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {CCA20B18-BEF5-4650-A704-A3291C588D87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {CCA20B18-BEF5-4650-A704-A3291C588D87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {CCA20B18-BEF5-4650-A704-A3291C588D87}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

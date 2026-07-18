@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pgvector.EntityFrameworkCore;
 using TradeMind.KnowledgeHub.Application;
 using TradeMind.KnowledgeHub.Domain;
@@ -173,9 +174,15 @@ public static class DependencyInjection
 
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<IFragmenter>(_ => new SlidingWindowFragmenter());
-        services.AddSingleton<IEmbeddingGenerator, DeterministicEmbeddingGenerator>();
+        services.TryAddSingleton<IEmbeddingGenerator, DeterministicEmbeddingGenerator>();
         services.AddScoped<IKnowledgeSourceRepository, PostgreSqlKnowledgeSourceRepository>();
         services.AddScoped<KnowledgeHubService>();
+        return services;
+    }
+
+    public static IServiceCollection AddKnowledgeHubAIEmbeddings(this IServiceCollection services)
+    {
+        services.AddSingleton<IEmbeddingGenerator, AIEmbeddingGeneratorAdapter>();
         return services;
     }
 }

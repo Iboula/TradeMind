@@ -17,7 +17,8 @@ Build the durable knowledge foundation.
 
 Introduce production AI provider integrations behind abstractions.
 
-- Add OpenAI embedding provider behind `IEmbeddingGenerator`.
+- Add provider-agnostic chat and embedding contracts.
+- Add OpenAI chat and embedding providers behind the AI abstraction layer.
 - Add provider configuration without committing secrets.
 - Add retry, timeout, rate-limit, and observability patterns.
 - Support provider swapping for cost, quality, or compliance.

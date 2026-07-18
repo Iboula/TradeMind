@@ -54,4 +54,6 @@ If extraction or processing fails, the source is marked `Failed`, the failure re
 
 ## Future AI provider flow
 
-Future OpenAI or other providers should implement `IEmbeddingGenerator`. The Application layer should keep the same contract while Infrastructure owns provider credentials, retries, and SDK details.
+OpenAI and future providers implement provider-agnostic interfaces in `TradeMind.AI.Abstractions`. Infrastructure owns credentials, SDK clients, logging, and exception translation.
+
+For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` into the existing `IEmbeddingGenerator` port. The current default remains deterministic 64-dimensional embeddings so it continues to match the existing `vector(64)` schema until a future migration intentionally changes embedding dimensions.

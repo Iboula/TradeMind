@@ -66,6 +66,29 @@ Responsibilities:
 
 Infrastructure contains provider-specific details such as EF Core, Npgsql, pgvector registration, raw SQL vector search, and migrations.
 
+## AI Abstractions
+
+Project: `src/TradeMind.AI.Abstractions`
+
+Responsibilities:
+
+- Define provider-agnostic chat contracts.
+- Define provider-agnostic embedding contracts.
+- Define provider metadata and capabilities.
+- Avoid all concrete AI SDK dependencies.
+
+## AI Infrastructure
+
+Project: `src/TradeMind.AI.Infrastructure`
+
+Responsibilities:
+
+- Bind and validate `AI` configuration.
+- Select the active provider.
+- Register provider implementations through dependency injection.
+- Isolate the official OpenAI SDK.
+- Translate between provider-independent contracts and OpenAI SDK types.
+
 ## Persistence model
 
 `KnowledgeHubDbContext` maps:

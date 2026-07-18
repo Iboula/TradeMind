@@ -9,6 +9,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0001: Modular monolith](ADR-0001-modular-monolith.md)
 - [ADR-0002: CQRS](ADR-0002-cqrs.md)
 - [ADR-0003: PostgreSQL and pgvector](ADR-0003-postgresql-pgvector.md)
+- [ADR-0004: AI provider abstraction](ADR-0004-ai-provider-abstraction.md)
 
 ## ADR format
 

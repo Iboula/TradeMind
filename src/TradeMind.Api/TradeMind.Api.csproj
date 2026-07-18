@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="../TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj" />
     <ProjectReference Include="../TradeMind.KnowledgeHub.Infrastructure/TradeMind.KnowledgeHub.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Infrastructure\TradeMind.AI.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
