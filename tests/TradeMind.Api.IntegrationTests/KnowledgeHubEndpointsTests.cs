@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 using TradeMind.Modules.KnowledgeHub.Application;
+using Xunit;
 
 namespace TradeMind.Api.IntegrationTests;
 
