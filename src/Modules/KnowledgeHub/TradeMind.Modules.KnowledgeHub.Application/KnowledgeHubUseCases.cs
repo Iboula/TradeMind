@@ -37,11 +37,7 @@ public sealed class ImportKnowledgeSourceHandler(
 
 public sealed class GetKnowledgeSourceHandler(IKnowledgeSourceRepository repository) : IRequestHandler<GetKnowledgeSourceQuery, KnowledgeSourceDto?>
 {
-    public async Task<KnowledgeSourceDto?> Handle(GetKnowledgeSourceQuery request, CancellationToken ct)
-    {
-        var source = await repository.GetAsync(request.Id, ct);
-        return source is null ? null : ImportKnowledgeSourceHandler.Map(source);
-    }
+    public Task<KnowledgeSourceDto?> Handle(GetKnowledgeSourceQuery request, CancellationToken ct) => repository.GetAsync(request.Id, ct);
 }
 
 public sealed class SearchKnowledgeHandler(IKnowledgeSearcher searcher) : IRequestHandler<SearchKnowledgeQuery, IReadOnlyList<KnowledgeSearchResult>>
