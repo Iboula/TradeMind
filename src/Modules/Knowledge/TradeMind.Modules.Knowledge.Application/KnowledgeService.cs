@@ -2,30 +2,35 @@ using TradeMind.Modules.Knowledge.Domain;
 
 namespace TradeMind.Modules.Knowledge.Application;
 
-public sealed class KnowledgeService(
-    IKnowledgeDocumentRepository repository,
-    IKnowledgeUnitOfWork unitOfWork,
-    IKnowledgeClock clock)
+public sealed class KnowledgeHubService(
+    IKnowledgeImporter importer,
+    IKnowledgeSourceRepository repository,
+    IKnowledgeSearcher searcher)
 {
-    public async Task<KnowledgeDocumentResponse> CreateAsync(
-        CreateKnowledgeDocumentCommand command,
+    public async Task<KnowledgeSourceResponse> ImportAsync(
+        ImportKnowledgeSourceCommand command,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(command);
-
-        var document = KnowledgeDocument.Create(command.Title, command.Source, clock.UtcNow);
-        await repository.AddAsync(document, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return Map(document);
+        var source = await importer.ImportAsync(command, cancellationToken);
+        return Map(source);
     }
 
-    public async Task<KnowledgeDocumentResponse?> GetAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<KnowledgeSourceResponse?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
-        var document = await repository.GetAsync(id, cancellationToken);
-        return document is null ? null : Map(document);
+        var source = await repository.GetAsync(id, cancellationToken);
+        return source is null ? null : Map(source);
     }
 
-    private static KnowledgeDocumentResponse Map(KnowledgeDocument document) =>
-        new(document.Id, document.Title, document.Source, document.Status.ToString(), document.Chunks.Count);
+    public Task<IReadOnlyList<KnowledgeSearchResult>> SearchAsync(
+        string query,
+        int limit,
+        CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(query);
+        return searcher.SearchAsync(query.Trim(), Math.Clamp(limit, 1, 20), cancellationToken);
+    }
+
+    private static KnowledgeSourceResponse Map(KnowledgeSource source) =>
+        new(source.Id, source.Name, source.MediaType, source.Status.ToString(), source.Fragments.Count, source.CreatedOnUtc);
 }
