@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
+    <PackageReference Include="Pgvector.EntityFrameworkCore" Version="0.2.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj" />
+    <ProjectReference Include="../TradeMind.KnowledgeHub.Domain/TradeMind.KnowledgeHub.Domain.csproj" />
+  </ItemGroup>
+</Project>
