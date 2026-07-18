@@ -21,15 +21,25 @@ public sealed class KnowledgeFragment
 
     internal static KnowledgeFragment Create(Guid sourceId, int position, string content, float[] vector)
     {
+        Validate(content, vector);
+        var id = Guid.NewGuid();
+        return new KnowledgeFragment(id, sourceId, position, content.Trim(), Embedding.Create(id, vector));
+    }
+
+    public static KnowledgeFragment Restore(Guid id, Guid sourceId, int position, string content, float[] vector)
+    {
+        Validate(content, vector);
+        return new KnowledgeFragment(id, sourceId, position, content.Trim(), Embedding.Create(id, vector));
+    }
+
+    private static void Validate(string content, float[] vector)
+    {
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
         ArgumentNullException.ThrowIfNull(vector);
         if (vector.Length == 0)
         {
             throw new ArgumentException("Embedding vector cannot be empty.", nameof(vector));
         }
-
-        var id = Guid.NewGuid();
-        return new KnowledgeFragment(id, sourceId, position, content.Trim(), Embedding.Create(id, vector));
     }
 }
 
