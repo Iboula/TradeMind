@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Pgvector.EntityFrameworkCore;
 using TradeMind.Modules.KnowledgeHub.Application;
 
 namespace TradeMind.Modules.KnowledgeHub.Infrastructure;
@@ -16,8 +17,16 @@ public static class KnowledgeHubModule
         var connectionString = configuration.GetConnectionString("KnowledgeHub")
             ?? throw new InvalidOperationException("Connection string 'KnowledgeHub' is required.");
 
-        services.AddDbContext<KnowledgeHubDbContext>(options => options.UseNpgsql(connectionString));
-        services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+        services.AddDbContext<KnowledgeHubDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsql => npgsql.UseVector()));
+
+        services.AddSingleton(_ =>
+        {
+            var builder = new NpgsqlDataSourceBuilder(connectionString);
+            builder.UseVector();
+            return builder.Build();
+        });
+
         services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(ImportKnowledgeSourceCommand).Assembly));
         services.AddScoped<IKnowledgeSourceRepository, KnowledgeSourceRepository>();
         services.AddScoped<IKnowledgeHubUnitOfWork>(sp => sp.GetRequiredService<KnowledgeHubDbContext>());
