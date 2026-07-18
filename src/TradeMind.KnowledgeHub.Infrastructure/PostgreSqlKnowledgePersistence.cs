@@ -1,3 +1,5 @@
+using System.Data;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Pgvector;
@@ -84,24 +86,63 @@ public sealed class PostgreSqlKnowledgeSourceRepository(KnowledgeHubDbContext db
         int limit,
         CancellationToken cancellationToken)
     {
-        var queryVector = new Vector(embedding);
+        var vectorLiteral = $"[{string.Join(',', embedding.Select(value => value.ToString("R", CultureInfo.InvariantCulture)))}]";
+        var connection = dbContext.Database.GetDbConnection();
+        var shouldClose = connection.State != ConnectionState.Open;
 
-        var results = await (
-            from fragment in dbContext.KnowledgeFragments.AsNoTracking()
-            join source in dbContext.KnowledgeSources.AsNoTracking()
-                on fragment.KnowledgeSourceId equals source.Id
-            where source.Status == ProcessingStatus.Ready
-            orderby EF.Functions.CosineDistance(fragment.Embedding, queryVector)
-            select new KnowledgeSearchResult(
-                source.Id,
-                source.Title,
-                fragment.Id,
-                fragment.Sequence,
-                fragment.Content,
-                1d - EF.Functions.CosineDistance(fragment.Embedding, queryVector)))
-            .Take(limit)
-            .ToListAsync(cancellationToken);
+        if (shouldClose)
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
 
-        return results;
+        try
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT s.id,
+                       s.title,
+                       f.id,
+                       f.sequence,
+                       f.content,
+                       1 - (f.embedding <=> CAST(@embedding AS vector)) AS score
+                FROM knowledge_fragments f
+                INNER JOIN knowledge_sources s ON s.id = f.knowledge_source_id
+                WHERE s.status = 'Ready'
+                ORDER BY f.embedding <=> CAST(@embedding AS vector)
+                LIMIT @limit;
+                """;
+
+            var embeddingParameter = command.CreateParameter();
+            embeddingParameter.ParameterName = "embedding";
+            embeddingParameter.Value = vectorLiteral;
+            command.Parameters.Add(embeddingParameter);
+
+            var limitParameter = command.CreateParameter();
+            limitParameter.ParameterName = "limit";
+            limitParameter.Value = limit;
+            command.Parameters.Add(limitParameter);
+
+            var results = new List<KnowledgeSearchResult>();
+            await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+            while (await reader.ReadAsync(cancellationToken))
+            {
+                results.Add(new KnowledgeSearchResult(
+                    reader.GetGuid(0),
+                    reader.GetString(1),
+                    reader.GetGuid(2),
+                    reader.GetInt32(3),
+                    reader.GetString(4),
+                    reader.GetDouble(5)));
+            }
+
+            return results;
+        }
+        finally
+        {
+            if (shouldClose)
+            {
+                await connection.CloseAsync();
+            }
+        }
     }
 }
