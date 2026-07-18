@@ -1,4 +1,5 @@
 using System;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Pgvector;
 
@@ -6,6 +7,8 @@ using Pgvector;
 
 namespace TradeMind.KnowledgeHub.Infrastructure.Migrations;
 
+[DbContext(typeof(KnowledgeHubDbContext))]
+[Migration("20260718160000_InitialKnowledgeHub")]
 public partial class InitialKnowledgeHub : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
