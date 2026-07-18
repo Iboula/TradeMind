@@ -11,7 +11,7 @@ public interface IKnowledgeSearcher { Task<IReadOnlyList<KnowledgeSearchResult>>
 public interface IKnowledgeSourceRepository
 {
     Task AddAsync(KnowledgeSource source, CancellationToken ct);
-    Task<KnowledgeSource?> GetAsync(Guid id, CancellationToken ct);
+    Task<KnowledgeSourceDto?> GetAsync(Guid id, CancellationToken ct);
 }
 public interface IKnowledgeHubUnitOfWork { Task SaveChangesAsync(CancellationToken ct); }
 
