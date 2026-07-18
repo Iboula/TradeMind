@@ -8,13 +8,20 @@ public sealed class KnowledgeSource : AggregateRoot<Guid>
 
     private KnowledgeSource() : base(Guid.Empty) { }
 
-    private KnowledgeSource(Guid id, string name, string mediaType, DateTimeOffset createdOnUtc)
+    private KnowledgeSource(
+        Guid id,
+        string name,
+        string mediaType,
+        KnowledgeSourceStatus status,
+        DateTimeOffset createdOnUtc,
+        DateTimeOffset? indexedOnUtc)
         : base(id)
     {
         Name = name;
         MediaType = mediaType;
+        Status = status;
         CreatedOnUtc = createdOnUtc;
-        Status = KnowledgeSourceStatus.Imported;
+        IndexedOnUtc = indexedOnUtc;
     }
 
     public string Name { get; private set; } = string.Empty;
@@ -29,8 +36,29 @@ public sealed class KnowledgeSource : AggregateRoot<Guid>
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(mediaType);
 
-        var source = new KnowledgeSource(Guid.NewGuid(), name.Trim(), mediaType.Trim(), createdOnUtc);
+        var source = new KnowledgeSource(
+            Guid.NewGuid(),
+            name.Trim(),
+            mediaType.Trim(),
+            KnowledgeSourceStatus.Imported,
+            createdOnUtc,
+            null);
+
         source.Raise(new KnowledgeSourceImported(source.Id, source.Name, createdOnUtc));
+        return source;
+    }
+
+    public static KnowledgeSource Restore(
+        Guid id,
+        string name,
+        string mediaType,
+        KnowledgeSourceStatus status,
+        DateTimeOffset createdOnUtc,
+        DateTimeOffset? indexedOnUtc,
+        IEnumerable<KnowledgeFragment> fragments)
+    {
+        var source = new KnowledgeSource(id, name, mediaType, status, createdOnUtc, indexedOnUtc);
+        source._fragments.AddRange(fragments.OrderBy(static fragment => fragment.Position));
         return source;
     }
 
@@ -39,7 +67,11 @@ public sealed class KnowledgeSource : AggregateRoot<Guid>
         ArgumentNullException.ThrowIfNull(contents);
         ArgumentNullException.ThrowIfNull(embeddings);
 
-        var normalized = contents.Where(static value => !string.IsNullOrWhiteSpace(value)).Select(static value => value.Trim()).ToArray();
+        var normalized = contents
+            .Where(static value => !string.IsNullOrWhiteSpace(value))
+            .Select(static value => value.Trim())
+            .ToArray();
+
         if (normalized.Length != embeddings.Count)
         {
             throw new ArgumentException("Every fragment must have exactly one embedding.", nameof(embeddings));
