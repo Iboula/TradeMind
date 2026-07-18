@@ -15,14 +15,22 @@ jobs:
         with:
           dotnet-version: 9.0.x
       - name: Restore
-        run: dotnet restore TradeMind.sln --verbosity minimal
+        run: dotnet restore TradeMind.sln --verbosity quiet
       - name: Build
         shell: bash
         run: |
-          set -o pipefail
-          dotnet build TradeMind.sln --configuration Release --no-restore --verbosity minimal 2>&1 | tee build.log
+          if ! dotnet build TradeMind.sln --configuration Release --no-restore --verbosity minimal > build.log 2>&1; then
+            grep -Ei "error|failed" build.log || true
+            tail -n 80 build.log
+            exit 1
+          fi
+          tail -n 20 build.log
       - name: Test
         shell: bash
         run: |
-          set -o pipefail
-          dotnet test TradeMind.sln --configuration Release --no-build --verbosity minimal 2>&1 | tee test.log
+          if ! dotnet test TradeMind.sln --configuration Release --no-build --verbosity minimal > test.log 2>&1; then
+            grep -Ei "error|failed|failure" test.log || true
+            tail -n 80 test.log
+            exit 1
+          fi
+          tail -n 30 test.log
