@@ -1,0 +1,32 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: trademind
+      POSTGRES_USER: trademind
+      POSTGRES_PASSWORD: trademind
+    ports:
+      - "5432:5432"
+    volumes:
+      - trademind-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trademind -d trademind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: src/TradeMind.Api/Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__KnowledgeHub: Host=postgres;Port=5432;Database=trademind;Username=trademind;Password=trademind
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  trademind-postgres:
