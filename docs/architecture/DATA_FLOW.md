@@ -1,0 +1,57 @@
+# Data Flow
+
+This document describes the current KnowledgeHub data flows.
+
+## API startup
+
+1. ASP.NET Core builds the application.
+2. `AddKnowledgeHub` registers KnowledgeHub services.
+3. A scoped `KnowledgeHubDbContext` is created.
+4. EF Core applies pending migrations.
+5. The API maps health and KnowledgeHub endpoints.
+
+## Source ingestion
+
+1. A client uploads a file to `POST /knowledge/sources`.
+2. The API rejects empty files.
+3. The API opens the uploaded stream and sends an `IngestKnowledgeSourceRequest` to `KnowledgeHubService`.
+4. The service copies the stream into memory and computes a SHA-256 content hash.
+5. The repository checks whether the hash already exists.
+6. The service creates a `KnowledgeSource`.
+7. The source enters `Processing` state.
+8. The extractor reads supported text from `.txt` or `.md`.
+9. The fragmenter splits text into sliding-window fragments.
+10. The embedding generator creates a 64-dimensional embedding for each fragment.
+11. The source adds fragments while processing.
+12. The source is marked `Ready`.
+13. The repository saves changes through EF Core and PostgreSQL.
+
+If extraction or processing fails, the source is marked `Failed`, the failure reason is stored, and the exception is rethrown.
+
+## Source retrieval
+
+1. A client calls `GET /knowledge/sources/{id}`.
+2. The API calls `KnowledgeHubService.GetAsync`.
+3. The repository queries PostgreSQL with `AsNoTracking` and includes fragments.
+4. The API returns source metadata and fragment summaries, or `404` when no source exists.
+
+## Semantic search
+
+1. A client calls `GET /knowledge/search?q=...`.
+2. The service validates the query and clamps the result limit.
+3. The embedding generator creates a query embedding.
+4. The PostgreSQL repository executes parameterized SQL against pgvector.
+5. PostgreSQL orders fragments by cosine distance using `<=>`.
+6. The repository returns `KnowledgeSearchResult` records with a similarity score.
+
+## Integration test flow
+
+1. Testcontainers starts `pgvector/pgvector:pg17`.
+2. The test fixture creates `KnowledgeHubDbContext`.
+3. EF Core applies migrations.
+4. Tests verify schema, extension, HNSW index, persistence, retrieval, and vector search.
+5. The container is disposed after the test fixture completes.
+
+## Future AI provider flow
+
+Future OpenAI or other providers should implement `IEmbeddingGenerator`. The Application layer should keep the same contract while Infrastructure owns provider credentials, retries, and SDK details.
