@@ -2,6 +2,7 @@ using System.Globalization;
 using Dapper;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Pgvector;
 using TradeMind.Modules.KnowledgeHub.Application;
 using TradeMind.Modules.KnowledgeHub.Domain;
 
@@ -9,13 +10,14 @@ namespace TradeMind.Modules.KnowledgeHub.Infrastructure;
 
 internal sealed class KnowledgeSourceRow { public Guid Id { get; set; } public string FileName { get; set; } = ""; public string MediaType { get; set; } = ""; public string Status { get; set; } = ""; public DateTimeOffset CreatedAtUtc { get; set; } public List<KnowledgeFragmentRow> Fragments { get; set; } = []; }
 internal sealed class KnowledgeFragmentRow { public Guid Id { get; set; } public Guid SourceId { get; set; } public int Position { get; set; } public string Content { get; set; } = ""; public KnowledgeSourceRow Source { get; set; } = null!; public EmbeddingRow Embedding { get; set; } = null!; }
-internal sealed class EmbeddingRow { public Guid Id { get; set; } public Guid FragmentId { get; set; } public string Values { get; set; } = ""; public KnowledgeFragmentRow Fragment { get; set; } = null!; }
+internal sealed class EmbeddingRow { public Guid Id { get; set; } public Guid FragmentId { get; set; } public Vector Values { get; set; } = new(new float[64]); public KnowledgeFragmentRow Fragment { get; set; } = null!; }
 
 internal sealed class KnowledgeHubDbContext(DbContextOptions<KnowledgeHubDbContext> options) : DbContext(options), IKnowledgeHubUnitOfWork
 {
     public DbSet<KnowledgeSourceRow> Sources => Set<KnowledgeSourceRow>();
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresExtension("vector");
         modelBuilder.Entity<KnowledgeSourceRow>(b => { b.ToTable("knowledge_sources"); b.HasKey(x => x.Id); b.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(512); b.Property(x => x.MediaType).HasColumnName("media_type").HasMaxLength(128); b.Property(x => x.Status).HasColumnName("status").HasMaxLength(32); b.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc"); });
         modelBuilder.Entity<KnowledgeFragmentRow>(b => { b.ToTable("knowledge_fragments"); b.HasKey(x => x.Id); b.Property(x => x.SourceId).HasColumnName("source_id"); b.Property(x => x.Position).HasColumnName("position"); b.Property(x => x.Content).HasColumnName("content"); b.HasOne(x => x.Source).WithMany(x => x.Fragments).HasForeignKey(x => x.SourceId).OnDelete(DeleteBehavior.Cascade); });
         modelBuilder.Entity<EmbeddingRow>(b => { b.ToTable("embeddings"); b.HasKey(x => x.Id); b.Property(x => x.FragmentId).HasColumnName("fragment_id"); b.Property(x => x.Values).HasColumnName("values").HasColumnType("vector(64)"); b.HasOne(x => x.Fragment).WithOne(x => x.Embedding).HasForeignKey<EmbeddingRow>(x => x.FragmentId).OnDelete(DeleteBehavior.Cascade); });
@@ -27,7 +29,7 @@ internal sealed class KnowledgeSourceRepository(KnowledgeHubDbContext db) : IKno
 {
     public Task AddAsync(KnowledgeSource source, CancellationToken ct)
     {
-        db.Add(new KnowledgeSourceRow { Id = source.Id, FileName = source.FileName, MediaType = source.MediaType, Status = source.Status.ToString(), CreatedAtUtc = source.CreatedAtUtc, Fragments = source.Fragments.Select(f => new KnowledgeFragmentRow { Id = f.Id, SourceId = source.Id, Position = f.Position, Content = f.Content, Embedding = new EmbeddingRow { Id = f.Embedding!.Id, FragmentId = f.Id, Values = ToVector(f.Embedding.Values) } }).ToList() });
+        db.Add(new KnowledgeSourceRow { Id = source.Id, FileName = source.FileName, MediaType = source.MediaType, Status = source.Status.ToString(), CreatedAtUtc = source.CreatedAtUtc, Fragments = source.Fragments.Select(f => new KnowledgeFragmentRow { Id = f.Id, SourceId = source.Id, Position = f.Position, Content = f.Content, Embedding = new EmbeddingRow { Id = f.Embedding!.Id, FragmentId = f.Id, Values = new Vector(f.Embedding.Values) } }).ToList() });
         return Task.CompletedTask;
     }
 
