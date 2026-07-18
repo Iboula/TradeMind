@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using Pgvector;
 using Pgvector.EntityFrameworkCore;
 using TradeMind.Modules.KnowledgeHub.Application;
 
