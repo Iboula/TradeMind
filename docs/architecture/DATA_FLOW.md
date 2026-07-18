@@ -57,3 +57,16 @@ If extraction or processing fails, the source is marked `Failed`, the failure re
 OpenAI and future providers implement provider-agnostic interfaces in `TradeMind.AI.Abstractions`. Infrastructure owns credentials, SDK clients, logging, and exception translation.
 
 For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` into the existing `IEmbeddingGenerator` port. The current default remains deterministic 64-dimensional embeddings so it continues to match the existing `vector(64)` schema until a future migration intentionally changes embedding dimensions.
+
+## AI orchestration flow
+
+1. A product module creates an `AIOrchestrationRequest` with a logical scenario, user message, optional system instruction, optional model controls, metadata, and correlation id.
+2. `IAIOrchestrator` creates a per-request `AIOrchestrationContext`.
+3. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
+4. `RequestValidationStep` validates structural input.
+5. `PromptConstructionStep` runs context contributors if any exist and builds a provider-agnostic `ChatRequest`.
+6. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
+7. `ProviderExecutionStep` calls `IChatProvider` and passes the caller's cancellation token.
+8. `ResponseNormalizationStep` returns `AIOrchestrationResponse` with provider, model, usage, duration, correlation id, response id, and executed steps.
+
+The flow does not call KnowledgeHub semantic search yet. KnowledgeHub and Memory can later contribute bounded context through `IAIContextContributor`.

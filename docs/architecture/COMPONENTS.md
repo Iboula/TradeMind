@@ -77,6 +77,21 @@ Responsibilities:
 - Define provider metadata and capabilities.
 - Avoid all concrete AI SDK dependencies.
 
+## AI Application
+
+Project: `src/TradeMind.AI.Application`
+
+Responsibilities:
+
+- Expose `IAIOrchestrator`.
+- Validate normalized AI orchestration requests.
+- Build provider-agnostic `ChatRequest` values.
+- Execute an ordered DI-driven orchestration pipeline.
+- Check provider chat capability through metadata.
+- Call `IChatProvider` without depending on provider infrastructure.
+- Normalize AI responses and record executed steps.
+- Provide `IAIContextContributor` for future Memory and KnowledgeHub context enrichment.
+
 ## AI Infrastructure
 
 Project: `src/TradeMind.AI.Infrastructure`

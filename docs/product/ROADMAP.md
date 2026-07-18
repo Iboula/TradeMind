@@ -19,6 +19,8 @@ Introduce production AI provider integrations behind abstractions.
 
 - Add provider-agnostic chat and embedding contracts.
 - Add OpenAI chat and embedding providers behind the AI abstraction layer.
+- Add provider-agnostic AI orchestration for validation, prompt construction, capability checks, execution, response normalization, and logging.
+- Provide context contribution extension points for future KnowledgeHub and Memory enrichment.
 - Add provider configuration without committing secrets.
 - Add retry, timeout, rate-limit, and observability patterns.
 - Support provider swapping for cost, quality, or compliance.

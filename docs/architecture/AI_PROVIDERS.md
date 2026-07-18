@@ -7,6 +7,7 @@ TradeMind isolates AI providers behind provider-agnostic contracts.
 The AI foundation has two projects:
 
 - `TradeMind.AI.Abstractions`: public contracts with no provider SDK dependency.
+- `TradeMind.AI.Application`: provider-agnostic orchestration, prompt construction, validation, capability checks, and response normalization.
 - `TradeMind.AI.Infrastructure`: concrete provider adapters, options, validation, logging, and SDK integration.
 
 Domain projects must not reference AI SDKs. Application code should depend on abstractions or existing module ports. Infrastructure owns concrete clients and provider-specific mapping.
@@ -62,6 +63,19 @@ Provider selection uses configuration:
 - `IAIProviderMetadata -> OpenAIProviderMetadata`
 
 Provider names are compared without case sensitivity. Empty or unknown provider values fail explicitly.
+
+## Orchestration usage
+
+AI product features should call `IAIOrchestrator` rather than calling `IChatProvider` directly. The orchestrator builds a `ChatRequest`, validates chat capability through `IAIProviderMetadata`, calls the active provider, and returns `AIOrchestrationResponse`.
+
+Composition can register providers and orchestration together:
+
+```csharp
+services.AddTradeMindAI(configuration);
+services.AddTradeMindAIOrchestration();
+```
+
+The orchestration layer does not select concrete SDK clients. It consumes the provider already registered by Infrastructure.
 
 ## Capabilities
 

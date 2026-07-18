@@ -15,6 +15,10 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.KnowledgeHub.Domain`: KnowledgeHub domain model.
 - `src/TradeMind.KnowledgeHub.Application`: KnowledgeHub use cases and ports.
 - `src/TradeMind.KnowledgeHub.Infrastructure`: KnowledgeHub adapters and persistence.
+- `src/TradeMind.AI.Abstractions`: provider-agnostic AI contracts.
+- `src/TradeMind.AI.Application`: AI orchestration, prompt construction, validation, capability checks, and response normalization.
+- `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
+- `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
 - `tests/TradeMind.KnowledgeHub.Tests`: unit tests.
 - `tests/TradeMind.KnowledgeHub.IntegrationTests`: PostgreSQL/pgvector integration tests.
 - `docs`: architecture, engineering, ADR, and product documentation.
@@ -63,6 +67,15 @@ dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
 The API expects a `ConnectionStrings:KnowledgeHub` connection string. Local development may use appsettings, user secrets, environment variables, or Docker Compose defaults. Real secrets must not be committed.
 
 AI provider configuration lives under the `AI` section. The checked-in OpenAI API key value is intentionally empty. Use environment variable `AI__OpenAI__ApiKey`, user secrets, or a future secret store for real credentials.
+
+AI product features should compose provider and orchestration registrations together:
+
+```csharp
+services.AddTradeMindAI(configuration);
+services.AddTradeMindAIOrchestration();
+```
+
+Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls.
 
 ## Migrations
 
