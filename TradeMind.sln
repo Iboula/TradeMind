@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api", "src/TradeMind.Api/TradeMind.Api.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D104}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Tests", "tests/TradeMind.KnowledgeHub.Tests/TradeMind.KnowledgeHub.Tests.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D105}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -32,5 +34,9 @@ Global
     {A5D7E105-1B33-41D9-9879-514E82A0D104}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {A5D7E105-1B33-41D9-9879-514E82A0D104}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {A5D7E105-1B33-41D9-9879-514E82A0D104}.Release|Any CPU.Build.0 = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {A5D7E105-1B33-41D9-9879-514E82A0D105}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal
