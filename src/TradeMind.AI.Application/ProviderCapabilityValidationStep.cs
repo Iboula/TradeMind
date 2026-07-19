@@ -11,10 +11,12 @@ public sealed class ProviderCapabilityValidationStep : IAIOrchestrationStep
         _providerMetadata = providerMetadata;
     }
 
+    public string Name => AIOrchestrationStepNames.ProviderCapabilityValidation;
+
     public int Order => 300;
 
     public Task ExecuteAsync(
-        AIOrchestrationContext context,
+        AIExecutionContext context,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -24,8 +26,8 @@ public sealed class ProviderCapabilityValidationStep : IAIOrchestrationStep
             throw new AIProviderCapabilityException(
                 _providerMetadata.ProviderName,
                 $"AI provider '{_providerMetadata.ProviderName}' does not support chat completion.",
-                context.CorrelationId,
-                nameof(ProviderCapabilityValidationStep));
+                context.Session.CorrelationId,
+                Name);
         }
 
         return Task.CompletedTask;

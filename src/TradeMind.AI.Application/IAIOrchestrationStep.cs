@@ -2,9 +2,11 @@ namespace TradeMind.AI.Application;
 
 public interface IAIOrchestrationStep
 {
+    string Name { get; }
+
     int Order { get; }
 
     Task ExecuteAsync(
-        AIOrchestrationContext context,
+        AIExecutionContext context,
         CancellationToken cancellationToken);
 }

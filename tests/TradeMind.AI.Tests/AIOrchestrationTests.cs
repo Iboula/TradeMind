@@ -60,11 +60,11 @@ public sealed class AIOrchestrationTests
 
         Assert.Equal(
             [
-                nameof(RequestValidationStep),
-                nameof(PromptConstructionStep),
-                nameof(ProviderCapabilityValidationStep),
-                nameof(ProviderExecutionStep),
-                nameof(ResponseNormalizationStep)
+                AIOrchestrationStepNames.RequestValidation,
+                AIOrchestrationStepNames.PromptConstruction,
+                AIOrchestrationStepNames.ProviderCapabilityValidation,
+                AIOrchestrationStepNames.ProviderExecution,
+                AIOrchestrationStepNames.ResponseNormalization
             ],
             response.ExecutedSteps);
     }
@@ -77,8 +77,8 @@ public sealed class AIOrchestrationTests
         var response = await provider.GetRequiredService<IAIOrchestrator>()
             .ExecuteAsync(ValidRequest(), CancellationToken.None);
 
-        Assert.Contains(nameof(ProviderExecutionStep), response.ExecutedSteps);
-        Assert.Contains(nameof(ResponseNormalizationStep), response.ExecutedSteps);
+        Assert.Contains(AIOrchestrationStepNames.ProviderExecution, response.ExecutedSteps);
+        Assert.Contains(AIOrchestrationStepNames.ResponseNormalization, response.ExecutedSteps);
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public sealed class AIOrchestrationTests
                 .ExecuteAsync(ValidRequest(), CancellationToken.None));
 
         Assert.Same(providerException, exception.InnerException);
-        Assert.Equal(nameof(ProviderExecutionStep), exception.StepName);
+        Assert.Equal(AIOrchestrationStepNames.ProviderExecution, exception.StepName);
     }
 
     [Fact]
@@ -227,11 +227,122 @@ public sealed class AIOrchestrationTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_ShouldReturnSessionId()
+    {
+        using var provider = CreateOrchestrationProvider();
+
+        var response = await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(ValidRequest(sessionId: "session-123"), CancellationToken.None);
+
+        Assert.Equal("session-123", response.SessionId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldReturnConversationId()
+    {
+        using var provider = CreateOrchestrationProvider();
+
+        var response = await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(ValidRequest(conversationId: "conversation-123"), CancellationToken.None);
+
+        Assert.Equal("conversation-123", response.ConversationId);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldPropagateTenantUserAndAgentToProviderMetadata()
+    {
+        var chatProvider = new FakeChatProvider();
+        using var provider = CreateOrchestrationProvider(chatProvider);
+
+        await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(
+                ValidRequest(
+                    tenantId: "tenant-1",
+                    userId: "user-1",
+                    agentId: "agent-1",
+                    conversationId: "conversation-1"),
+                CancellationToken.None);
+
+        Assert.NotNull(chatProvider.LastRequest);
+        Assert.Equal("tenant-1", chatProvider.LastRequest.Metadata?["TenantId"]);
+        Assert.Equal("user-1", chatProvider.LastRequest.Metadata?["UserId"]);
+        Assert.Equal("agent-1", chatProvider.LastRequest.Metadata?["AgentId"]);
+        Assert.Equal("conversation-1", chatProvider.LastRequest.Metadata?["ConversationId"]);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldMarkCompletedOnSuccess()
+    {
+        using var provider = CreateOrchestrationProvider();
+
+        var response = await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(ValidRequest(), CancellationToken.None);
+
+        Assert.Equal(AIExecutionState.Completed, response.State);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldMarkFailedOnProviderError()
+    {
+        var loggerProvider = new RecordingLoggerProvider();
+        using var provider = CreateOrchestrationProvider(
+            new FakeChatProvider(new InvalidOperationException("provider unavailable")),
+            loggerProvider: loggerProvider);
+
+        await Assert.ThrowsAsync<AIOrchestrationException>(() =>
+            provider.GetRequiredService<IAIOrchestrator>()
+                .ExecuteAsync(ValidRequest(), CancellationToken.None));
+
+        Assert.Contains("Failed", string.Join(Environment.NewLine, loggerProvider.Messages), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldMarkCancelledAndPropagateOperationCanceledException()
+    {
+        var loggerProvider = new RecordingLoggerProvider();
+        using var provider = CreateOrchestrationProvider(
+            new FakeChatProvider(new OperationCanceledException()),
+            loggerProvider: loggerProvider);
+
+        await Assert.ThrowsAsync<OperationCanceledException>(() =>
+            provider.GetRequiredService<IAIOrchestrator>()
+                .ExecuteAsync(ValidRequest(), CancellationToken.None));
+
+        Assert.Contains("Cancelled", string.Join(Environment.NewLine, loggerProvider.Messages), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldRecordProviderDurationAndTotalDuration()
+    {
+        using var provider = CreateOrchestrationProvider();
+
+        var response = await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(ValidRequest(), CancellationToken.None);
+
+        Assert.NotNull(response.ProviderDuration);
+        Assert.True(response.ProviderDuration >= TimeSpan.Zero);
+        Assert.True(response.TotalDuration >= TimeSpan.Zero);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ShouldRecordEachStepOnce()
+    {
+        using var provider = CreateOrchestrationProvider();
+
+        var response = await provider.GetRequiredService<IAIOrchestrator>()
+            .ExecuteAsync(ValidRequest(), CancellationToken.None);
+
+        Assert.Equal(response.ExecutedSteps.Count, response.ExecutedSteps.Distinct(StringComparer.Ordinal).Count());
+    }
+
+    [Fact]
     public void AddTradeMindAIOrchestration_ShouldResolveOrchestratorAndSteps()
     {
         using var provider = CreateOrchestrationProvider();
 
         Assert.NotNull(provider.GetRequiredService<IAIOrchestrator>());
+        Assert.NotNull(provider.GetRequiredService<IAISessionFactory>());
+        Assert.NotNull(provider.GetRequiredService<TimeProvider>());
         Assert.Equal(5, provider.GetServices<IAIOrchestrationStep>().Count());
     }
 
@@ -308,7 +419,12 @@ public sealed class AIOrchestrationTests
         float? temperature = 0.2f,
         int? maxOutputTokens = 256,
         IReadOnlyDictionary<string, string>? metadata = null,
-        string? correlationId = "corr-123")
+        string? correlationId = "corr-123",
+        string? sessionId = null,
+        string? conversationId = null,
+        string? tenantId = null,
+        string? userId = null,
+        string? agentId = null)
     {
         return new AIOrchestrationRequest(
             "Answer with concise risk-aware language.",
@@ -318,7 +434,12 @@ public sealed class AIOrchestrationTests
             temperature,
             maxOutputTokens,
             metadata,
-            correlationId);
+            correlationId)
+        {
+            SessionId = sessionId,
+            ConversationId = conversationId,
+            Identity = new AIIdentityContext(tenantId, userId, agentId)
+        };
     }
 
     private static IConfiguration OpenAIConfiguration(

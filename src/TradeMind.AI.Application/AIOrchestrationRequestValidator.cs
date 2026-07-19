@@ -37,6 +37,16 @@ public sealed class AIOrchestrationRequestValidator
             errors.Add($"CorrelationId must be {MaximumCorrelationIdLength} characters or fewer.");
         }
 
+        if (request.SessionId is { Length: > MaximumCorrelationIdLength })
+        {
+            errors.Add($"SessionId must be {MaximumCorrelationIdLength} characters or fewer.");
+        }
+
+        if (request.ConversationId is { Length: > MaximumCorrelationIdLength })
+        {
+            errors.Add($"ConversationId must be {MaximumCorrelationIdLength} characters or fewer.");
+        }
+
         if (errors.Count > 0)
         {
             throw new AIOrchestrationValidationException(errors, correlationId, stepName);

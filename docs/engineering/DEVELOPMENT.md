@@ -75,7 +75,7 @@ services.AddTradeMindAI(configuration);
 services.AddTradeMindAIOrchestration();
 ```
 
-Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls.
+Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls. Tests that verify AI session timestamps or execution duration should inject a controlled `TimeProvider`.
 
 ## Migrations
 

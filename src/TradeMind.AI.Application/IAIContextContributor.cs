@@ -3,6 +3,6 @@ namespace TradeMind.AI.Application;
 public interface IAIContextContributor
 {
     Task ContributeAsync(
-        AIOrchestrationContext context,
+        AIExecutionContext context,
         CancellationToken cancellationToken);
 }

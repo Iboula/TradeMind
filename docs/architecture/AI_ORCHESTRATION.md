@@ -28,9 +28,9 @@ Task<AIOrchestrationResponse> ExecuteAsync(
     CancellationToken cancellationToken);
 ```
 
-`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, and optional correlation id.
+`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, and optional identity context.
 
-`AIOrchestrationResponse` carries text content, provider, model, token usage, correlation id, total duration, executed steps, UTC generation date, and optional response id.
+`AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, and optional response id.
 
 ## Pipeline
 
@@ -50,17 +50,17 @@ flowchart LR
 
 `RequestValidationStep` validates non-empty user message, non-empty scenario, temperature range, positive token limit, and reasonable correlation id length.
 
-`PromptConstructionStep` runs registered `IAIContextContributor` instances, builds a `ChatRequest` with `IPromptBuilder`, and attaches correlation and scenario metadata.
+`PromptConstructionStep` runs registered `IAIContextContributor` instances, builds a `ChatRequest` with `IPromptBuilder`, and attaches safe session, correlation, scenario, conversation, tenant, user, and agent metadata when present.
 
 `ProviderCapabilityValidationStep` checks `IAIProviderMetadata.Capabilities.SupportsChat`. It does not inspect concrete provider types.
 
 `ProviderExecutionStep` calls `IChatProvider.CompleteAsync`, passes the caller's `CancellationToken`, measures provider duration, and stores the normalized provider response.
 
-`ResponseNormalizationStep` copies provider response content, provider name, model, usage, response id, generated date, total duration, and executed step names into `AIOrchestrationResponse`.
+`ResponseNormalizationStep` copies provider response content, provider name, model, usage, response id, execution identifiers, durations, state, and executed step names into `AIOrchestrationResponse`.
 
 ## Context
 
-`AIOrchestrationContext` is the per-request working state. It contains the original request, correlation id, start date, `ChatRequest`, `ChatResponse`, final response, executed step list, provider duration, and a typed `Items` dictionary for extension data.
+`AIExecutionContext` is the per-request working state. It contains `AISession`, the original request, `ChatRequest`, `ChatResponse`, final response, metrics, executed step list, state, optional safe error, and a controlled typed `Items` dictionary for extension data.
 
 The context does not contain services and must not become a service locator.
 
@@ -82,7 +82,7 @@ Capabilities are checked through `IAIProviderMetadata`. Chat orchestration requi
 
 ## Logging
 
-The orchestrator logs start, completion, cancellation, and failure using structured logs. Logs include scenario, correlation id, logical model, step count, provider, total duration, and failed step where relevant.
+The orchestrator logs session creation, start, step start, step completion, provider execution, completion, cancellation, and failure using structured logs. Logs include session id, correlation id, conversation id, tenant id, user id, agent id, scenario, logical model, step count, provider, state, total duration, and failed step where relevant.
 
 Logs must not include full prompts, user messages, responses, API keys, document content, embeddings, or secrets.
 

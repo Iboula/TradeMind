@@ -2,10 +2,12 @@ namespace TradeMind.AI.Application;
 
 public sealed class ResponseNormalizationStep : IAIOrchestrationStep
 {
+    public string Name => AIOrchestrationStepNames.ResponseNormalization;
+
     public int Order => 500;
 
     public Task ExecuteAsync(
-        AIOrchestrationContext context,
+        AIExecutionContext context,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -13,19 +15,24 @@ public sealed class ResponseNormalizationStep : IAIOrchestrationStep
         var chatResponse = context.ChatResponse
             ?? throw new AIOrchestrationException(
                 "Chat response has not been produced.",
-                context.CorrelationId,
-                nameof(ResponseNormalizationStep));
+                context.Session.CorrelationId,
+                Name);
 
-        context.FinalResponse = new AIOrchestrationResponse(
-            chatResponse.Content,
+        context.SetFinalResponse(new AIOrchestrationResponse(
+            context.Session.SessionId,
+            context.Session.ConversationId,
+            context.Session.CorrelationId,
+            context.Session.Scenario,
             chatResponse.ProviderName,
             chatResponse.Model,
+            chatResponse.Content,
             chatResponse.Usage,
-            context.CorrelationId,
-            DateTimeOffset.UtcNow - context.StartedAtUtc,
+            TimeSpan.Zero,
+            context.Metrics.ProviderDuration,
             context.ExecutedSteps.ToArray(),
             chatResponse.GeneratedAtUtc,
-            chatResponse.ResponseId);
+            context.State,
+            chatResponse.ResponseId));
 
         return Task.CompletedTask;
     }

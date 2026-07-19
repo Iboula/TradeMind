@@ -84,9 +84,12 @@ Project: `src/TradeMind.AI.Application`
 Responsibilities:
 
 - Expose `IAIOrchestrator`.
+- Create `AISession` values through `IAISessionFactory`.
+- Carry tenant, user, agent, conversation, and correlation identity through `AIIdentityContext`.
 - Validate normalized AI orchestration requests.
 - Build provider-agnostic `ChatRequest` values.
 - Execute an ordered DI-driven orchestration pipeline.
+- Track `AIExecutionContext`, `AIExecutionState`, `AIExecutionMetrics`, and `AIExecutionError`.
 - Check provider chat capability through metadata.
 - Call `IChatProvider` without depending on provider infrastructure.
 - Normalize AI responses and record executed steps.

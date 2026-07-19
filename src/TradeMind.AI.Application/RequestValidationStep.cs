@@ -9,14 +9,16 @@ public sealed class RequestValidationStep : IAIOrchestrationStep
         _validator = validator;
     }
 
+    public string Name => AIOrchestrationStepNames.RequestValidation;
+
     public int Order => 100;
 
     public Task ExecuteAsync(
-        AIOrchestrationContext context,
+        AIExecutionContext context,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        _validator.Validate(context.Request, context.CorrelationId, nameof(RequestValidationStep));
+        _validator.Validate(context.Request, context.Session.CorrelationId, Name);
         return Task.CompletedTask;
     }
 }

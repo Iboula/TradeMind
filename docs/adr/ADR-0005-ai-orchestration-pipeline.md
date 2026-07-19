@@ -28,7 +28,7 @@ Steps execute sequentially and receive the caller's `CancellationToken`. The orc
 
 `IPromptBuilder` builds `ChatRequest` instances from `TradeMind.AI.Abstractions`. It preserves message order, ignores absent optional content, and requires at least one user message.
 
-`IAIContextContributor` is introduced as a small extension point. Memory, KnowledgeHub, or other modules may later enrich `AIOrchestrationContext` before prompt construction without coupling the AI application layer to module infrastructure. The pipeline works with no contributors registered.
+`IAIContextContributor` is introduced as a small extension point. Memory, KnowledgeHub, or other modules may later enrich the AI execution context before prompt construction without coupling the AI application layer to module infrastructure. The pipeline works with no contributors registered.
 
 ## Error handling
 

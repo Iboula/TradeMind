@@ -60,13 +60,15 @@ For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` 
 
 ## AI orchestration flow
 
-1. A product module creates an `AIOrchestrationRequest` with a logical scenario, user message, optional system instruction, optional model controls, metadata, and correlation id.
-2. `IAIOrchestrator` creates a per-request `AIOrchestrationContext`.
-3. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
-4. `RequestValidationStep` validates structural input.
-5. `PromptConstructionStep` runs context contributors if any exist and builds a provider-agnostic `ChatRequest`.
-6. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
-7. `ProviderExecutionStep` calls `IChatProvider` and passes the caller's cancellation token.
-8. `ResponseNormalizationStep` returns `AIOrchestrationResponse` with provider, model, usage, duration, correlation id, response id, and executed steps.
+1. A product module creates an `AIOrchestrationRequest` with a logical scenario, user message, optional system instruction, optional model controls, metadata, optional session id, optional conversation id, optional correlation id, and optional identity context.
+2. `IAISessionFactory` creates `AISession`, generating missing session and correlation identifiers with `TimeProvider`.
+3. `IAIOrchestrator` creates `AIExecutionContext` and moves it from `Created` to `Running`.
+4. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
+5. `RequestValidationStep` validates structural input.
+6. `PromptConstructionStep` runs context contributors if any exist and builds a provider-agnostic `ChatRequest`.
+7. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
+8. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
+9. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, and executed steps.
+10. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
 
 The flow does not call KnowledgeHub semantic search yet. KnowledgeHub and Memory can later contribute bounded context through `IAIContextContributor`.
