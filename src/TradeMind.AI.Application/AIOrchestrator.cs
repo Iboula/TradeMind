@@ -130,6 +130,30 @@ public sealed class AIOrchestrator : IAIOrchestrator
                 session.CorrelationId);
             throw;
         }
+        catch (PromptEngineException exception)
+        {
+            context.Fail(
+                new AIExecutionError(
+                    "AI_PROMPT_RENDERING_FAILED",
+                    exception.Message,
+                    _timeProvider.GetUtcNow(),
+                    currentStep,
+                    context.Metrics.ProviderName,
+                    exceptionType: exception.GetType().Name),
+                _timeProvider.GetUtcNow());
+
+            _logger.LogError(
+                exception,
+                "AI orchestration prompt rendering failed for session {SessionId}, scenario {Scenario}, at step {StepName}, state {State}, template {TemplateId}, version {Version}, and correlation id {CorrelationId}",
+                session.SessionId,
+                session.Scenario,
+                currentStep,
+                context.State,
+                exception.TemplateId.Value,
+                exception.Version?.ToString(),
+                session.CorrelationId);
+            throw;
+        }
         catch (Exception exception)
         {
             var orchestrationException = new AIOrchestrationException(

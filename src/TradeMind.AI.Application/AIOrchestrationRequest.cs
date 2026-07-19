@@ -19,6 +19,7 @@ public sealed record AIOrchestrationRequest
         Temperature = temperature;
         MaxOutputTokens = maxOutputTokens;
         Metadata = CopyMetadata(metadata);
+        PromptVariables = new Dictionary<string, string>();
         CorrelationId = correlationId;
         Identity = AIIdentityContext.Empty;
     }
@@ -36,6 +37,12 @@ public sealed record AIOrchestrationRequest
     public int? MaxOutputTokens { get; init; }
 
     public IReadOnlyDictionary<string, string> Metadata { get; init; }
+
+    public PromptTemplateId? PromptTemplateId { get; init; }
+
+    public PromptTemplateVersion? PromptTemplateVersion { get; init; }
+
+    public IReadOnlyDictionary<string, string> PromptVariables { get; init; }
 
     public string? CorrelationId { get; init; }
 

@@ -88,6 +88,7 @@ Responsibilities:
 - Carry tenant, user, agent, conversation, and correlation identity through `AIIdentityContext`.
 - Validate normalized AI orchestration requests.
 - Build provider-agnostic `ChatRequest` values.
+- Define, version, validate, and render provider-agnostic prompt templates through the Prompt Engine.
 - Execute an ordered DI-driven orchestration pipeline.
 - Track `AIExecutionContext`, `AIExecutionState`, `AIExecutionMetrics`, and `AIExecutionError`.
 - Check provider chat capability through metadata.

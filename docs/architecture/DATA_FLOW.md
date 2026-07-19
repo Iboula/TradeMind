@@ -65,10 +65,21 @@ For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` 
 3. `IAIOrchestrator` creates `AIExecutionContext` and moves it from `Created` to `Running`.
 4. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
 5. `RequestValidationStep` validates structural input.
-6. `PromptConstructionStep` runs context contributors if any exist and builds a provider-agnostic `ChatRequest`.
+6. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, and builds a provider-agnostic `ChatRequest`.
 7. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
 8. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
 9. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, and executed steps.
 10. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
 
 The flow does not call KnowledgeHub semantic search yet. KnowledgeHub and Memory can later contribute bounded context through `IAIContextContributor`.
+
+## Prompt rendering flow
+
+1. A caller supplies `PromptTemplateId`, optional version, and prompt variables on `AIOrchestrationRequest`.
+2. `PromptConstructionStep` calls `IPromptRenderer`.
+3. The renderer resolves the template from `IPromptTemplateRegistry`.
+4. The renderer validates declared variables, applies defaults, converts types, and rejects unknown variables or unresolved placeholders.
+5. The renderer returns provider-independent messages.
+6. `PromptConstructionStep` adapts rendered messages to `ChatRequest`.
+
+If no template id is supplied, the existing system-instruction and user-message path is preserved.

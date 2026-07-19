@@ -28,7 +28,7 @@ Task<AIOrchestrationResponse> ExecuteAsync(
     CancellationToken cancellationToken);
 ```
 
-`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, and optional identity context.
+`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, and optional prompt template selection.
 
 `AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, and optional response id.
 
@@ -50,7 +50,7 @@ flowchart LR
 
 `RequestValidationStep` validates non-empty user message, non-empty scenario, temperature range, positive token limit, and reasonable correlation id length.
 
-`PromptConstructionStep` runs registered `IAIContextContributor` instances, builds a `ChatRequest` with `IPromptBuilder`, and attaches safe session, correlation, scenario, conversation, tenant, user, and agent metadata when present.
+`PromptConstructionStep` runs registered `IAIContextContributor` instances, renders a prompt template through `IPromptRenderer` when one is requested, otherwise uses the legacy `IPromptBuilder` path, and attaches safe session, correlation, scenario, conversation, tenant, user, and agent metadata when present.
 
 `ProviderCapabilityValidationStep` checks `IAIProviderMetadata.Capabilities.SupportsChat`. It does not inspect concrete provider types.
 
@@ -66,7 +66,9 @@ The context does not contain services and must not become a service locator.
 
 ## Prompt Builder
 
-`IPromptBuilder` builds `ChatRequest` values from provider-agnostic messages. `PromptBuilder` supports system, user, assistant, and context messages, preserves insertion order, ignores absent optional content, and requires at least one user message.
+`IPromptBuilder` builds `ChatRequest` values for the legacy path. `PromptBuilder` supports system, user, assistant, and context messages, preserves insertion order, ignores absent optional content, and requires at least one user message.
+
+The Prompt Engine is the preferred path for reusable prompt definitions. It renders versioned templates into provider-independent messages before `PromptConstructionStep` adapts them to `ChatRequest`.
 
 Prompt construction does not include trading-specific rules. Product modules should supply those rules through request content or later dedicated context contributors.
 

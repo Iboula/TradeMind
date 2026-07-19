@@ -23,6 +23,8 @@ public sealed class AIExecutionContext
 
     public ChatRequest? ChatRequest { get; private set; }
 
+    public PromptRenderResult? PromptRenderResult { get; private set; }
+
     public ChatResponse? ChatResponse { get; private set; }
 
     public AIOrchestrationResponse? FinalResponse { get; private set; }
@@ -72,6 +74,13 @@ public sealed class AIExecutionContext
         ArgumentNullException.ThrowIfNull(chatRequest);
         EnsureState(AIExecutionState.Running, "Chat request can only be set while execution is running.");
         ChatRequest = chatRequest;
+    }
+
+    public void SetPromptRenderResult(PromptRenderResult promptRenderResult)
+    {
+        ArgumentNullException.ThrowIfNull(promptRenderResult);
+        EnsureState(AIExecutionState.Running, "Prompt render result can only be set while execution is running.");
+        PromptRenderResult = promptRenderResult;
     }
 
     public void SetChatResponse(ChatResponse chatResponse)
