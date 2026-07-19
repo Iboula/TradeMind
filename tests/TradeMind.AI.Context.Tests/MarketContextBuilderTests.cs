@@ -1,5 +1,6 @@
 using TradeMind.AI.Context.Application;
 using TradeMind.AI.Context.Domain;
+using TradeMind.Market.Abstractions;
 
 namespace TradeMind.AI.Context.Tests;
 
@@ -356,6 +357,108 @@ public sealed class MarketContextBuilderTests
         var trace = Assert.Single(result.Traces);
         Assert.Equal(ContextProviderExecutionStatus.Unavailable, trace.Status);
         Assert.NotNull(trace.Error);
+    }
+
+    [Fact]
+    public async Task Builder_ShouldExposeSkippedProvidersInBuildMetadata()
+    {
+        var market = ContextTestData.MarketProvider((_, _) => Task.FromResult(
+            ContextProviderResult.Unavailable(new ContextProviderId("market"), "missing")));
+        var dependent = new TestContextProvider(
+            new ContextProviderDescriptor(
+                new ContextProviderId("knowledge"),
+                ContextProviderCategory.Knowledge,
+                ContextRequirement.Optional,
+                20,
+                TimeSpan.FromSeconds(1),
+                [market.Descriptor.Id]),
+            (_, _) => Task.FromResult(ContextProviderResult.NotConfigured(
+                new ContextProviderId("knowledge"),
+                "not configured")));
+
+        var result = await ContextTestData.Builder([market, dependent])
+            .BuildAsync(ContextTestData.Query(), CancellationToken.None);
+
+        Assert.Contains(market.Descriptor.Id, result.ExecutedProviders);
+        Assert.Contains(dependent.Descriptor.Id, result.SkippedProviders);
+        Assert.Contains(result.Traces, trace =>
+            trace.ProviderId == dependent.Descriptor.Id
+            && trace.Status == ContextProviderExecutionStatus.Skipped);
+    }
+
+    [Fact]
+    public async Task Builder_ShouldReturnStructuredFailureForNullProviderResult()
+    {
+        var provider = ContextTestData.MarketProvider((_, _) =>
+            Task.FromResult<ContextProviderResult>(null!));
+
+        var result = await ContextTestData.Builder([provider])
+            .BuildAsync(ContextTestData.Query(), CancellationToken.None);
+
+        Assert.Equal(MarketContextBuildStatus.Failed, result.Status);
+        Assert.Contains(result.Errors, error => error.Code == ContextBuildErrorCode.InvalidProviderResult);
+        Assert.Contains(result.Traces, trace =>
+            trace.Status == ContextProviderExecutionStatus.Failed
+            && trace.Error?.Code == ContextBuildErrorCode.InvalidProviderResult);
+    }
+
+    [Fact]
+    public async Task Builder_ShouldPropagateCallerCancellationToEveryActiveProvider()
+    {
+        var arrived = 0;
+        var allCanceled = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        async Task<ContextProviderResult> WaitForCancellation(
+            ContextProviderRequest _,
+            CancellationToken cancellationToken)
+        {
+            Interlocked.Increment(ref arrived);
+            try
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                if (Interlocked.Decrement(ref arrived) == 0)
+                {
+                    allCanceled.SetResult();
+                }
+
+                throw;
+            }
+
+            return ContextTestData.MarketResult();
+        }
+
+        var first = ContextTestData.MarketProvider(WaitForCancellation);
+        var second = ContextTestData.MarketProvider(WaitForCancellation, id: "market-2");
+        using var cancellation = new CancellationTokenSource();
+        var build = ContextTestData.Builder([first, second])
+            .BuildAsync(ContextTestData.Query(), cancellation.Token);
+
+        while (Volatile.Read(ref arrived) != 2)
+        {
+            await Task.Yield();
+        }
+
+        cancellation.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => build);
+        await allCanceled.Task.WaitAsync(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void BuildQuery_ShouldKeepConnectorAndWorkspaceOptional()
+    {
+        var query = new BuildMarketContextQuery(
+            "user-1",
+            "session-1",
+            null,
+            new Instrument("EURUSD"),
+            Timeframe.M15,
+            workspaceId: "workspace-1");
+
+        Assert.Null(query.ConnectorId);
+        Assert.Equal("workspace-1", query.WorkspaceId);
     }
 
     private static TestContextProvider KnowledgeProvider(

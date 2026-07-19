@@ -132,6 +132,15 @@ public sealed class ContextProviderRegistryTests
             ((IList<ContextProviderId>)descriptor.Dependencies).Add(new ContextProviderId("other")));
     }
 
+    [Fact]
+    public void Registry_ShouldExposeAnImmutableProviderCollection()
+    {
+        var registry = new ContextProviderRegistry([ContextTestData.MarketProvider()]);
+
+        Assert.Throws<NotSupportedException>(() =>
+            ((IList<IContextProvider>)registry.Providers).Clear());
+    }
+
     private static TestContextProvider Provider(
         string id,
         int priority,

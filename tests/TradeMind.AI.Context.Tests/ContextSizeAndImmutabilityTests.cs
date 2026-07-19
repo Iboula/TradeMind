@@ -148,6 +148,65 @@ public sealed class ContextSizeAndImmutabilityTests
             typeof(IEconomicCalendarContextSource).GetMethod("GetAsync")?.ReturnType);
     }
 
+    [Fact]
+    public void SizePolicy_ShouldRespectMaximumWarningCount()
+    {
+        var result = Policy(new ContextEngineOptions
+        {
+            MaximumKnowledgeChunks = 1,
+            MaximumWarnings = 1
+        }).Normalize([
+            KnowledgeData("one", "two", "three"),
+            new MemoryContextData(new MemoryContext(
+                "conversation",
+                null,
+                [Item(1, "one"), Item(2, "two")],
+                false,
+                2))
+        ]);
+
+        Assert.Single(result.Warnings);
+    }
+
+    [Fact]
+    public void SizePolicy_ShouldLimitNewsAndCalendarItems()
+    {
+        var result = Policy(new ContextEngineOptions
+        {
+            MaximumNewsItems = 1,
+            MaximumCalendarItems = 1
+        }).Normalize([
+            new NewsContextData(new NewsContext([
+                new NewsItem("older", "Older", ContextTestData.Now.AddMinutes(-1)),
+                new NewsItem("newer", "Newer", ContextTestData.Now)
+            ])),
+            new EconomicCalendarContextData(new EconomicCalendarContext([
+                new EconomicCalendarEvent("late", "Late", ContextTestData.Now.AddHours(1)),
+                new EconomicCalendarEvent("early", "Early", ContextTestData.Now)
+            ]))
+        ]);
+
+        Assert.Equal("newer", result.News?.Context.Items.Single().Id);
+        Assert.Equal("early", result.EconomicCalendar?.Context.Events.Single().Id);
+        Assert.Contains(result.Warnings, warning => warning.Code == "news-truncated");
+        Assert.Contains(result.Warnings, warning => warning.Code == "calendar-truncated");
+    }
+
+    [Fact]
+    public void ApplicationAssembly_ShouldNotReferenceTechnicalSourceModules()
+    {
+        var references = typeof(MarketContextBuilder).Assembly
+            .GetReferencedAssemblies()
+            .Select(reference => reference.Name ?? string.Empty)
+            .ToArray();
+
+        Assert.DoesNotContain(references, name => name.Contains("EntityFrameworkCore", StringComparison.Ordinal));
+        Assert.DoesNotContain(references, name => name.Contains("Npgsql", StringComparison.Ordinal));
+        Assert.DoesNotContain(references, name => name.Contains("KnowledgeHub", StringComparison.Ordinal));
+        Assert.DoesNotContain(references, name => name.Contains("MarketConnectors", StringComparison.Ordinal));
+        Assert.DoesNotContain(references, name => name.Contains("Http", StringComparison.OrdinalIgnoreCase));
+    }
+
     private static ContextSizePolicy Policy(ContextEngineOptions options) =>
         new(Options.Create(options));
 
