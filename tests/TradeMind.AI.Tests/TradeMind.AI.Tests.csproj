@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\src\TradeMind.KnowledgeHub.Application\TradeMind.KnowledgeHub.Application.csproj" />
     <ProjectReference Include="..\..\src\TradeMind.KnowledgeHub.Infrastructure\TradeMind.KnowledgeHub.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\TradeMind.AI.Application\TradeMind.AI.Application.csproj" />
+    <ProjectReference Include="..\..\src\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj" />
   </ItemGroup>
 
 </Project>

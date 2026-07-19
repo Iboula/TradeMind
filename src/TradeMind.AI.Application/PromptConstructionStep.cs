@@ -46,7 +46,7 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
 
     private ChatRequest BuildLegacyChatRequest(AIExecutionContext context)
     {
-        return _promptBuilder
+        var request = _promptBuilder
             .WithSystemMessage(context.Request.SystemInstruction)
             .AddUserMessage(context.Request.UserMessage)
             .Build(
@@ -54,6 +54,11 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
                 context.Request.Temperature,
                 context.Request.MaxOutputTokens,
                 BuildMetadata(context));
+
+        return request with
+        {
+            Messages = InjectMemoryMessages(request.Messages, context)
+        };
     }
 
     private async Task<ChatRequest> BuildTemplateChatRequestAsync(
@@ -75,12 +80,36 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
 
         context.SetPromptRenderResult(result);
 
+        var messages = result.Messages.Select(ToChatMessage).ToArray();
+
         return new ChatRequest(
-            result.Messages.Select(ToChatMessage).ToArray(),
+            InjectMemoryMessages(messages, context),
             string.IsNullOrWhiteSpace(context.Request.Model) ? null : context.Request.Model,
             context.Request.Temperature,
             context.Request.MaxOutputTokens,
             BuildMetadata(context));
+    }
+
+    private static IReadOnlyList<ChatMessage> InjectMemoryMessages(
+        IReadOnlyList<ChatMessage> messages,
+        AIExecutionContext context)
+    {
+        if (!context.Items.TryGetValue(AIExecutionContextItemKey.MemoryChatMessages, out var value)
+            || value is not IReadOnlyList<ChatMessage> memoryMessages
+            || memoryMessages.Count == 0)
+        {
+            return messages;
+        }
+
+        var output = messages.ToList();
+        var insertIndex = output.FindLastIndex(message => message.Role == ChatRole.User);
+        if (insertIndex < 0)
+        {
+            insertIndex = output.Count;
+        }
+
+        output.InsertRange(insertIndex, memoryMessages);
+        return output.ToArray();
     }
 
     private static ChatMessage ToChatMessage(PromptRenderedMessage message)

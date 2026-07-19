@@ -44,6 +44,8 @@ public sealed record AIOrchestrationRequest
 
     public IReadOnlyDictionary<string, string> PromptVariables { get; init; }
 
+    public bool UseMemory { get; init; }
+
     public string? CorrelationId { get; init; }
 
     public string? SessionId { get; init; }

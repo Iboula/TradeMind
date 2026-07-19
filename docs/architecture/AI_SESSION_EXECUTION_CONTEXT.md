@@ -94,7 +94,9 @@ The orchestrator still raises exceptions for failed executions. Public responses
 
 ## Future Memory Engine
 
-Memory Engine can later use `SessionId`, `ConversationId`, `TenantId`, `UserId`, `AgentId`, and `Scenario` to decide what context can be retrieved or stored. This sprint does not persist messages, summaries, or conversation memory.
+Memory Engine uses `SessionId`, `ConversationId`, `TenantId`, `UserId`, and `Scenario` to decide what context can be retrieved or stored. `AIOrchestrationRequest.UseMemory` enables the behavior per request. Memory-specific services are not stored in `AIExecutionContext`; optional memory messages and safe counts are carried through `Items` so the core context does not become a service locator.
+
+The current Memory Engine implementation is in-memory only. It stores conversation entries and summaries for the life of the process and is not durable production storage.
 
 ## Future Cost Engine
 

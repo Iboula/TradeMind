@@ -96,6 +96,23 @@ Responsibilities:
 - Normalize AI responses and record executed steps.
 - Provide `IAIContextContributor` for future Memory and KnowledgeHub context enrichment.
 
+## AI Memory
+
+Project: `src/TradeMind.AI.Memory`
+
+Responsibilities:
+
+- Manage provider-agnostic conversational memory for AI sessions.
+- Scope memory by conversation, tenant, and user through `ConversationMemoryKey`.
+- Store ordered conversation entries and optional summaries through `IMemoryStore`.
+- Read bounded context windows through `IMemoryReader`.
+- Write user and assistant messages through `IMemoryWriter`.
+- Estimate tokens deterministically through `ITokenEstimator`.
+- Provide a deterministic local summarizer for tests and development.
+- Register optional AI orchestration steps for memory read and memory write.
+
+The Memory module does not depend on OpenAI, EF Core, Npgsql, pgvector, ASP.NET Core, `HttpContext`, JWT, KnowledgeHub, file storage, or provider infrastructure. The current implementation is in-memory and not durable.
+
 ## AI Infrastructure
 
 Project: `src/TradeMind.AI.Infrastructure`

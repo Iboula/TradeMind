@@ -79,6 +79,8 @@ The renderer:
 
 If a template id is supplied, `PromptConstructionStep` renders the template and adapts the rendered messages to `ChatRequest`. If no template id is supplied, the historical `SystemInstruction` plus `UserMessage` path remains in place.
 
+When Memory Engine is registered and enabled for the request, memory messages are inserted after rendered system/template context and before the current user message. Prompt templates remain provider-agnostic and do not depend on memory storage contracts.
+
 ## Generic Chat
 
 The built-in template is:

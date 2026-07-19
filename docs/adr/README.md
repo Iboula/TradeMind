@@ -13,6 +13,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0005: AI orchestration pipeline](ADR-0005-ai-orchestration-pipeline.md)
 - [ADR-0006: AI session and execution context](ADR-0006-ai-session-execution-context.md)
 - [ADR-0007: Prompt Engine](ADR-0007-prompt-engine.md)
+- [ADR-0008: Conversational Memory Engine](ADR-0008-memory-engine.md)
 
 ## ADR format
 

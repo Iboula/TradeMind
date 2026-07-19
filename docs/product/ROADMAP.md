@@ -29,11 +29,13 @@ Introduce production AI provider integrations behind abstractions.
 
 ## Phase 3: Memory Engine
 
-Turn KnowledgeHub retrieval into durable AI memory.
+Build conversation memory for AI sessions.
 
-- Build memory records and retrieval policies.
-- Rank context by relevance, recency, source trust, and user intent.
-- Store AI interaction summaries when approved.
+- Manage conversation history by tenant, user, and conversation.
+- Add bounded context windows for recent user and assistant messages.
+- Add conversation summaries for older exchanges.
+- Keep Memory Engine separate from RAG and KnowledgeHub document retrieval.
+- Replace in-memory storage with PostgreSQL persistence when retention and privacy rules are finalized.
 - Keep sensitive trading data governed by explicit retention rules.
 
 ## Phase 4: Trading Journal

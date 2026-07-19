@@ -65,13 +65,15 @@ For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` 
 3. `IAIOrchestrator` creates `AIExecutionContext` and moves it from `Created` to `Running`.
 4. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
 5. `RequestValidationStep` validates structural input.
-6. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, and builds a provider-agnostic `ChatRequest`.
-7. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
-8. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
-9. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, and executed steps.
-10. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
+6. If Memory Engine is registered and `UseMemory` is true, `MemoryReadStep` loads a bounded conversation window before prompt construction.
+7. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, injects memory messages before the current user message when present, and builds a provider-agnostic `ChatRequest`.
+8. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
+9. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
+10. If Memory Engine is registered and the provider call succeeds, `MemoryWriteStep` writes the current user message and assistant response.
+11. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, and executed steps.
+12. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
 
-The flow does not call KnowledgeHub semantic search yet. KnowledgeHub and Memory can later contribute bounded context through `IAIContextContributor`.
+The flow does not call KnowledgeHub semantic search yet. Memory is conversation history only; KnowledgeHub semantic retrieval remains a separate future integration.
 
 ## Prompt rendering flow
 
@@ -83,3 +85,15 @@ The flow does not call KnowledgeHub semantic search yet. KnowledgeHub and Memory
 6. `PromptConstructionStep` adapts rendered messages to `ChatRequest`.
 
 If no template id is supplied, the existing system-instruction and user-message path is preserved.
+
+## Memory flow
+
+1. A caller sets `UseMemory = true` and provides `ConversationId`; tenant and user identifiers are copied from `AIIdentityContext` when present.
+2. `MemoryReadStep` builds `ConversationMemoryKey` from conversation, tenant, and user.
+3. `IMemoryReader` selects a bounded recent window and optional summary.
+4. The selected memory is converted to provider-agnostic chat messages.
+5. `PromptConstructionStep` inserts summary and history before the current user message.
+6. After a successful provider response, `MemoryWriteStep` writes the current user message and assistant response.
+7. `MemoryWriter` may update a summary when compaction thresholds are reached.
+
+Memory logs contain identifiers, counts, and sequence ranges only. They do not contain user content, assistant content, summaries, prompts, provider responses, or secrets.
