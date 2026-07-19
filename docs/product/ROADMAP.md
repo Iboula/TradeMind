@@ -22,6 +22,7 @@ Introduce production AI provider integrations behind abstractions.
 - Add provider-agnostic AI orchestration for validation, prompt construction, capability checks, execution, response normalization, and logging.
 - Add AI session and execution context tracking for identity propagation, execution state, durations, tokens, and safe errors.
 - Add a versioned Prompt Engine for reusable provider-agnostic prompt templates.
+- Add a Knowledge RAG Engine for bounded KnowledgeHub context retrieval and internal citations.
 - Provide context contribution extension points for future KnowledgeHub and Memory enrichment.
 - Add provider configuration without committing secrets.
 - Add retry, timeout, rate-limit, and observability patterns.

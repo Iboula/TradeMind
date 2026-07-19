@@ -66,14 +66,15 @@ For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` 
 4. The pipeline executes registered `IAIOrchestrationStep` implementations ordered by `Order`.
 5. `RequestValidationStep` validates structural input.
 6. If Memory Engine is registered and `UseMemory` is true, `MemoryReadStep` loads a bounded conversation window before prompt construction.
-7. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, injects memory messages before the current user message when present, and builds a provider-agnostic `ChatRequest`.
-8. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
-9. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
-10. If Memory Engine is registered and the provider call succeeds, `MemoryWriteStep` writes the current user message and assistant response.
-11. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, and executed steps.
-12. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
+7. If Knowledge RAG Engine is registered and `Knowledge.Enabled` is true, `KnowledgeRetrievalStep` retrieves bounded KnowledgeHub context.
+8. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, injects memory and knowledge messages before the current user message when present, and builds a provider-agnostic `ChatRequest`.
+9. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
+10. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
+11. If Memory Engine is registered and the provider call succeeds, `MemoryWriteStep` writes the current user message and assistant response.
+12. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, executed steps, and safe Knowledge RAG counters.
+13. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
 
-The flow does not call KnowledgeHub semantic search yet. Memory is conversation history only; KnowledgeHub semantic retrieval remains a separate future integration.
+Knowledge RAG is optional. When disabled, no KnowledgeHub search is performed.
 
 ## Prompt rendering flow
 
@@ -97,3 +98,13 @@ If no template id is supplied, the existing system-instruction and user-message 
 7. `MemoryWriter` may update a summary when compaction thresholds are reached.
 
 Memory logs contain identifiers, counts, and sequence ranges only. They do not contain user content, assistant content, summaries, prompts, provider responses, or secrets.
+
+## Knowledge RAG flow
+
+1. A caller sets `Knowledge.Enabled = true`.
+2. The RAG step uses the explicit query or the current user message, according to `AIKnowledgeOptions`.
+3. `IKnowledgeContextRetriever` calls `IKnowledgeSearcher`, which adapts to KnowledgeHub search.
+4. The retriever filters, deduplicates, orders, budgets, and cites fragments.
+5. `IKnowledgeContextComposer` creates a delimited reference-material message.
+6. `PromptConstructionStep` injects the RAG context before the current user message.
+7. The response exposes citation ids and counts, not full fragment content.

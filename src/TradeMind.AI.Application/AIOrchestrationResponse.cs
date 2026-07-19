@@ -18,7 +18,11 @@ public sealed record AIOrchestrationResponse
         IReadOnlyList<string> executedSteps,
         DateTimeOffset completedAtUtc,
         AIExecutionState state,
-        string? responseId = null)
+        string? responseId = null,
+        bool knowledgeUsed = false,
+        IReadOnlyList<string>? knowledgeCitationIds = null,
+        int? knowledgeSelectedResultCount = null,
+        TimeSpan? knowledgeRetrievalDuration = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sessionId);
         ArgumentException.ThrowIfNullOrWhiteSpace(correlationId);
@@ -45,6 +49,10 @@ public sealed record AIOrchestrationResponse
         CompletedAtUtc = completedAtUtc;
         State = state;
         ResponseId = responseId;
+        KnowledgeUsed = knowledgeUsed;
+        KnowledgeCitationIds = knowledgeCitationIds?.ToArray() ?? [];
+        KnowledgeSelectedResultCount = knowledgeSelectedResultCount;
+        KnowledgeRetrievalDuration = knowledgeRetrievalDuration;
     }
 
     public string SessionId { get; init; }
@@ -78,4 +86,12 @@ public sealed record AIOrchestrationResponse
     public AIExecutionState State { get; init; }
 
     public string? ResponseId { get; init; }
+
+    public bool KnowledgeUsed { get; init; }
+
+    public IReadOnlyList<string> KnowledgeCitationIds { get; init; }
+
+    public int? KnowledgeSelectedResultCount { get; init; }
+
+    public TimeSpan? KnowledgeRetrievalDuration { get; init; }
 }

@@ -14,7 +14,7 @@ The orchestration layer gives future AI features one common flow for:
 - provider execution through `IChatProvider`;
 - response normalization;
 - structured operational logging;
-- optional extension by modules such as Memory and future KnowledgeHub context enrichment.
+- optional extension by modules such as Memory and Knowledge RAG.
 
 The layer does not implement persistent memory, RAG, streaming, tool calling, multi-agent behavior, or trading business rules.
 
@@ -28,7 +28,7 @@ Task<AIOrchestrationResponse> ExecuteAsync(
     CancellationToken cancellationToken);
 ```
 
-`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, and an opt-in `UseMemory` flag.
+`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, an opt-in `UseMemory` flag, and disabled-by-default `AIKnowledgeOptions`.
 
 `AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, and optional response id.
 
@@ -40,7 +40,8 @@ Pipeline steps implement `IAIOrchestrationStep`. They are registered through dep
 flowchart LR
     Request["AIOrchestrationRequest"] --> Validation["RequestValidationStep"]
     Validation --> MemoryRead["MemoryReadStep optional"]
-    MemoryRead --> Prompt["PromptConstructionStep"]
+    MemoryRead --> Knowledge["KnowledgeRetrievalStep optional"]
+    Knowledge --> Prompt["PromptConstructionStep"]
     Prompt --> Capabilities["ProviderCapabilityValidationStep"]
     Capabilities --> Provider["ProviderExecutionStep"]
     Provider --> MemoryWrite["MemoryWriteStep optional"]
@@ -55,6 +56,8 @@ flowchart LR
 `PromptConstructionStep` runs registered `IAIContextContributor` instances, renders a prompt template through `IPromptRenderer` when one is requested, otherwise uses the legacy `IPromptBuilder` path, and attaches safe session, correlation, scenario, conversation, tenant, user, and agent metadata when present.
 
 When Memory Engine is registered and the request opts in, `MemoryReadStep` runs before prompt construction. It contributes provider-agnostic memory messages through `AIExecutionContext.Items`; `PromptConstructionStep` inserts them before the current user message. `MemoryWriteStep` runs after provider success and writes the current user message plus assistant response.
+
+When Knowledge RAG Engine is registered and `Knowledge.Enabled` is true, `KnowledgeRetrievalStep` runs before prompt construction. It retrieves KnowledgeHub fragments, composes a delimited context message, and stores safe citation ids and counts for response normalization.
 
 `ProviderCapabilityValidationStep` checks `IAIProviderMetadata.Capabilities.SupportsChat`. It does not inspect concrete provider types.
 
@@ -112,8 +115,8 @@ Potential contributors include:
 - journal summaries;
 - strategy review evidence.
 
-## Memory And Future KnowledgeHub Integration
+## Memory And Knowledge Integration
 
 Memory Engine is optional and lives in `TradeMind.AI.Memory`. `AddTradeMindAIOrchestration()` remains usable without memory. `AddTradeMindMemory()` adds memory read/write steps and in-memory services.
 
-KnowledgeHub semantic search is not invoked by the orchestration pipeline in this increment. A future `KnowledgeHub` contributor can read request scenario and metadata, retrieve relevant fragments through KnowledgeHub application contracts, and add summarized context to the prompt without referencing KnowledgeHub infrastructure from `TradeMind.AI.Application`.
+Knowledge RAG is optional and lives in `TradeMind.AI.Knowledge`. `AddTradeMindKnowledgeRag()` adds retrieval and composition without requiring KnowledgeHub Infrastructure from AI Application.

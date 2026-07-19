@@ -113,6 +113,20 @@ Responsibilities:
 
 The Memory module does not depend on OpenAI, EF Core, Npgsql, pgvector, ASP.NET Core, `HttpContext`, JWT, KnowledgeHub, file storage, or provider infrastructure. The current implementation is in-memory and not durable.
 
+## AI Knowledge
+
+Project: `src/TradeMind.AI.Knowledge`
+
+Responsibilities:
+
+- Retrieve KnowledgeHub fragments for one AI request.
+- Apply query, score, ordering, deduplication, and context-budget policy.
+- Compose bounded provider-agnostic RAG context.
+- Create internal citations such as `[K1]`.
+- Register an optional orchestration step before prompt construction.
+
+The RAG module depends on KnowledgeHub Application contracts and AI Application orchestration contracts. It does not depend on KnowledgeHub Infrastructure, EF Core, Npgsql, pgvector, OpenAI, ASP.NET Core, or Memory Store implementations.
+
 ## AI Infrastructure
 
 Project: `src/TradeMind.AI.Infrastructure`

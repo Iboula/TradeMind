@@ -32,8 +32,19 @@ public sealed class ResponseNormalizationStep : IAIOrchestrationStep
             context.ExecutedSteps.ToArray(),
             chatResponse.GeneratedAtUtc,
             context.State,
-            chatResponse.ResponseId));
+            chatResponse.ResponseId,
+            GetItem<bool>(context, AIExecutionContextItemKey.KnowledgeUsed),
+            GetItem<IReadOnlyList<string>>(context, AIExecutionContextItemKey.KnowledgeCitationIds),
+            GetItem<int?>(context, AIExecutionContextItemKey.KnowledgeSelectedResultCount),
+            GetItem<TimeSpan?>(context, AIExecutionContextItemKey.KnowledgeRetrievalDuration)));
 
         return Task.CompletedTask;
+    }
+
+    private static T? GetItem<T>(AIExecutionContext context, AIExecutionContextItemKey key)
+    {
+        return context.Items.TryGetValue(key, out var value) && value is T typedValue
+            ? typedValue
+            : default;
     }
 }

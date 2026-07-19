@@ -4,6 +4,7 @@ public static class AIOrchestrationStepNames
 {
     public const string RequestValidation = "ai.request.validation";
     public const string MemoryRead = "ai.memory.read";
+    public const string KnowledgeRetrieval = "ai.knowledge.retrieval";
     public const string PromptConstruction = "ai.prompt.construction";
     public const string ProviderCapabilityValidation = "ai.provider.capability.validation";
     public const string ProviderExecution = "ai.provider.execution";

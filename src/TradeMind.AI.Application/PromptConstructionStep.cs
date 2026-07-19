@@ -57,7 +57,7 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
 
         return request with
         {
-            Messages = InjectMemoryMessages(request.Messages, context)
+            Messages = InjectContextMessages(request.Messages, context)
         };
     }
 
@@ -83,20 +83,21 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
         var messages = result.Messages.Select(ToChatMessage).ToArray();
 
         return new ChatRequest(
-            InjectMemoryMessages(messages, context),
+            InjectContextMessages(messages, context),
             string.IsNullOrWhiteSpace(context.Request.Model) ? null : context.Request.Model,
             context.Request.Temperature,
             context.Request.MaxOutputTokens,
             BuildMetadata(context));
     }
 
-    private static IReadOnlyList<ChatMessage> InjectMemoryMessages(
+    private static IReadOnlyList<ChatMessage> InjectContextMessages(
         IReadOnlyList<ChatMessage> messages,
         AIExecutionContext context)
     {
-        if (!context.Items.TryGetValue(AIExecutionContextItemKey.MemoryChatMessages, out var value)
-            || value is not IReadOnlyList<ChatMessage> memoryMessages
-            || memoryMessages.Count == 0)
+        var memoryMessages = GetChatMessages(context, AIExecutionContextItemKey.MemoryChatMessages);
+        var knowledgeMessages = GetChatMessages(context, AIExecutionContextItemKey.KnowledgeChatMessages);
+
+        if (memoryMessages.Count == 0 && knowledgeMessages.Count == 0)
         {
             return messages;
         }
@@ -108,8 +109,37 @@ public sealed class PromptConstructionStep : IAIOrchestrationStep
             insertIndex = output.Count;
         }
 
-        output.InsertRange(insertIndex, memoryMessages);
+        var contextMessages = OrderContextMessages(memoryMessages, knowledgeMessages);
+        output.InsertRange(insertIndex, contextMessages);
         return output.ToArray();
+    }
+
+    private static IReadOnlyList<ChatMessage> GetChatMessages(
+        AIExecutionContext context,
+        AIExecutionContextItemKey key)
+    {
+        return context.Items.TryGetValue(key, out var value) && value is IReadOnlyList<ChatMessage> messages
+            ? messages
+            : [];
+    }
+
+    private static IReadOnlyList<ChatMessage> OrderContextMessages(
+        IReadOnlyList<ChatMessage> memoryMessages,
+        IReadOnlyList<ChatMessage> knowledgeMessages)
+    {
+        var ordered = new List<ChatMessage>();
+        var remainingMemory = memoryMessages;
+
+        if (memoryMessages.FirstOrDefault() is { Role: ChatRole.System } summary
+            && summary.Content.StartsWith("Conversation summary", StringComparison.Ordinal))
+        {
+            ordered.Add(summary);
+            remainingMemory = memoryMessages.Skip(1).ToArray();
+        }
+
+        ordered.AddRange(knowledgeMessages);
+        ordered.AddRange(remainingMemory);
+        return ordered;
     }
 
     private static ChatMessage ToChatMessage(PromptRenderedMessage message)

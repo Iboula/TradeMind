@@ -17,6 +17,7 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.KnowledgeHub.Infrastructure`: KnowledgeHub adapters and persistence.
 - `src/TradeMind.AI.Abstractions`: provider-agnostic AI contracts.
 - `src/TradeMind.AI.Application`: AI orchestration, prompt construction, validation, capability checks, and response normalization.
+- `src/TradeMind.AI.Knowledge`: provider-agnostic KnowledgeHub RAG retrieval, context budgeting, citations, prompt composition, and optional orchestration step.
 - `src/TradeMind.AI.Memory`: provider-agnostic conversation memory contracts, in-memory store, window reader, writer, summarizer, and optional orchestration steps.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
@@ -79,6 +80,8 @@ services.AddTradeMindAIOrchestration();
 `AddTradeMindAIOrchestration()` also registers the Prompt Engine. `AddTradeMindPromptEngine()` can be used independently when a test or future module only needs template rendering.
 
 `AddTradeMindMemory()` registers the in-memory Memory Engine and optional memory orchestration steps. Memory remains opt-in per request through `UseMemory`; callers must provide a conversation id when memory is enabled.
+
+`AddTradeMindKnowledgeRag()` registers optional KnowledgeHub RAG retrieval and composition. Knowledge retrieval remains disabled per request unless `AIOrchestrationRequest.Knowledge.Enabled` is true.
 
 Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls. Tests that verify AI session timestamps, prompt rendering timestamps, or execution duration should inject a controlled `TimeProvider`.
 

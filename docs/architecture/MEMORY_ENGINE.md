@@ -70,6 +70,8 @@ The in-memory implementation is not durable, is not multi-pod safe, and should n
 
 Memory Engine stores conversation history and summaries. KnowledgeHub stores user knowledge sources and fragments. RAG retrieves relevant external or user-provided knowledge. This sprint does not add embeddings, pgvector, semantic search, or document retrieval to memory.
 
+RAG context is not written into conversation memory by default. Memory stores the user and assistant exchange; Knowledge RAG supplies document context for the current provider call only.
+
 ```mermaid
 flowchart LR
     Request["AIOrchestrationRequest UseMemory"] --> Read["ai.memory.read"]

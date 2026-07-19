@@ -81,6 +81,8 @@ If a template id is supplied, `PromptConstructionStep` renders the template and 
 
 When Memory Engine is registered and enabled for the request, memory messages are inserted after rendered system/template context and before the current user message. Prompt templates remain provider-agnostic and do not depend on memory storage contracts.
 
+When Knowledge RAG Engine is registered and enabled for the request, a delimited KnowledgeHub context message is also inserted before the current user message. Prompt templates do not call KnowledgeHub directly.
+
 ## Generic Chat
 
 The built-in template is:
