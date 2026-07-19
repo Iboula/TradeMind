@@ -27,6 +27,16 @@ public sealed class AIOrchestrator : IAIOrchestrator
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        if (request.Tool.Enabled
+            && (!_steps.Any(step => step.Name == AIOrchestrationStepNames.ToolExecution)
+                || !_steps.Any(step => step.Name == AIOrchestrationStepNames.ToolResultComposition)))
+        {
+            throw new AIOrchestrationValidationException(
+                ["Tool Engine orchestration must be registered when tool invocation is enabled."],
+                request.CorrelationId,
+                AIOrchestrationStepNames.RequestValidation);
+        }
+
         var session = _sessionFactory.Create(request);
         var context = new AIExecutionContext(session, request, _timeProvider.GetUtcNow());
         var currentStep = string.Empty;

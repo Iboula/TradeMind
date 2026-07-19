@@ -15,6 +15,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0007: Prompt Engine](ADR-0007-prompt-engine.md)
 - [ADR-0008: Conversational Memory Engine](ADR-0008-memory-engine.md)
 - [ADR-0009: Knowledge RAG Engine](ADR-0009-knowledge-rag-engine.md)
+- [ADR-0010: Controlled AI Tool Engine](ADR-0010-tool-engine.md)
 
 ## ADR format
 

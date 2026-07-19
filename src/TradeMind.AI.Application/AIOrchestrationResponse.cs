@@ -22,7 +22,12 @@ public sealed record AIOrchestrationResponse
         bool knowledgeUsed = false,
         IReadOnlyList<string>? knowledgeCitationIds = null,
         int? knowledgeSelectedResultCount = null,
-        TimeSpan? knowledgeRetrievalDuration = null)
+        TimeSpan? knowledgeRetrievalDuration = null,
+        bool toolUsed = false,
+        string? toolId = null,
+        bool? toolSuccess = null,
+        TimeSpan? toolDuration = null,
+        string? toolErrorCode = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sessionId);
         ArgumentException.ThrowIfNullOrWhiteSpace(correlationId);
@@ -53,6 +58,11 @@ public sealed record AIOrchestrationResponse
         KnowledgeCitationIds = knowledgeCitationIds?.ToArray() ?? [];
         KnowledgeSelectedResultCount = knowledgeSelectedResultCount;
         KnowledgeRetrievalDuration = knowledgeRetrievalDuration;
+        ToolUsed = toolUsed;
+        ToolId = string.IsNullOrWhiteSpace(toolId) ? null : toolId;
+        ToolSuccess = toolSuccess;
+        ToolDuration = toolDuration;
+        ToolErrorCode = string.IsNullOrWhiteSpace(toolErrorCode) ? null : toolErrorCode;
     }
 
     public string SessionId { get; init; }
@@ -94,4 +104,14 @@ public sealed record AIOrchestrationResponse
     public int? KnowledgeSelectedResultCount { get; init; }
 
     public TimeSpan? KnowledgeRetrievalDuration { get; init; }
+
+    public bool ToolUsed { get; init; }
+
+    public string? ToolId { get; init; }
+
+    public bool? ToolSuccess { get; init; }
+
+    public TimeSpan? ToolDuration { get; init; }
+
+    public string? ToolErrorCode { get; init; }
 }

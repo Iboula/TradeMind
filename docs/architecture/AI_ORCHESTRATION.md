@@ -2,7 +2,7 @@
 
 TradeMind AI orchestration is the provider-agnostic application pipeline that turns a logical product request into a normalized chat response.
 
-It lives in `TradeMind.AI.Application` and depends on `TradeMind.AI.Abstractions`. It does not depend on OpenAI, provider infrastructure, EF Core, Npgsql, HTTP clients, or KnowledgeHub infrastructure.
+It lives in `TradeMind.AI.Application` and depends on `TradeMind.AI.Abstractions` plus the provider-agnostic Tool Engine contracts used by its optional explicit-tool adapter. It does not depend on OpenAI, provider infrastructure, EF Core, Npgsql, HTTP clients, or KnowledgeHub infrastructure.
 
 ## Objective
 
@@ -14,9 +14,9 @@ The orchestration layer gives future AI features one common flow for:
 - provider execution through `IChatProvider`;
 - response normalization;
 - structured operational logging;
-- optional extension by modules such as Memory and Knowledge RAG.
+- optional extension by modules such as Memory, Knowledge RAG, and controlled explicit tools.
 
-The layer does not implement persistent memory, RAG, streaming, tool calling, multi-agent behavior, or trading business rules.
+The layer does not implement provider-native tool calling, autonomous tool selection, streaming, multi-agent behavior, or trading business rules.
 
 ## Public contracts
 
@@ -28,9 +28,9 @@ Task<AIOrchestrationResponse> ExecuteAsync(
     CancellationToken cancellationToken);
 ```
 
-`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, an opt-in `UseMemory` flag, and disabled-by-default `AIKnowledgeOptions`.
+`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, an opt-in `UseMemory` flag, disabled-by-default `AIKnowledgeOptions`, and disabled-by-default explicit `AIToolInvocationOptions`.
 
-`AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, and optional response id.
+`AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, optional response id, safe Knowledge metadata, and safe tool metadata. It never exposes complete tool arguments or output.
 
 ## Pipeline
 
@@ -42,7 +42,9 @@ flowchart LR
     Validation --> MemoryRead["MemoryReadStep optional"]
     MemoryRead --> Knowledge["KnowledgeRetrievalStep optional"]
     Knowledge --> Prompt["PromptConstructionStep"]
-    Prompt --> Capabilities["ProviderCapabilityValidationStep"]
+    Prompt --> ToolExecution["ToolExecutionStep optional explicit call"]
+    ToolExecution --> ToolComposition["ToolResultCompositionStep optional"]
+    ToolComposition --> Capabilities["ProviderCapabilityValidationStep"]
     Capabilities --> Provider["ProviderExecutionStep"]
     Provider --> MemoryWrite["MemoryWriteStep optional"]
     MemoryWrite --> Normalize["ResponseNormalizationStep"]
@@ -59,15 +61,17 @@ When Memory Engine is registered and the request opts in, `MemoryReadStep` runs 
 
 When Knowledge RAG Engine is registered and `Knowledge.Enabled` is true, `KnowledgeRetrievalStep` runs before prompt construction. It retrieves KnowledgeHub fragments, composes a delimited context message, and stores safe citation ids and counts for response normalization.
 
+When Tool Engine orchestration is registered and `Tool.Enabled` is true, `ToolExecutionStep` executes the explicitly named tool after prompt construction. `ToolResultCompositionStep` inserts only successful structured output before the current user message as bounded, untrusted external data. The model does not select the tool. Authorization failures always stop provider invocation; configured non-security failures may continue without a tool result.
+
 `ProviderCapabilityValidationStep` checks `IAIProviderMetadata.Capabilities.SupportsChat`. It does not inspect concrete provider types.
 
 `ProviderExecutionStep` calls `IChatProvider.CompleteAsync`, passes the caller's `CancellationToken`, measures provider duration, and stores the normalized provider response.
 
-`ResponseNormalizationStep` copies provider response content, provider name, model, usage, response id, execution identifiers, durations, state, and executed step names into `AIOrchestrationResponse`.
+`ResponseNormalizationStep` copies provider response content, provider name, model, usage, response id, execution identifiers, durations, state, executed step names, Knowledge counters, and safe tool status into `AIOrchestrationResponse`.
 
 ## Context
 
-`AIExecutionContext` is the per-request working state. It contains `AISession`, the original request, `ChatRequest`, `ChatResponse`, final response, metrics, executed step list, state, optional safe error, and a controlled typed `Items` dictionary for extension data.
+`AIExecutionContext` is the per-request working state. It contains `AISession`, the original request, `ChatRequest`, `ChatResponse`, final response, metrics, executed step list, state, optional safe error, optional tool result and safe tool status, and a controlled typed `Items` dictionary for extension data.
 
 The context does not contain services and must not become a service locator.
 
@@ -120,3 +124,7 @@ Potential contributors include:
 Memory Engine is optional and lives in `TradeMind.AI.Memory`. `AddTradeMindAIOrchestration()` remains usable without memory. `AddTradeMindMemory()` adds memory read/write steps and in-memory services.
 
 Knowledge RAG is optional and lives in `TradeMind.AI.Knowledge`. `AddTradeMindKnowledgeRag()` adds retrieval and composition without requiring KnowledgeHub Infrastructure from AI Application.
+
+## Tool Engine Integration
+
+Tool Engine is optional and lives in `TradeMind.AI.Tools`. `AddTradeMindAIToolOrchestration()` registers the core engine and the two application pipeline steps. Disabled requests do not access the registry or executor. See [Tool Engine](TOOL_ENGINE.md) for authorization, validation, timeout, result composition, and security policy.

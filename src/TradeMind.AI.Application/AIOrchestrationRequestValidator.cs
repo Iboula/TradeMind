@@ -52,6 +52,16 @@ public sealed class AIOrchestrationRequestValidator
             errors.Add("ConversationId is required when memory is enabled.");
         }
 
+        if (request.Tool.Enabled && request.Tool.ToolId is null)
+        {
+            errors.Add("ToolId is required when tool invocation is enabled.");
+        }
+
+        if (request.Tool.TimeoutOverride is not null && request.Tool.TimeoutOverride <= TimeSpan.Zero)
+        {
+            errors.Add("Tool TimeoutOverride must be greater than zero when provided.");
+        }
+
         if (errors.Count > 0)
         {
             throw new AIOrchestrationValidationException(errors, correlationId, stepName);

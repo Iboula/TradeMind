@@ -1,3 +1,5 @@
+using TradeMind.AI.Tools;
+
 namespace TradeMind.AI.Application;
 
 public sealed record AIOrchestrationRequest
@@ -21,6 +23,7 @@ public sealed record AIOrchestrationRequest
         Metadata = CopyMetadata(metadata);
         PromptVariables = new Dictionary<string, string>();
         Knowledge = AIKnowledgeOptions.Disabled;
+        Tool = AIToolInvocationOptions.Disabled;
         CorrelationId = correlationId;
         Identity = AIIdentityContext.Empty;
     }
@@ -48,6 +51,8 @@ public sealed record AIOrchestrationRequest
     public bool UseMemory { get; init; }
 
     public AIKnowledgeOptions Knowledge { get; init; }
+
+    public AIToolInvocationOptions Tool { get; init; }
 
     public string? CorrelationId { get; init; }
 

@@ -36,7 +36,12 @@ public sealed class ResponseNormalizationStep : IAIOrchestrationStep
             GetItem<bool>(context, AIExecutionContextItemKey.KnowledgeUsed),
             GetItem<IReadOnlyList<string>>(context, AIExecutionContextItemKey.KnowledgeCitationIds),
             GetItem<int?>(context, AIExecutionContextItemKey.KnowledgeSelectedResultCount),
-            GetItem<TimeSpan?>(context, AIExecutionContextItemKey.KnowledgeRetrievalDuration)));
+            GetItem<TimeSpan?>(context, AIExecutionContextItemKey.KnowledgeRetrievalDuration),
+            context.ToolUsed,
+            context.ToolId?.Value,
+            context.ToolSuccess,
+            context.ToolDuration,
+            context.ToolErrorCode));
 
         return Task.CompletedTask;
     }

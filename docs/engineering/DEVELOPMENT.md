@@ -19,6 +19,7 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.AI.Application`: AI orchestration, prompt construction, validation, capability checks, and response normalization.
 - `src/TradeMind.AI.Knowledge`: provider-agnostic KnowledgeHub RAG retrieval, context budgeting, citations, prompt composition, and optional orchestration step.
 - `src/TradeMind.AI.Memory`: provider-agnostic conversation memory contracts, in-memory store, window reader, writer, summarizer, and optional orchestration steps.
+- `src/TradeMind.AI.Tools`: provider-agnostic tool definitions, registry, discovery, authorization, validation, controlled execution, result composition, and deterministic demonstration tools.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
 - `tests/TradeMind.KnowledgeHub.Tests`: unit tests.
@@ -82,6 +83,18 @@ services.AddTradeMindAIOrchestration();
 `AddTradeMindMemory()` registers the in-memory Memory Engine and optional memory orchestration steps. Memory remains opt-in per request through `UseMemory`; callers must provide a conversation id when memory is enabled.
 
 `AddTradeMindKnowledgeRag()` registers optional KnowledgeHub RAG retrieval and composition. Knowledge retrieval remains disabled per request unless `AIOrchestrationRequest.Knowledge.Enabled` is true.
+
+`AddTradeMindAIToolOrchestration()` registers the Tool Engine plus explicit tool execution and result composition steps. Tool invocation remains disabled unless `AIOrchestrationRequest.Tool.Enabled` is true, and the caller must provide a structured tool id and arguments. Development-only tools require explicit local configuration:
+
+```csharp
+services.AddTradeMindAIOrchestration();
+services.AddTradeMindAIToolOrchestration(options =>
+{
+    options.EnableDevelopmentTools = true;
+});
+```
+
+Do not enable development tools in production policy. Do not derive `AIToolInvocationOptions` directly from free-form model or user text. Tests should use deterministic `IAITool` implementations and controlled `TimeProvider` instances; Tool Engine tests require no network, database, broker, or secret.
 
 Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls. Tests that verify AI session timestamps, prompt rendering timestamps, or execution duration should inject a controlled `TimeProvider`.
 

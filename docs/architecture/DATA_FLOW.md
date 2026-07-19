@@ -68,11 +68,13 @@ For KnowledgeHub, `AIEmbeddingGeneratorAdapter` can bridge `IEmbeddingProvider` 
 6. If Memory Engine is registered and `UseMemory` is true, `MemoryReadStep` loads a bounded conversation window before prompt construction.
 7. If Knowledge RAG Engine is registered and `Knowledge.Enabled` is true, `KnowledgeRetrievalStep` retrieves bounded KnowledgeHub context.
 8. `PromptConstructionStep` runs context contributors if any exist, renders a prompt template when `PromptTemplateId` is supplied, injects memory and knowledge messages before the current user message when present, and builds a provider-agnostic `ChatRequest`.
-9. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
-10. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
-11. If Memory Engine is registered and the provider call succeeds, `MemoryWriteStep` writes the current user message and assistant response.
-12. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, executed steps, and safe Knowledge RAG counters.
-13. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
+9. If Tool Engine orchestration is registered and `Tool.Enabled` is true, `ToolExecutionStep` executes the explicit structured invocation once after authorization and validation.
+10. `ToolResultCompositionStep` inserts only a successful bounded result as untrusted external data before the current user message.
+11. `ProviderCapabilityValidationStep` checks that the active provider supports chat.
+12. `ProviderExecutionStep` calls `IChatProvider`, passes the caller's cancellation token, and records provider duration and token metrics.
+13. If Memory Engine is registered and the provider call succeeds, `MemoryWriteStep` writes the current user message and assistant response.
+14. `ResponseNormalizationStep` creates `AIOrchestrationResponse` with session id, conversation id, correlation id, scenario, provider, model, usage, durations, state, response id, executed steps, safe Knowledge RAG counters, and safe tool status.
+15. The orchestrator marks the context `Completed`, `Failed`, or `Cancelled`.
 
 Knowledge RAG is optional. When disabled, no KnowledgeHub search is performed.
 
@@ -108,3 +110,18 @@ Memory logs contain identifiers, counts, and sequence ranges only. They do not c
 5. `IKnowledgeContextComposer` creates a delimited reference-material message.
 6. `PromptConstructionStep` injects the RAG context before the current user message.
 7. The response exposes citation ids and counts, not full fragment content.
+
+## Explicit tool flow
+
+1. A trusted application consumer enables `AIOrchestrationRequest.Tool` and supplies a valid lowercase-kebab-case tool id plus structured arguments.
+2. `RequestValidationStep` requires the tool id and validates the optional timeout shape.
+3. Prompt, Memory, and Knowledge context are prepared through their existing paths.
+4. `ToolExecutionStep` creates an execution request with session, correlation, conversation, tenant, user, agent, scenario, timeout, idempotency key, and permissions.
+5. The registry resolves one known tool.
+6. The authorizer enforces availability, permissions, identity restrictions, scenario, and side-effect ceilings.
+7. The argument validator applies invariant conversion, defaults, bounds, allowed values, nullability, and sensitive-value protection.
+8. The executor invokes the handler once with a linked caller and timeout token, then normalizes timing and result metadata.
+9. Successful output is bounded and composed as untrusted external data before the current user message.
+10. The provider is called once and the response exposes tool id, use, success, duration, and safe error code only.
+
+Unknown, unavailable, and unauthorized tools fail closed. Validation or execution failures follow `FailClosed` or `ContinueWithoutTool`; continuation never injects failed output or an exception into the prompt.

@@ -95,6 +95,7 @@ Responsibilities:
 - Call `IChatProvider` without depending on provider infrastructure.
 - Normalize AI responses and record executed steps.
 - Provide `IAIContextContributor` for future Memory and KnowledgeHub context enrichment.
+- Adapt explicitly requested Tool Engine execution into the orchestration pipeline without provider-native tool calling.
 
 ## AI Memory
 
@@ -126,6 +127,22 @@ Responsibilities:
 - Register an optional orchestration step before prompt construction.
 
 The RAG module depends on KnowledgeHub Application contracts and AI Application orchestration contracts. It does not depend on KnowledgeHub Infrastructure, EF Core, Npgsql, pgvector, OpenAI, ASP.NET Core, or Memory Store implementations.
+
+## AI Tools
+
+Project: `src/TradeMind.AI.Tools`
+
+Responsibilities:
+
+- Define immutable tool ids, definitions, parameters, requests, contexts, metrics, errors, and results.
+- Register and discover tools through an immutable in-memory registry.
+- Authorize availability, permissions, identity restrictions, scenarios, and side-effect levels.
+- Validate and normalize structured arguments with invariant culture.
+- Execute one explicitly requested tool with timeout and caller cancellation.
+- Compose bounded successful output as untrusted provider-agnostic context.
+- Provide deterministic `echo` and `add-numbers` demonstration tools.
+
+The module has no provider SDK, EF Core, Npgsql, ASP.NET Core, `HttpContext`, filesystem, network, broker, market data, database, or trading dependency. The AI Application adapter adds optional `ToolExecution` and `ToolResultComposition` steps.
 
 ## AI Infrastructure
 

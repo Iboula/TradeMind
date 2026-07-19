@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TradeMind.AI.Tools;
 
 namespace TradeMind.AI.Application;
 
@@ -33,6 +34,16 @@ public static class DependencyInjection
         services.AddTransient<IAIOrchestrationStep, ProviderExecutionStep>();
         services.AddTransient<IAIOrchestrationStep, ResponseNormalizationStep>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddTradeMindAIToolOrchestration(
+        this IServiceCollection services,
+        Action<AIToolEngineOptions>? configure = null)
+    {
+        services.AddTradeMindAITools(configure);
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IAIOrchestrationStep, ToolExecutionStep>());
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IAIOrchestrationStep, ToolResultCompositionStep>());
         return services;
     }
 

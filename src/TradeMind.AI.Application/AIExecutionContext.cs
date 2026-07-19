@@ -1,4 +1,5 @@
 using TradeMind.AI.Abstractions;
+using TradeMind.AI.Tools;
 
 namespace TradeMind.AI.Application;
 
@@ -36,6 +37,18 @@ public sealed class AIExecutionContext
     public AIExecutionState State { get; private set; } = AIExecutionState.Created;
 
     public AIExecutionError? Error { get; private set; }
+
+    public AIToolExecutionResult? ToolExecutionResult { get; private set; }
+
+    public bool ToolUsed { get; private set; }
+
+    public AIToolId? ToolId { get; private set; }
+
+    public bool? ToolSuccess { get; private set; }
+
+    public TimeSpan? ToolDuration { get; private set; }
+
+    public string? ToolErrorCode { get; private set; }
 
     public IReadOnlyDictionary<AIExecutionContextItemKey, object> Items => _items;
 
@@ -120,6 +133,41 @@ public sealed class AIExecutionContext
         }
 
         _items[key] = value;
+    }
+
+    public void SetToolExecutionResult(AIToolExecutionResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        EnsureState(AIExecutionState.Running, "Tool results can only be set while execution is running.");
+
+        if (ToolExecutionResult is not null)
+        {
+            throw new InvalidOperationException("Tool execution result has already been set.");
+        }
+
+        ToolExecutionResult = result;
+        ToolUsed = true;
+        ToolId = result.ToolId;
+        ToolSuccess = result.Success;
+        ToolDuration = result.Duration;
+        ToolErrorCode = result.Error?.Code;
+    }
+
+    public void RecordToolFailure(
+        AIToolId toolId,
+        bool toolWasInvoked,
+        string errorCode,
+        TimeSpan? duration = null)
+    {
+        ArgumentNullException.ThrowIfNull(toolId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(errorCode);
+        EnsureState(AIExecutionState.Running, "Tool failures can only be recorded while execution is running.");
+
+        ToolUsed = toolWasInvoked;
+        ToolId = toolId;
+        ToolSuccess = false;
+        ToolDuration = duration;
+        ToolErrorCode = errorCode;
     }
 
     public void Complete(DateTimeOffset completedAtUtc)
