@@ -22,7 +22,9 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.AI.Tools`: provider-agnostic tool definitions, registry, discovery, authorization, validation, controlled execution, result composition, and deterministic demonstration tools.
 - `src/TradeMind.AI.Agents`: provider-agnostic versioned agent definitions, registry, discovery, authorization, policy mapping, execution, metrics, and built-in declarative agents.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
+- `src/TradeMind.Trading.Coaching`: provider-agnostic trading journal validation, metrics, rules, scoring, structured coaching agent, and business service.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
+- `tests/TradeMind.Trading.Coaching.Tests`: deterministic Trading Coach unit and composition tests.
 - `tests/TradeMind.KnowledgeHub.Tests`: unit tests.
 - `tests/TradeMind.KnowledgeHub.IntegrationTests`: PostgreSQL/pgvector integration tests.
 - `docs`: architecture, engineering, ADR, and product documentation.
@@ -115,6 +117,18 @@ services.AddTradeMindAIAgents(options =>
 Keep agent ids lowercase-kebab-case and versions semantic. Add a new version rather than mutating the behavior of an already published version. Request overrides may narrow an agent definition but must never widen permissions, context budgets, timeouts, tool lists, failure behavior, or side effects. Development-only agents require explicit configuration and remain unavailable in production.
 
 Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls. Tests that verify AI session timestamps, prompt rendering timestamps, or execution duration should inject a controlled `TimeProvider`.
+
+Register Trading Coaching after the AI orchestration and Agent Framework dependencies required by the host:
+
+```csharp
+services.AddTradeMindAIOrchestration();
+services.AddTradeMindAIAgents();
+services.AddTradeMindTradingCoaching();
+```
+
+Memory and Knowledge orchestration registrations are optional. Enable them only when the host needs the corresponding `TradingCoachExecutionOptions`; Memory requires a conversation id. The coach never requires Tool Engine registration. Its memory policy does not automatically save the structured journal request or provider response, and its Knowledge policy is limited to bounded educational process context.
+
+The Prompt Engine uses `major.minor` template versions, so `trading-coach-analysis` `1.0` belongs to semantic agent version `1.0.0`. Add a new prompt and agent version for behavior changes instead of mutating the published pair. Tests and local hosts should use fake providers; the coaching suite requires no network, database, credential, market data, or broker.
 
 ## Migrations
 

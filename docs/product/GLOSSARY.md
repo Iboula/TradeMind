@@ -2,7 +2,7 @@
 
 ## AI Coach
 
-A future assistant that reviews trades, journal entries, rules, and knowledge sources to help traders improve process quality.
+The product capability for educational review of trades, journal entries, rules, and knowledge sources. Its first implementation is the bounded `trading-coach` `1.0.0` journal-analysis MVP.
 
 ## AI Provider
 
@@ -71,3 +71,15 @@ A future capability for defining, versioning, and validating trading strategies.
 ## Testcontainers
 
 A testing library used to run disposable Docker containers for integration tests.
+
+## Trading Coach
+
+A provider-agnostic educational agent that analyzes explicitly supplied journal data. It prioritizes deterministic metrics and process findings, emits strict structured output, and cannot access market data, a broker, orders, or trading tools.
+
+## Process Score
+
+A bounded and explained review score for plan adherence, risk discipline, execution quality, emotional control, journal completeness, or overall process quality. It is not a prediction of profitability.
+
+## Rule-Based Finding
+
+A deterministic coaching observation produced by application code from supplied journal facts. A provider can enrich its explanation but cannot remove it or change its calculated inputs.

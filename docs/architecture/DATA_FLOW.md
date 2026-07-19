@@ -140,3 +140,18 @@ Unknown, unavailable, and unauthorized tools fail closed. Validation or executio
 10. On error, the optional failure hook is attempted without replacing the primary exception; there is no automatic retry.
 
 An agent timeout uses `TimeProvider` and becomes `AIAgentTimeoutException`. Caller cancellation remains `OperationCanceledException`. Reduced-capability mode applies only to optional Memory, Knowledge, or Tool failures and never to authorization.
+
+## Trading Coach analysis flow
+
+1. A trusted product caller supplies an immutable `TradingJournalAnalysisRequest`, `TradingCoachProfile`, bounded `TradingCoachExecutionOptions`, and cancellation token.
+2. The validator rejects unsafe signs, ranges, timestamps, text lengths, unsupported direction, and contradictory explicit risk data without logging values.
+3. The normalizer trims text, canonicalizes direction, timeframe, and tags, reports unambiguous derivations, and calculates completeness.
+4. The metrics calculator derives only supported historical values and records sources, unavailable metrics, and consistency warnings.
+5. The rule analyzer detects documented process breaches, missing fields, behavior terms, and process-versus-result distinctions; the scorer creates deterministic process scores.
+6. The service creates an exact `trading-coach` `1.0.0` request. Structured journal content is supplied as delimited JSON prompt data, not as a free-form system instruction.
+7. Optional Memory uses a small window and does not automatically save the request or response. Optional Knowledge uses an explicit educational-process query and bounded filters. Neither is required for execution.
+8. `IAIAgentExecutor` invokes the existing orchestrator once. Tools are disabled and no tool orchestration registration is required.
+9. The response parser accepts one exact JSON schema and assigns analysis identity, time, and version from application-controlled values.
+10. The merger restores deterministic metrics, findings, missing information, scores, and disclaimer as authoritative values; AI actions must reference a finding.
+11. The final safety filter fails closed on directional trade instructions, order execution language, exact predictions, leverage instructions, guarantees, or promised returns.
+12. The service returns an immutable `TradingCoachAnalysis` and logs identifiers, counts, state, and duration only.

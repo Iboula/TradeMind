@@ -172,6 +172,23 @@ Responsibilities:
 
 The module composes public AI contracts only. It has no OpenAI SDK, EF Core, Npgsql, pgvector, ASP.NET Core, HTTP context, filesystem, network, market data, broker, or agent persistence dependency.
 
+## Trading Coaching
+
+Project: `src/TradeMind.Trading.Coaching`
+
+Responsibilities:
+
+- Define immutable journal-analysis input, coaching profile, execution options, findings, metrics, scores, actions, and final analysis contracts.
+- Validate and normalize explicitly supplied journal data without persistence access.
+- Calculate deterministic risk and execution metrics with invariant culture.
+- Detect transparent French and English process and behavior patterns.
+- Produce deterministic findings and process scores that are independent of profit and loss.
+- Define `trading-coach-analysis` prompt `1.0` and `trading-coach` agent `1.0.0`.
+- Parse strict provider JSON, merge with deterministic priority, and apply final fail-closed safety validation.
+- Orchestrate one exact agent execution with optional minimal Memory and optional educational Knowledge.
+
+The module has no concrete provider, EF Core, Npgsql, pgvector, ASP.NET Core, HTTP identity, filesystem, market data, broker, or Tool Engine dependency. Tools and side effects are disabled by the agent definition.
+
 ## Persistence model
 
 `KnowledgeHubDbContext` maps:
@@ -186,3 +203,5 @@ The model installs the PostgreSQL `vector` extension and maps embeddings to `vec
 Unit tests verify domain and pure infrastructure behavior.
 
 Integration tests verify PostgreSQL and pgvector behavior with Testcontainers, including migrations, extension installation, HNSW index creation, persistence, retrieval, and cosine search.
+
+`tests/TradeMind.Trading.Coaching.Tests` contains 135 deterministic unit and composition tests for validation, normalization, metrics, rules, behavior patterns, scores, strict JSON, safety, merging, service execution, agent policy, and DI boundaries. These tests require no network, database, provider credential, Tool Engine, market data, or broker.

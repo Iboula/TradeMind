@@ -25,7 +25,7 @@ Introduce production AI provider integrations behind abstractions.
 - Add a Knowledge RAG Engine for bounded KnowledgeHub context retrieval and internal citations.
 - Add a controlled provider-agnostic Tool Engine for explicit, authorized, validated, timeout-bound application capabilities.
 - Add a versioned, provider-agnostic Agent Framework for declarative agent identity, discovery, authorization, engine policy composition, and safe execution.
-- Use `generic-assistant` as the reference agent and keep `trading-coach` as an educational development skeleton until journal, market, risk, and compliance rules exist.
+- Use `generic-assistant` as the reference agent, retain `trading-coach` `0.1.0` as a development skeleton, and publish the bounded educational `trading-coach` `1.0.0` business-agent MVP.
 - Design autonomous loops and multi-agent coordination separately, after step budgets, delegation, repeated authorization, termination, idempotency, and audit rules are approved.
 - Add provider-native tool calling only after loop limits, model-proposed argument policy, confirmations, and multi-call security are defined.
 - Provide context contribution extension points for future KnowledgeHub and Memory enrichment.
@@ -61,6 +61,9 @@ Use journal and knowledge context to provide coaching.
 - Ask reflective questions.
 - Highlight risk violations and process drift.
 - Avoid pretending to guarantee trade outcomes.
+- Deliver the first journal-analysis MVP with deterministic validation, metrics, rules, process scoring, strict JSON, linked actions, and final safety filtering.
+- Keep the MVP limited to explicitly supplied journal snapshots until Trading Journal persistence and cross-trade retention policies are approved.
+- Add cross-trade pattern history only through an authorized journal read model; do not give the coach direct database access.
 
 ## Phase 6: Market Analysis
 
