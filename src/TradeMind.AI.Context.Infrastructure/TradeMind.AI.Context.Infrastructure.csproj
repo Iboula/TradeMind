@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.AI.Context.Application\TradeMind.AI.Context.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Context.Domain\TradeMind.AI.Context.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Knowledge\TradeMind.AI.Knowledge.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj" />
+    <ProjectReference Include="..\TradeMind.MarketConnectors.Application\TradeMind.MarketConnectors.Application.csproj" />
+  </ItemGroup>
+
+</Project>
