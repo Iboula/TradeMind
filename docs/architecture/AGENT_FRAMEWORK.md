@@ -98,6 +98,8 @@ The host may omit optional engines when its registered agents never enable them.
 
 `trading-coach` `1.0.0` is the first functional business agent and is implemented by `TradeMind.Trading.Coaching`. It accepts only explicitly supplied journal data, applies deterministic validation, normalization, metrics, rule findings, and process scores before one provider call, parses strict JSON, merges with deterministic priority, and runs a fail-closed final safety filter. Memory and educational Knowledge are optional and degradable. Tools, streaming, provider-native tool calling, autonomous execution, market access, broker access, signals, and side effects are disabled. Prompt template `trading-coach-analysis` `1.0` is the Prompt Engine counterpart to agent semantic version `1.0.0`.
 
+`journal-analysis` `1.0.0` is implemented by `TradeMind.Trading.Analytics`. It interprets deterministic multi-trade aggregates, data quality, behavior trends, risk drift, setup cohorts, score evolution, and rule findings. It never receives authority to recalculate those values. Optional Memory and educational Knowledge follow the same bounded, degradable model; automatic request and response storage is disabled. Tools, streaming, provider-native tool calling, autonomous execution, predictions, signals, market access, broker access, and side effects are disabled. Prompt template `trading-journal-analysis` `1.0` is the Prompt Engine counterpart to semantic agent version `1.0.0`.
+
 Business modules register additional `IAIAgent` versions and prompt templates through their own DI entry point. They do not move business validation or calculations into the generic Agent Framework.
 
 ## Limits and evolution

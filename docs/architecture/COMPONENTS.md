@@ -189,6 +189,23 @@ Responsibilities:
 
 The module has no concrete provider, EF Core, Npgsql, pgvector, ASP.NET Core, HTTP identity, filesystem, market data, broker, or Tool Engine dependency. Tools and side effects are disabled by the agent definition.
 
+## Trading Analytics
+
+Project: `src/TradeMind.Trading.Analytics`
+
+Responsibilities:
+
+- Accept a bounded immutable collection of explicitly supplied Coaching journal contracts.
+- Validate every trade through Coaching and report indexed invalid or incomplete records.
+- Normalize, checksum, deduplicate, and chronologically order the supplied collection.
+- Reuse deterministic per-trade metrics, findings, behavior patterns, and process scores.
+- Calculate descriptive aggregates, historical R drawdown, streaks, UTC periods, setup cohorts, behavior trends, risk drift, post-outcome associations, score evolution, and data quality.
+- Produce deterministic cross-trade findings and linked review actions.
+- Define prompt `trading-journal-analysis` `1.0` and agent `journal-analysis` `1.0.0` for optional narrative enrichment.
+- Parse strict JSON, merge with deterministic priority, and reuse the shared fail-closed educational safety policy.
+
+The module has no concrete provider, EF Core, Npgsql, pgvector, ASP.NET Core, `HttpContext`, filesystem, market data, broker, order, or Tool Engine dependency. It does not persist journals, predict performance, or establish causality.
+
 ## Persistence model
 
 `KnowledgeHubDbContext` maps:
@@ -205,3 +222,5 @@ Unit tests verify domain and pure infrastructure behavior.
 Integration tests verify PostgreSQL and pgvector behavior with Testcontainers, including migrations, extension installation, HNSW index creation, persistence, retrieval, and cosine search.
 
 `tests/TradeMind.Trading.Coaching.Tests` contains 135 deterministic unit and composition tests for validation, normalization, metrics, rules, behavior patterns, scores, strict JSON, safety, merging, service execution, agent policy, and DI boundaries. These tests require no network, database, provider credential, Tool Engine, market data, or broker.
+
+`tests/TradeMind.Trading.Analytics.Tests` contains 167 deterministic unit and composition tests for collection validation, deduplication, statistics, drawdown, streaks, periods, setups, behavior, risk drift, post-outcome associations, score evolution, rules, agent policy, strict JSON, merging, safety, service execution, and DI boundaries. These tests require no network, database, provider credential, Tool Engine, market data, or broker.

@@ -23,8 +23,10 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.AI.Agents`: provider-agnostic versioned agent definitions, registry, discovery, authorization, policy mapping, execution, metrics, and built-in declarative agents.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
 - `src/TradeMind.Trading.Coaching`: provider-agnostic trading journal validation, metrics, rules, scoring, structured coaching agent, and business service.
+- `src/TradeMind.Trading.Analytics`: provider-agnostic multi-trade validation, deduplication, descriptive statistics, trends, data quality, structured journal-analysis agent, and business service.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
 - `tests/TradeMind.Trading.Coaching.Tests`: deterministic Trading Coach unit and composition tests.
+- `tests/TradeMind.Trading.Analytics.Tests`: deterministic Trading Journal Analytics unit and composition tests.
 - `tests/TradeMind.KnowledgeHub.Tests`: unit tests.
 - `tests/TradeMind.KnowledgeHub.IntegrationTests`: PostgreSQL/pgvector integration tests.
 - `docs`: architecture, engineering, ADR, and product documentation.
@@ -129,6 +131,21 @@ services.AddTradeMindTradingCoaching();
 Memory and Knowledge orchestration registrations are optional. Enable them only when the host needs the corresponding `TradingCoachExecutionOptions`; Memory requires a conversation id. The coach never requires Tool Engine registration. Its memory policy does not automatically save the structured journal request or provider response, and its Knowledge policy is limited to bounded educational process context.
 
 The Prompt Engine uses `major.minor` template versions, so `trading-coach-analysis` `1.0` belongs to semantic agent version `1.0.0`. Add a new prompt and agent version for behavior changes instead of mutating the published pair. Tests and local hosts should use fake providers; the coaching suite requires no network, database, credential, market data, or broker.
+
+Register Trading Analytics after the orchestration components needed by the host:
+
+```csharp
+services.AddTradeMindAIOrchestration();
+services.AddTradeMindAIAgents();
+services.AddTradeMindTradingAnalytics(options =>
+{
+    options.IncludeAIInterpretation = false;
+});
+```
+
+`AddTradeMindTradingAnalytics()` also composes Trading Coaching because per-trade validation, metrics, findings, behavior detection, and scores remain authoritative there. AI interpretation, Memory, and Knowledge are disabled by default. The service does not require the Tool Engine. When AI interpretation is enabled, register a provider through the existing AI infrastructure and optionally register Memory or Knowledge orchestration only when their options are enabled.
+
+The Prompt Engine template `trading-journal-analysis` `1.0` belongs to semantic agent version `journal-analysis` `1.0.0`. Analytics tests use a fake `IAIAgentExecutor`, require no network or database, and should retain exactly reproducible UTC and invariant-culture inputs.
 
 ## Migrations
 

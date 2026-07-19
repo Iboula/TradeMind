@@ -155,3 +155,25 @@ An agent timeout uses `TimeProvider` and becomes `AIAgentTimeoutException`. Call
 10. The merger restores deterministic metrics, findings, missing information, scores, and disclaimer as authoritative values; AI actions must reference a finding.
 11. The final safety filter fails closed on directional trade instructions, order execution language, exact predictions, leverage instructions, guarantees, or promised returns.
 12. The service returns an immutable `TradingCoachAnalysis` and logs identifiers, counts, state, and duration only.
+
+## Trading Journal Analytics flow
+
+1. A trusted caller supplies an immutable `TradingJournalAnalyticsRequest` containing an explicit journal snapshot, profile, UTC date window, grouping and analysis switches, language, and safe identity identifiers.
+2. The collection validator enforces bounds and invokes the Coaching validator for every trade. Invalid and incomplete indexes are recorded without values.
+3. The collection normalizer invokes Coaching normalization, derives canonical checksums where no journal id exists, resolves strict duplicates by documented completeness policy, and sorts chronologically.
+4. For every retained trade, Coaching calculates deterministic metrics, rule findings, behavior patterns, and process scores.
+5. The statistics calculator creates descriptive aggregate metrics.
+6. The same chronological snapshot produces historical cumulative-R drawdown and deterministic streaks.
+7. The period aggregator creates UTC day, Monday-based week, month, or ungrouped cohorts with exclusive end boundaries.
+8. Optional setup analysis groups normalized setup names and flags insufficient samples.
+9. Optional behavior analysis counts the nine supported lexical patterns and compares first and recent occurrence rates.
+10. Risk analysis compares baseline and recent documented risk and records non-causal observed associations around supplied outcomes.
+11. Post-outcome analysis compares the next supplied trade after wins, losses, two losses, large wins, and rule violations.
+12. Optional score evolution compares first and recent deterministic Coaching scores and emits ordered period values.
+13. Data quality combines count, completeness, validity, duplicates, consistency, and date coverage into explicit limitations and confidence.
+14. The cross-trade rule analyzer creates deterministic findings, strengths, linked recommendations, and checklist items.
+15. If AI interpretation is enabled, the service creates one exact `journal-analysis` `1.0.0` request containing aggregates only. Optional Memory and educational Knowledge remain bounded; Tools are disabled.
+16. `IAIAgentExecutor` calls the provider at most once, and the strict parser rejects malformed, unbounded, unsafe, or wrong-language JSON without exposing raw output.
+17. The merger preserves every deterministic metric, drawdown, streak, trend, score, data-quality value, and finding while allowing narrative enrichment only.
+18. The shared educational safety policy runs after the merge and fails closed on signals, asset or order recommendations, leverage instructions, predictions, promises, or financial certainty.
+19. The service returns an immutable `TradingJournalAnalyticsReport` and logs only safe identifiers, counts, phases, durations, and error codes.

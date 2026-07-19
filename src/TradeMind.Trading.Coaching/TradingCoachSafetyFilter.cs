@@ -94,7 +94,7 @@ public sealed class TradingCoachSafetyFilter : ITradingCoachSafetyFilter
         TradingCoachSafetyPolicy.ContainsProhibitedContent(value) ? "Content removed by safety policy." : value;
 }
 
-internal static class TradingCoachSafetyPolicy
+public static class TradingCoachSafetyPolicy
 {
     private static readonly Regex[] ProhibitedPatterns =
     [
@@ -106,7 +106,12 @@ internal static class TradingCoachSafetyPolicy
         Create(@"\buse\s+(?:the\s+)?maximum\s+leverage\b|\butilise[rz]?\s+(?:le\s+)?levier\s+maximal\b"),
         Create(@"\b(?:price|prix)\b.{0,30}\b(?:will|va|sera|atteindra|reach)\b.{0,20}\d"),
         Create(@"\b(?:place|execute|submit)\s+(?:the\s+|an?\s+)?(?:buy|sell|market|limit)?\s*order\b|\b(?:place[rz]?|execute[rz]?)\s+(?:un\s+)?ordre\b"),
-        Create(@"\b(?:promise|promesse)\b.{0,20}\b(?:return|profit|gain|rendement)\b")
+        Create(@"\b(?:promise|promesse)\b.{0,20}\b(?:return|profit|gain|rendement)\b"),
+        Create(@"\b(?:recommend|recommande[rz]?|should)\b.{0,20}\b(?:buy|sell|acheter|vendre)\b"),
+        Create(@"\b(?:buy|sell|acheter|vendre)\s+(?:[a-z]{2,10}(?:usd|usdt)?|this\s+asset|cet\s+actif)\b"),
+        Create(@"\b[a-z]{2,12}\b.{0,20}\b(?:will|va)\s+(?:rise|fall|reach|monter|baisser|atteindre)\b"),
+        Create(@"\b(?:will|va|garanti\s+de)\s+(?:return|yield|profit|gain|rapporter|produire)\b"),
+        Create(@"\b(?:certain|sure|assured|sans\s+risque)\b.{0,20}\b(?:profit|return|yield|gain|rendement)\b")
     ];
 
     public static bool ContainsProhibitedContent(string value) =>

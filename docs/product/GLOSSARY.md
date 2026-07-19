@@ -83,3 +83,19 @@ A bounded and explained review score for plan adherence, risk discipline, execut
 ## Rule-Based Finding
 
 A deterministic coaching observation produced by application code from supplied journal facts. A provider can enrich its explanation but cannot remove it or change its calculated inputs.
+
+## Historical R Drawdown
+
+The largest observed decline from a prior cumulative-R peak in the chronological journal history supplied to Analytics. It is descriptive and order-dependent, not a forecast of future drawdown.
+
+## Observed Association
+
+A descriptive relationship found between supplied historical events, such as a loss followed by higher documented risk. It does not establish that one event caused the other.
+
+## Trading Journal Analytics
+
+The provider-agnostic `TradeMind.Trading.Analytics` capability that validates and deduplicates an explicitly supplied trade history, reuses deterministic Coaching metrics and scores, and calculates descriptive aggregates, cohorts, trends, streaks, data quality, and educational findings. Optional AI can enrich narrative only.
+
+## Risk Drift
+
+A deterministic comparison of documented risk across an explicitly supplied chronological history, including baseline-versus-recent direction, repeated profile-limit exceedance, between-trade variation, and non-causal post-outcome associations.

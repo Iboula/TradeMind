@@ -34,6 +34,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching.Tests", "tests/TradeMind.Trading.Coaching.Tests/TradeMind.Trading.Coaching.Tests.csproj", "{4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics", "src/TradeMind.Trading.Analytics/TradeMind.Trading.Analytics.csproj", "{DA9A97AC-219F-4B2D-A162-72A1E112B4BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics.Tests", "tests/TradeMind.Trading.Analytics.Tests/TradeMind.Trading.Analytics.Tests.csproj", "{740BEF96-4E85-423B-8094-5D519F112D1B}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -104,5 +108,13 @@ Global
     {4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}.Release|Any CPU.Build.0 = Release|Any CPU
+    {DA9A97AC-219F-4B2D-A162-72A1E112B4BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {DA9A97AC-219F-4B2D-A162-72A1E112B4BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {DA9A97AC-219F-4B2D-A162-72A1E112B4BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {DA9A97AC-219F-4B2D-A162-72A1E112B4BF}.Release|Any CPU.Build.0 = Release|Any CPU
+    {740BEF96-4E85-423B-8094-5D519F112D1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {740BEF96-4E85-423B-8094-5D519F112D1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {740BEF96-4E85-423B-8094-5D519F112D1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {740BEF96-4E85-423B-8094-5D519F112D1B}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

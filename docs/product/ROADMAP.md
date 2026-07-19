@@ -52,6 +52,7 @@ Capture trading decisions and outcomes.
 - Link journal entries to KnowledgeHub sources and market context.
 - Extract recurring mistakes and strengths.
 - Prepare analytics for behavior and process quality.
+- Map an authorized journal read model into the existing immutable Coaching and Analytics contracts when persistence ownership, retention, and deletion policies are approved.
 
 ## Phase 5: AI Coach
 
@@ -64,6 +65,8 @@ Use journal and knowledge context to provide coaching.
 - Deliver the first journal-analysis MVP with deterministic validation, metrics, rules, process scoring, strict JSON, linked actions, and final safety filtering.
 - Keep the MVP limited to explicitly supplied journal snapshots until Trading Journal persistence and cross-trade retention policies are approved.
 - Add cross-trade pattern history only through an authorized journal read model; do not give the coach direct database access.
+- Deliver deterministic multi-trade journal analytics for descriptive aggregates, historical R drawdown, streaks, UTC cohorts, setup consistency, behavior trends, risk drift, observed post-outcome associations, score evolution, and data quality.
+- Offer `journal-analysis` `1.0.0` only as optional narrative enrichment over deterministic analytics, with no prediction, causality, signal, market access, broker access, or Tool Engine.
 
 ## Phase 6: Market Analysis
 

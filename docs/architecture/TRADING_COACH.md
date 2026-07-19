@@ -10,7 +10,7 @@ The module focuses on plan adherence, discipline, documented risk, position-size
 
 The module references `TradeMind.AI.Agents` and `TradeMind.AI.Application`. Its remaining dependencies are Microsoft DI, Options, and Logging abstractions. It has no EF Core, Npgsql, pgvector, OpenAI SDK, ASP.NET Core, ambient HTTP identity, filesystem, broker, or market-data dependency.
 
-The current input is a snapshot contract, not a persisted Trading Journal aggregate. A future Trading Journal module can map its own authorized read model into `TradingJournalAnalysisRequest` without giving the coach direct database access.
+The current input is a snapshot contract, not a persisted Trading Journal aggregate. A future Trading Journal module can map its own authorized read model into `TradingJournalAnalysisRequest` without giving the coach direct database access. Multi-trade history is handled separately by `TradeMind.Trading.Analytics`, which composes these same contracts without expanding Coaching's one-trade responsibility.
 
 ## Input
 
@@ -94,4 +94,4 @@ Validation, parsing, safety, authorization, and timeout failures stop the analys
 
 ## Limits
 
-The MVP analyzes one supplied snapshot. It does not persist journals, compare a history of trades, diagnose psychology, validate strategy edge, inspect live prices, calculate recommended lots, or execute any action. Cross-trade repetition analysis requires a future authorized history contract and retention decision.
+The MVP analyzes one supplied snapshot. It does not persist journals, diagnose psychology, validate strategy edge, inspect live prices, calculate recommended lots, or execute any action. `TradeMind.Trading.Analytics` can compare an explicitly supplied history through a separate immutable contract, but it still does not own persistence, authorization, retention, causal inference, or future prediction.
