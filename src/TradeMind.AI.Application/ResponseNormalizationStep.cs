@@ -41,7 +41,8 @@ public sealed class ResponseNormalizationStep : IAIOrchestrationStep
             context.ToolId?.Value,
             context.ToolSuccess,
             context.ToolDuration,
-            context.ToolErrorCode));
+            context.ToolErrorCode,
+            GetItem<bool>(context, AIExecutionContextItemKey.MemoryUsed)));
 
         return Task.CompletedTask;
     }

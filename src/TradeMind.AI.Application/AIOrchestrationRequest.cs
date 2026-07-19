@@ -22,6 +22,7 @@ public sealed record AIOrchestrationRequest
         MaxOutputTokens = maxOutputTokens;
         Metadata = CopyMetadata(metadata);
         PromptVariables = new Dictionary<string, string>();
+        Memory = AIMemoryOptions.Disabled;
         Knowledge = AIKnowledgeOptions.Disabled;
         Tool = AIToolInvocationOptions.Disabled;
         CorrelationId = correlationId;
@@ -49,6 +50,8 @@ public sealed record AIOrchestrationRequest
     public IReadOnlyDictionary<string, string> PromptVariables { get; init; }
 
     public bool UseMemory { get; init; }
+
+    public AIMemoryOptions Memory { get; init; }
 
     public AIKnowledgeOptions Knowledge { get; init; }
 

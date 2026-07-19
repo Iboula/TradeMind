@@ -156,6 +156,22 @@ Responsibilities:
 - Isolate the official OpenAI SDK.
 - Translate between provider-independent contracts and OpenAI SDK types.
 
+## AI Agents
+
+Project: `src/TradeMind.AI.Agents`
+
+Responsibilities:
+
+- Define immutable agent ids, semantic versions, definitions, capabilities, policies, requests, contexts, responses, metrics, and safe errors.
+- Snapshot registered agents and resolve `Exact`, `Latest`, or `LatestStable` versions.
+- Discover public definitions by availability, permission, tenant, user, scenario, capability, tag, and side-effect boundary.
+- Authorize every execution and reject request overrides that widen the definition.
+- Map agent policy to the existing Prompt, Memory, Knowledge, Tool, identity, and orchestration contracts.
+- Invoke `IAIOrchestrator` once with timeout and caller cancellation, optional bounded hooks, no retry, and structured logs.
+- Provide `generic-assistant` `1.0.0` and the development-only `trading-coach` `0.1.0` educational skeleton.
+
+The module composes public AI contracts only. It has no OpenAI SDK, EF Core, Npgsql, pgvector, ASP.NET Core, HTTP context, filesystem, network, market data, broker, or agent persistence dependency.
+
 ## Persistence model
 
 `KnowledgeHubDbContext` maps:

@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Knowledge", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tools", "src/TradeMind.AI.Tools/TradeMind.AI.Tools.csproj", "{D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Agents", "src/TradeMind.AI.Agents/TradeMind.AI.Agents.csproj", "{AD3D8EC7-F845-4F06-896F-BDAAA92B321F}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -86,5 +88,9 @@ Global
     {D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}.Release|Any CPU.Build.0 = Release|Any CPU
+    {AD3D8EC7-F845-4F06-896F-BDAAA92B321F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {AD3D8EC7-F845-4F06-896F-BDAAA92B321F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {AD3D8EC7-F845-4F06-896F-BDAAA92B321F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {AD3D8EC7-F845-4F06-896F-BDAAA92B321F}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

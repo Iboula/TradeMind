@@ -125,3 +125,18 @@ Memory logs contain identifiers, counts, and sequence ranges only. They do not c
 10. The provider is called once and the response exposes tool id, use, success, duration, and safe error code only.
 
 Unknown, unavailable, and unauthorized tools fail closed. Validation or execution failures follow `FailClosed` or `ContinueWithoutTool`; continuation never injects failed output or an exception into the prompt.
+
+## Versioned agent flow
+
+1. A product module creates `AIAgentExecutionRequest` with a canonical agent id, explicit version strategy, scenario, user message, identity, permissions, and optional narrower engine settings.
+2. `InMemoryAIAgentRegistry` resolves one immutable definition by `Exact`, `Latest`, or `LatestStable` semantic ordering.
+3. `PolicyBasedAIAgentAuthorizer` checks availability, permissions, tenant, user, scenario, requested capabilities, timeout, tool, and side-effect boundaries.
+4. `AIAgentPolicyGuard` rejects every override that would enable a forbidden capability, disable a required capability, enlarge a context budget, weaken fail-closed behavior, or add rights.
+5. The optional starting hook receives a service-free `AIAgentExecutionContext`.
+6. `AIAgentRequestMapper` applies Prompt defaults and effective Memory, Knowledge, Tool, identity, session, conversation, correlation, and metadata settings.
+7. `IAIOrchestrator` runs its existing ordered pipeline exactly once and calls the active provider once.
+8. `AIAgentResponseMapper` exposes safe content, provider, public citation ids, optional tool id, engine-use flags, state, timing, and token metrics.
+9. The optional completion hook runs and the executor returns `AIAgentExecutionResponse`.
+10. On error, the optional failure hook is attempted without replacing the primary exception; there is no automatic retry.
+
+An agent timeout uses `TimeProvider` and becomes `AIAgentTimeoutException`. Caller cancellation remains `OperationCanceledException`. Reduced-capability mode applies only to optional Memory, Knowledge, or Tool failures and never to authorization.

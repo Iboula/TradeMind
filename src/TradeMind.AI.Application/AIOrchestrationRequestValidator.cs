@@ -47,7 +47,7 @@ public sealed class AIOrchestrationRequestValidator
             errors.Add($"ConversationId must be {MaximumCorrelationIdLength} characters or fewer.");
         }
 
-        if (request.UseMemory && string.IsNullOrWhiteSpace(request.ConversationId))
+        if ((request.UseMemory || request.Memory.Enabled) && string.IsNullOrWhiteSpace(request.ConversationId))
         {
             errors.Add("ConversationId is required when memory is enabled.");
         }

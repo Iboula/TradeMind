@@ -24,6 +24,9 @@ Introduce production AI provider integrations behind abstractions.
 - Add a versioned Prompt Engine for reusable provider-agnostic prompt templates.
 - Add a Knowledge RAG Engine for bounded KnowledgeHub context retrieval and internal citations.
 - Add a controlled provider-agnostic Tool Engine for explicit, authorized, validated, timeout-bound application capabilities.
+- Add a versioned, provider-agnostic Agent Framework for declarative agent identity, discovery, authorization, engine policy composition, and safe execution.
+- Use `generic-assistant` as the reference agent and keep `trading-coach` as an educational development skeleton until journal, market, risk, and compliance rules exist.
+- Design autonomous loops and multi-agent coordination separately, after step budgets, delegation, repeated authorization, termination, idempotency, and audit rules are approved.
 - Add provider-native tool calling only after loop limits, model-proposed argument policy, confirmations, and multi-call security are defined.
 - Provide context contribution extension points for future KnowledgeHub and Memory enrichment.
 - Add provider configuration without committing secrets.

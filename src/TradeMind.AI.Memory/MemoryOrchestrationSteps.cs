@@ -28,7 +28,7 @@ public sealed class MemoryReadStep : IAIOrchestrationStep
         AIExecutionContext context,
         CancellationToken cancellationToken)
     {
-        if (!context.Request.UseMemory)
+        if (!IsMemoryEnabled(context.Request))
         {
             context.SetItem(AIExecutionContextItemKey.MemoryUsed, false);
             return;
@@ -47,7 +47,7 @@ public sealed class MemoryReadStep : IAIOrchestrationStep
                 context.Session.CorrelationId);
 
             var result = await _memoryReader.ReadAsync(
-                new MemoryReadRequest(key, _options.Window),
+                new MemoryReadRequest(key, GetWindow(context.Request)),
                 cancellationToken).ConfigureAwait(false);
 
             context.SetItem(AIExecutionContextItemKey.MemoryChatMessages, ToChatMessages(result));
@@ -66,7 +66,7 @@ public sealed class MemoryReadStep : IAIOrchestrationStep
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            if (_options.FailureMode == MemoryFailureMode.ContinueWithoutMemory)
+            if (GetFailureMode(context.Request) == MemoryFailureMode.ContinueWithoutMemory)
             {
                 context.SetItem(AIExecutionContextItemKey.MemoryUsed, false);
                 context.SetItem(AIExecutionContextItemKey.MemoryChatMessages, Array.Empty<ChatMessage>());
@@ -82,6 +82,34 @@ public sealed class MemoryReadStep : IAIOrchestrationStep
             throw new MemoryOperationException("Memory read failed.", null, exception);
         }
     }
+
+    private static bool IsMemoryEnabled(AIOrchestrationRequest request) =>
+        request.UseMemory || request.Memory.Enabled;
+
+    private MemoryWindowOptions GetWindow(AIOrchestrationRequest request)
+    {
+        if (!request.Memory.Enabled)
+        {
+            return _options.Window;
+        }
+
+        var window = request.Memory.Window;
+        return new MemoryWindowOptions(
+            window.MaxEntries,
+            window.MaxCharacters,
+            window.MaxEstimatedTokens,
+            window.IncludeSystemMessages,
+            window.IncludeSummary,
+            window.RecentUserMessagesMinimum,
+            window.RecentAssistantMessagesMinimum);
+    }
+
+    private MemoryFailureMode GetFailureMode(AIOrchestrationRequest request) =>
+        request.Memory.Enabled
+            ? request.Memory.FailureMode == AIMemoryFailureMode.ContinueWithoutMemory
+                ? MemoryFailureMode.ContinueWithoutMemory
+                : MemoryFailureMode.FailClosed
+            : _options.FailureMode;
 
     private static ConversationMemoryKey CreateKey(AIExecutionContext context)
     {
@@ -143,7 +171,7 @@ public sealed class MemoryWriteStep : IAIOrchestrationStep
         AIExecutionContext context,
         CancellationToken cancellationToken)
     {
-        if (!context.Request.UseMemory)
+        if (!IsMemoryEnabled(context.Request))
         {
             return;
         }
@@ -167,24 +195,32 @@ public sealed class MemoryWriteStep : IAIOrchestrationStep
                 context.Session.SessionId,
                 context.Session.CorrelationId);
 
-            await _memoryWriter.WriteUserMessageAsync(
-                new MemoryWriteRequest(
-                    key,
-                    ConversationMemoryRole.User,
-                    context.Request.UserMessage,
-                    context.Session.CorrelationId,
-                    context.Session.SessionId),
-                cancellationToken).ConfigureAwait(false);
+            if (!context.Request.Memory.Enabled || context.Request.Memory.SaveUserMessage)
+            {
+                await _memoryWriter.WriteUserMessageAsync(
+                    new MemoryWriteRequest(
+                        key,
+                        ConversationMemoryRole.User,
+                        context.Request.UserMessage,
+                        context.Session.CorrelationId,
+                        context.Session.SessionId,
+                        allowCompaction: !context.Request.Memory.Enabled || context.Request.Memory.CompactionEnabled),
+                    cancellationToken).ConfigureAwait(false);
+            }
 
-            await _memoryWriter.WriteAssistantMessageAsync(
-                new MemoryWriteRequest(
-                    key,
-                    ConversationMemoryRole.Assistant,
-                    response.Content,
-                    context.Session.CorrelationId,
-                    context.Session.SessionId,
-                    response.Usage?.OutputTokens),
-                cancellationToken).ConfigureAwait(false);
+            if (!context.Request.Memory.Enabled || context.Request.Memory.SaveAssistantResponse)
+            {
+                await _memoryWriter.WriteAssistantMessageAsync(
+                    new MemoryWriteRequest(
+                        key,
+                        ConversationMemoryRole.Assistant,
+                        response.Content,
+                        context.Session.CorrelationId,
+                        context.Session.SessionId,
+                        response.Usage?.OutputTokens,
+                        allowCompaction: !context.Request.Memory.Enabled || context.Request.Memory.CompactionEnabled),
+                    cancellationToken).ConfigureAwait(false);
+            }
 
             _logger.LogInformation(
                 "Memory write completed after provider success for conversation {ConversationId}, tenant {TenantId}, user {UserId}, session {SessionId}, and correlation {CorrelationId}",
@@ -196,7 +232,7 @@ public sealed class MemoryWriteStep : IAIOrchestrationStep
         }
         catch (Exception exception) when (exception is not OperationCanceledException)
         {
-            if (_options.FailureMode == MemoryFailureMode.ContinueWithoutMemory)
+            if (GetFailureMode(context.Request) == MemoryFailureMode.ContinueWithoutMemory)
             {
                 _logger.LogWarning(
                     exception,
@@ -210,4 +246,14 @@ public sealed class MemoryWriteStep : IAIOrchestrationStep
             throw new MemoryOperationException("Memory write failed after provider response.", null, exception);
         }
     }
+
+    private static bool IsMemoryEnabled(AIOrchestrationRequest request) =>
+        request.UseMemory || request.Memory.Enabled;
+
+    private MemoryFailureMode GetFailureMode(AIOrchestrationRequest request) =>
+        request.Memory.Enabled
+            ? request.Memory.FailureMode == AIMemoryFailureMode.ContinueWithoutMemory
+                ? MemoryFailureMode.ContinueWithoutMemory
+                : MemoryFailureMode.FailClosed
+            : _options.FailureMode;
 }

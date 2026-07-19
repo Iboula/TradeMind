@@ -16,6 +16,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0008: Conversational Memory Engine](ADR-0008-memory-engine.md)
 - [ADR-0009: Knowledge RAG Engine](ADR-0009-knowledge-rag-engine.md)
 - [ADR-0010: Controlled AI Tool Engine](ADR-0010-tool-engine.md)
+- [ADR-0011: Versioned AI Agent Framework](ADR-0011-agent-framework.md)
 
 ## ADR format
 

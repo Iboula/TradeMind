@@ -69,7 +69,8 @@ public sealed record MemoryWriteRequest
         string? sessionId = null,
         int? tokenCount = null,
         bool isSensitive = false,
-        IReadOnlyDictionary<string, string>? metadata = null)
+        IReadOnlyDictionary<string, string>? metadata = null,
+        bool allowCompaction = true)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
@@ -89,6 +90,7 @@ public sealed record MemoryWriteRequest
         Metadata = metadata is null
             ? new Dictionary<string, string>()
             : new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase);
+        AllowCompaction = allowCompaction;
     }
 
     public ConversationMemoryKey Key { get; init; }
@@ -106,6 +108,8 @@ public sealed record MemoryWriteRequest
     public bool IsSensitive { get; init; }
 
     public IReadOnlyDictionary<string, string> Metadata { get; init; }
+
+    public bool AllowCompaction { get; init; }
 }
 
 public sealed record ConversationSummaryRequest(

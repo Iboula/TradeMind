@@ -28,9 +28,9 @@ Task<AIOrchestrationResponse> ExecuteAsync(
     CancellationToken cancellationToken);
 ```
 
-`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, an opt-in `UseMemory` flag, disabled-by-default `AIKnowledgeOptions`, and disabled-by-default explicit `AIToolInvocationOptions`.
+`AIOrchestrationRequest` carries an optional system instruction, user message, logical scenario, optional logical model, optional temperature, optional token limit, read-only metadata, optional session id, optional conversation id, optional correlation id, optional identity context, optional prompt template selection, an opt-in `UseMemory` compatibility flag, disabled-by-default request-scoped `AIMemoryOptions`, disabled-by-default `AIKnowledgeOptions`, and disabled-by-default explicit `AIToolInvocationOptions`.
 
-`AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, optional response id, safe Knowledge metadata, and safe tool metadata. It never exposes complete tool arguments or output.
+`AIOrchestrationResponse` carries session id, optional conversation id, correlation id, scenario, provider, model, text content, token usage, total duration, optional provider duration, executed steps, UTC completion date, execution state, optional response id, a safe Memory-used flag, safe Knowledge metadata, and safe tool metadata. It never exposes memory content, Knowledge fragments, complete tool arguments, or tool output.
 
 ## Pipeline
 
@@ -57,7 +57,7 @@ flowchart LR
 
 `PromptConstructionStep` runs registered `IAIContextContributor` instances, renders a prompt template through `IPromptRenderer` when one is requested, otherwise uses the legacy `IPromptBuilder` path, and attaches safe session, correlation, scenario, conversation, tenant, user, and agent metadata when present.
 
-When Memory Engine is registered and the request opts in, `MemoryReadStep` runs before prompt construction. It contributes provider-agnostic memory messages through `AIExecutionContext.Items`; `PromptConstructionStep` inserts them before the current user message. `MemoryWriteStep` runs after provider success and writes the current user message plus assistant response.
+When Memory Engine is registered and the request opts in, `MemoryReadStep` runs before prompt construction. It contributes provider-agnostic memory messages through `AIExecutionContext.Items`; `PromptConstructionStep` inserts them before the current user message. `MemoryWriteStep` runs after provider success. Legacy callers use the configured global window and save both messages. Agent callers can supply a narrower request-scoped window, save flags, compaction flag, and failure mode.
 
 When Knowledge RAG Engine is registered and `Knowledge.Enabled` is true, `KnowledgeRetrievalStep` runs before prompt construction. It retrieves KnowledgeHub fragments, composes a delimited context message, and stores safe citation ids and counts for response normalization.
 
@@ -128,3 +128,9 @@ Knowledge RAG is optional and lives in `TradeMind.AI.Knowledge`. `AddTradeMindKn
 ## Tool Engine Integration
 
 Tool Engine is optional and lives in `TradeMind.AI.Tools`. `AddTradeMindAIToolOrchestration()` registers the core engine and the two application pipeline steps. Disabled requests do not access the registry or executor. See [Tool Engine](TOOL_ENGINE.md) for authorization, validation, timeout, result composition, and security policy.
+
+## Agent Framework Facade
+
+`TradeMind.AI.Agents` sits above this pipeline. It resolves a named semantic agent version, authorizes identity and requested capabilities, applies immutable Prompt, Memory, Knowledge, Tool, timeout, and side-effect policies, and maps the effective result to one `AIOrchestrationRequest`.
+
+The agent executor invokes this orchestrator exactly once. It does not insert another provider abstraction or duplicate pipeline steps. The normalized orchestration response is mapped to safe agent identifiers, engine-use flags, public citation ids, optional tool id, provider, state, and phase metrics. See [AI Agent Framework](AGENT_FRAMEWORK.md).

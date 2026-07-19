@@ -49,7 +49,10 @@ public sealed class MemoryWriter : IMemoryWriter
             request.Role);
 
         var entry = await _store.AppendAsync(request, cancellationToken).ConfigureAwait(false);
-        await CompactIfNeededAsync(request.Key, cancellationToken).ConfigureAwait(false);
+        if (request.AllowCompaction)
+        {
+            await CompactIfNeededAsync(request.Key, cancellationToken).ConfigureAwait(false);
+        }
 
         _logger.LogInformation(
             "Memory write completed for conversation {ConversationId}, tenant {TenantId}, user {UserId}, sequence {SequenceNumber}, and role {Role}",

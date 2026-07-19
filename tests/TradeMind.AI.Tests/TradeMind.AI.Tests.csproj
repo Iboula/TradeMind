@@ -33,6 +33,7 @@
     <ProjectReference Include="..\..\src\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj" />
     <ProjectReference Include="..\..\src\TradeMind.AI.Knowledge\TradeMind.AI.Knowledge.csproj" />
     <ProjectReference Include="..\..\src\TradeMind.AI.Tools\TradeMind.AI.Tools.csproj" />
+    <ProjectReference Include="..\..\src\TradeMind.AI.Agents\TradeMind.AI.Agents.csproj" />
   </ItemGroup>
 
 </Project>

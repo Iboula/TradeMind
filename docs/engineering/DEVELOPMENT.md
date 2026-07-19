@@ -20,6 +20,7 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.AI.Knowledge`: provider-agnostic KnowledgeHub RAG retrieval, context budgeting, citations, prompt composition, and optional orchestration step.
 - `src/TradeMind.AI.Memory`: provider-agnostic conversation memory contracts, in-memory store, window reader, writer, summarizer, and optional orchestration steps.
 - `src/TradeMind.AI.Tools`: provider-agnostic tool definitions, registry, discovery, authorization, validation, controlled execution, result composition, and deterministic demonstration tools.
+- `src/TradeMind.AI.Agents`: provider-agnostic versioned agent definitions, registry, discovery, authorization, policy mapping, execution, metrics, and built-in declarative agents.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
 - `tests/TradeMind.KnowledgeHub.Tests`: unit tests.
@@ -95,6 +96,23 @@ services.AddTradeMindAIToolOrchestration(options =>
 ```
 
 Do not enable development tools in production policy. Do not derive `AIToolInvocationOptions` directly from free-form model or user text. Tests should use deterministic `IAITool` implementations and controlled `TimeProvider` instances; Tool Engine tests require no network, database, broker, or secret.
+
+Register the Agent Framework after the orchestration engines required by the host:
+
+```csharp
+services.AddTradeMindAIOrchestration();
+services.AddTradeMindMemory();
+services.AddTradeMindKnowledgeRag();
+services.AddTradeMindAIToolOrchestration();
+services.AddTradeMindAIAgents(options =>
+{
+    options.EnableDevelopmentAgents = environment.IsDevelopment();
+});
+```
+
+`AddTradeMindAIAgents()` registers the immutable registry, policy authorizer, request and response mappers, executor, built-in definitions, and the trading-coach prompt. It does not select a concrete provider and does not add optional Memory, Knowledge, or Tool orchestration steps for the host.
+
+Keep agent ids lowercase-kebab-case and versions semantic. Add a new version rather than mutating the behavior of an already published version. Request overrides may narrow an agent definition but must never widen permissions, context budgets, timeouts, tool lists, failure behavior, or side effects. Development-only agents require explicit configuration and remain unavailable in production.
 
 Unit and composition tests should inject fake `IChatProvider` and `IAIProviderMetadata` implementations rather than requiring external AI calls. Tests that verify AI session timestamps, prompt rendering timestamps, or execution duration should inject a controlled `TimeProvider`.
 

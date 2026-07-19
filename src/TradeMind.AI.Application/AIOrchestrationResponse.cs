@@ -27,7 +27,8 @@ public sealed record AIOrchestrationResponse
         string? toolId = null,
         bool? toolSuccess = null,
         TimeSpan? toolDuration = null,
-        string? toolErrorCode = null)
+        string? toolErrorCode = null,
+        bool memoryUsed = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(sessionId);
         ArgumentException.ThrowIfNullOrWhiteSpace(correlationId);
@@ -63,6 +64,7 @@ public sealed record AIOrchestrationResponse
         ToolSuccess = toolSuccess;
         ToolDuration = toolDuration;
         ToolErrorCode = string.IsNullOrWhiteSpace(toolErrorCode) ? null : toolErrorCode;
+        MemoryUsed = memoryUsed;
     }
 
     public string SessionId { get; init; }
@@ -114,4 +116,6 @@ public sealed record AIOrchestrationResponse
     public TimeSpan? ToolDuration { get; init; }
 
     public string? ToolErrorCode { get; init; }
+
+    public bool MemoryUsed { get; init; }
 }
