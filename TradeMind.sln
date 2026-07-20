@@ -80,6 +80,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Tests", "tests/TradeMind.AI.ExpertAgents.Consensus.Tests/TradeMind.AI.ExpertAgents.Consensus.Tests.csproj", "{29D71967-6777-4CBB-9F12-292C6A56C1B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Domain", "src/TradeMind.AI.TradingDecisions.Domain/TradeMind.AI.TradingDecisions.Domain.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Application", "src/TradeMind.AI.TradingDecisions.Application/TradeMind.AI.TradingDecisions.Application.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Tests", "tests/TradeMind.AI.TradingDecisions.Tests/TradeMind.AI.TradingDecisions.Tests.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -242,5 +248,17 @@ Global
     {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Release|Any CPU.Build.0 = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}.Release|Any CPU.Build.0 = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}.Release|Any CPU.Build.0 = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal

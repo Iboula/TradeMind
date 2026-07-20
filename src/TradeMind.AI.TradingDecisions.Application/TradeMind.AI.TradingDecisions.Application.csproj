@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Consensus.Domain\TradeMind.AI.ExpertAgents.Consensus.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Domain\TradeMind.AI.ExpertAgents.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingDecisions.Domain\TradeMind.AI.TradingDecisions.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
