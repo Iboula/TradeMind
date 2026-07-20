@@ -74,6 +74,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Tests", "tests/TradeMind.AI.ExpertAgents.Dispatch.Tests/TradeMind.AI.ExpertAgents.Dispatch.Tests.csproj", "{161AE459-930B-4252-A22E-7116F4160D7F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Domain", "src/TradeMind.AI.ExpertAgents.Consensus.Domain/TradeMind.AI.ExpertAgents.Consensus.Domain.csproj", "{B221C61B-B380-4522-8217-C76771F55B69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Application", "src/TradeMind.AI.ExpertAgents.Consensus.Application/TradeMind.AI.ExpertAgents.Consensus.Application.csproj", "{23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Tests", "tests/TradeMind.AI.ExpertAgents.Consensus.Tests/TradeMind.AI.ExpertAgents.Consensus.Tests.csproj", "{29D71967-6777-4CBB-9F12-292C6A56C1B4}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -224,5 +230,17 @@ Global
     {161AE459-930B-4252-A22E-7116F4160D7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {161AE459-930B-4252-A22E-7116F4160D7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {161AE459-930B-4252-A22E-7116F4160D7F}.Release|Any CPU.Build.0 = Release|Any CPU
+    {B221C61B-B380-4522-8217-C76771F55B69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {B221C61B-B380-4522-8217-C76771F55B69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {B221C61B-B380-4522-8217-C76771F55B69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {B221C61B-B380-4522-8217-C76771F55B69}.Release|Any CPU.Build.0 = Release|Any CPU
+    {23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}.Release|Any CPU.Build.0 = Release|Any CPU
+    {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {29D71967-6777-4CBB-9F12-292C6A56C1B4}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal
