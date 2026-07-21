@@ -98,6 +98,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Tests", "tests/TradeMind.AI.TradingPlans.Tests/TradeMind.AI.TradingPlans.Tests.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Domain", "src/TradeMind.AI.TradingWorkspace.Domain/TradeMind.AI.TradingWorkspace.Domain.csproj", "{14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Application", "src/TradeMind.AI.TradingWorkspace.Application/TradeMind.AI.TradingWorkspace.Application.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A483}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Tests", "tests/TradeMind.AI.TradingWorkspace.Tests/TradeMind.AI.TradingWorkspace.Tests.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A484}"
+EndProject
 Global
   GlobalSection(SolutionConfigurationPlatforms) = preSolution
     Debug|Any CPU = Debug|Any CPU
@@ -296,5 +302,17 @@ Global
     {F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}.Debug|Any CPU.Build.0 = Debug|Any CPU
     {F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}.Release|Any CPU.ActiveCfg = Release|Any CPU
     {F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}.Release|Any CPU.Build.0 = Release|Any CPU
+    {14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A483}.Release|Any CPU.Build.0 = Release|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A484}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A484}.Debug|Any CPU.Build.0 = Debug|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A484}.Release|Any CPU.ActiveCfg = Release|Any CPU
+    {F44E97D2-B2C9-424F-AC2B-3FE3E461A484}.Release|Any CPU.Build.0 = Release|Any CPU
   EndGlobalSection
 EndGlobal
