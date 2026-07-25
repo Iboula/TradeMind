@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\TradeMind.AI.TradingAssistant\TradeMind.AI.TradingAssistant.csproj" />
+    <ProjectReference Include="..\..\src\TradeMind.AI.TradingWorkspace.Domain\TradeMind.AI.TradingWorkspace.Domain.csproj" />
   </ItemGroup>
 
 </Project>

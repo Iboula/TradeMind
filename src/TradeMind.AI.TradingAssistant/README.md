@@ -6,6 +6,7 @@ Deterministic, explainable and non-executable assistant built on top of `Trading
 
 - deterministic intent classification;
 - structured localized answers (`en` / `fr`);
+- deterministic correlation identifiers and `TimeProvider`-based timestamps;
 - declarative recommendations;
 - workspace trace citations;
 - safety disclaimer;

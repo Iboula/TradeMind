@@ -1,6 +1,10 @@
 using System.Collections.ObjectModel;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using TradeMind.AI.TradingWorkspace.Domain;
 
 namespace TradeMind.AI.TradingAssistant;
@@ -26,11 +30,13 @@ public sealed record TradingAssistantRequest
     {
         ArgumentNullException.ThrowIfNull(workspace);
         ArgumentException.ThrowIfNullOrWhiteSpace(question);
+        var normalizedQuestion = question.Trim();
+        var normalizedLocale = NormalizeLocale(locale);
         Workspace = workspace;
-        Question = question.Trim();
-        Locale = NormalizeLocale(locale);
+        Question = normalizedQuestion;
+        Locale = normalizedLocale;
         CorrelationId = string.IsNullOrWhiteSpace(correlationId)
-            ? Guid.NewGuid().ToString("N")
+            ? BuildCorrelationId(workspace, normalizedQuestion, normalizedLocale)
             : correlationId.Trim();
     }
 
@@ -41,6 +47,15 @@ public sealed record TradingAssistantRequest
 
     private static string NormalizeLocale(string locale) =>
         string.Equals(locale?.Trim(), "fr", StringComparison.OrdinalIgnoreCase) ? "fr" : "en";
+
+    private static string BuildCorrelationId(
+        TradingWorkspaceResult workspace,
+        string question,
+        string locale)
+    {
+        var seed = $"{workspace.WorkspaceId}|{locale}|{question}";
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(seed)))[..32].ToLowerInvariant();
+    }
 }
 
 public sealed record TradingAssistantCitation(string Source, string Value);
@@ -117,10 +132,10 @@ public sealed class DeterministicTradingAssistantIntentClassifier : ITradingAssi
             return TradingAssistantIntent.Decision;
         if (ContainsAny(value, "next", "prochaine", "action", "quoi faire", "what should"))
             return TradingAssistantIntent.NextActions;
-        if (ContainsAny(value, "issue", "error", "warning", "problème", "erreur", "alerte", "bloqué"))
-            return TradingAssistantIntent.Issues;
         if (ContainsAny(value, "why", "explain", "pourquoi", "explique"))
             return TradingAssistantIntent.Explain;
+        if (ContainsAny(value, "issue", "error", "warning", "problème", "erreur", "alerte", "bloqué"))
+            return TradingAssistantIntent.Issues;
 
         return TradingAssistantIntent.Summary;
     }
@@ -133,13 +148,16 @@ public sealed class DeterministicTradingAssistant : ITradingAssistant
 {
     private readonly ITradingAssistantIntentClassifier _classifier;
     private readonly ILogger<DeterministicTradingAssistant> _logger;
+    private readonly TimeProvider _timeProvider;
 
     public DeterministicTradingAssistant(
         ITradingAssistantIntentClassifier classifier,
-        ILogger<DeterministicTradingAssistant> logger)
+        ILogger<DeterministicTradingAssistant> logger,
+        TimeProvider timeProvider)
     {
         _classifier = classifier;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     public Task<TradingAssistantResponse> AnswerAsync(
@@ -175,7 +193,7 @@ public sealed class DeterministicTradingAssistant : ITradingAssistant
             citations,
             disclaimer,
             request.CorrelationId,
-            DateTimeOffset.UtcNow));
+            _timeProvider.GetUtcNow()));
     }
 
     private static IReadOnlyCollection<string> BuildFacts(
@@ -298,6 +316,8 @@ public static class TradingAssistantDependencyInjection
     public static IServiceCollection AddTradingAssistant(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton(typeof(ILogger<>), typeof(NullLogger<>));
         services.AddSingleton<ITradingAssistantIntentClassifier, DeterministicTradingAssistantIntentClassifier>();
         services.AddScoped<ITradingAssistant, DeterministicTradingAssistant>();
         return services;
