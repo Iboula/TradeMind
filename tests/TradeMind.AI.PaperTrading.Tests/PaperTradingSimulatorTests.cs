@@ -194,14 +194,19 @@ internal static class PaperTradingTestData
     public static (TradingWorkspaceResult Workspace, TradingPlanResult Plan) Create(
         TradingPlanDirection direction = TradingPlanDirection.Long,
         bool withEntry = true,
-        TradingPlanType planType = TradingPlanType.ExecutableCandidate)
+        TradingPlanType planType = TradingPlanType.ExecutableCandidate,
+        int targetCount = 1,
+        DateTimeOffset? expiresAtUtc = null,
+        TradingWorkspaceStatus workspaceStatus = TradingWorkspaceStatus.Succeeded,
+        TradingWorkspaceState workspaceState = TradingWorkspaceState.PlanReady,
+        Guid? planGuid = null)
     {
         var instrument = new Instrument("EURUSD");
         var timeframe = Timeframe.H1;
         var contextId = new MarketContextId(Guid.Parse("11111111-1111-1111-1111-111111111111"));
         var decisionId = new TradingDecisionId(Guid.Parse("22222222-2222-2222-2222-222222222222"));
         var assessmentId = new RiskAssessmentId(Guid.Parse("33333333-3333-3333-3333-333333333333"));
-        var planId = new TradingPlanId(Guid.Parse("44444444-4444-4444-4444-444444444444"));
+        var planId = new TradingPlanId(planGuid ?? Guid.Parse("44444444-4444-4444-4444-444444444444"));
         var run = new AgentRunId("paper-run");
         var agentId = new AgentId("paper-agent");
         var reference = new ContextSourceReference("paper-test", "paper-source");
@@ -213,7 +218,9 @@ internal static class PaperTradingTestData
         var targetPrice = new Price(direction == TradingPlanDirection.Long ? 102m : 98m);
         var entryProposal = withEntry ? new EntryProposal(instrument, timeframe, entryPrice, AgentMarketLevelType.Entry, [run], [reference], "Test entry.") : null;
         var stopProposal = withEntry ? new StopProposal(instrument, timeframe, stopPrice, AgentMarketLevelType.Stop, [run], [reference], "Test stop.") : null;
-        var targetProposals = withEntry ? new[] { new TargetProposal(instrument, timeframe, targetPrice, 1, [run], [reference], "Test target.") } : Array.Empty<TargetProposal>();
+        var targetProposals = withEntry
+            ? Enumerable.Range(1, targetCount).Select(ordinal => new TargetProposal(instrument, timeframe, new Price(direction == TradingPlanDirection.Long ? 100m + ordinal * 2m : 100m - ordinal * 2m), ordinal, [run], [reference], $"Test target {ordinal}.")).ToArray()
+            : Array.Empty<TargetProposal>();
         var invalidation = new DecisionInvalidation(new ConsensusInvalidation("paper-invalidation", [run]), bias, true, "Test invalidation.");
         var risk = new DecisionRisk(new ConsensusRisk("Paper risk", ConsensusRiskSeverity.Medium, [run], [reference]), "Test risk.");
         var trace = new DecisionTraceReference(run, agentId, AgentVersion.Parse("1.0.0"), reference, DecisionTraceRole.Entry);
@@ -296,11 +303,11 @@ internal static class PaperTradingTestData
             "Deterministic paper plan.",
             Now,
             Now.AddMinutes(1),
-            Now.AddHours(1));
+            expiresAtUtc ?? Now.AddHours(1));
         var workspace = new TradingWorkspaceResult(
             workspaceId: new WorkspaceId(Guid.Parse("66666666-6666-6666-6666-666666666666")),
-            TradingWorkspaceStatus.Succeeded,
-            TradingWorkspaceState.PlanReady,
+            workspaceStatus,
+            workspaceState,
             TradingWorkspaceBuildMode.Snapshot,
             contextId,
             instrument,
