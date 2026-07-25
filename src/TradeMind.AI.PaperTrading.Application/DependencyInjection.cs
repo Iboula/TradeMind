@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<PaperTradingOptions>, PaperTradingOptionsValidator>());
         services.TryAddSingleton<IPaperTradingEligibilityPolicy, DefaultPaperTradingEligibilityPolicy>();
         services.TryAddScoped<IPaperTradingSimulator, PaperTradingSimulator>();
+        services.TryAddScoped<IPaperTradingEngine, PaperTradingEngine>();
         return services;
     }
 }

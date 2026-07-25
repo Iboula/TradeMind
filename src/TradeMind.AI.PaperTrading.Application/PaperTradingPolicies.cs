@@ -79,6 +79,11 @@ public sealed class DefaultPaperTradingEligibilityPolicy : IPaperTradingEligibil
             errors.Add(new("WORKSPACE_STATUS_INELIGIBLE", "The workspace did not complete successfully."));
         }
 
+        if (workspace.Blockers.Count > 0 || workspace.State is TradingWorkspaceState.Blocked or TradingWorkspaceState.Conflicted)
+        {
+            errors.Add(new("WORKSPACE_BLOCKED", "The workspace contains a blocking condition and cannot be simulated."));
+        }
+
         if (plan.Status is TradingPlanStatus.Expired or TradingPlanStatus.TimedOut or TradingPlanStatus.Cancelled)
         {
             return Decision(false, false, true, warnings, [new("PLAN_EXPIRED", "The trading plan is expired or no longer active.")], errors);
@@ -139,7 +144,8 @@ public sealed class DefaultPaperTradingEligibilityPolicy : IPaperTradingEligibil
         {
             var entry = plan.Entry.Price.Value;
             var stop = plan.Stop.Price.Value;
-            var target = plan.Targets.OrderBy(item => item.Ordinal).ThenBy(item => item.Price.Value).First().Price.Value;
+            var orderedTargets = plan.Targets.OrderBy(item => item.Ordinal).ThenBy(item => item.Price.Value).ToArray();
+            var target = orderedTargets.First().Price.Value;
             var coherent = plan.Direction switch
             {
                 TradingPlanDirection.Long => stop < entry && target > entry,
@@ -149,6 +155,14 @@ public sealed class DefaultPaperTradingEligibilityPolicy : IPaperTradingEligibil
             if (!coherent)
             {
                 errors.Add(new("LEVELS_INCOHERENT", "Entry, stop and target levels are not coherent with direction."));
+            }
+
+            var targetsOrdered = plan.Direction == TradingPlanDirection.Long
+                ? orderedTargets.Zip(orderedTargets.Skip(1), (left, right) => left.Price.Value < right.Price.Value).All(value => value)
+                : orderedTargets.Zip(orderedTargets.Skip(1), (left, right) => left.Price.Value > right.Price.Value).All(value => value);
+            if (!targetsOrdered)
+            {
+                errors.Add(new("TARGETS_INCOHERENT", "Target levels must be ordered consistently with the plan direction."));
             }
         }
 
