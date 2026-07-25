@@ -94,6 +94,49 @@ public sealed class PaperTradingEngineTests
     }
 
     [Fact]
+    public async Task Short_position_uses_bid_entry_and_ask_take_profit()
+    {
+        var source = PaperTradingTestData.Create(TradingPlanDirection.Short);
+        var result = await PaperTradingTestData.Simulator().SimulateAsync(NewRequest(source, [
+            new(source.Plan.Instrument, Now.AddMinutes(1), 100m, 100.1m, 1),
+            new(source.Plan.Instrument, Now.AddMinutes(2), 97.9m, 98m, 2)
+        ]));
+
+        Assert.Equal(PaperTradingStatus.Succeeded, result.Status);
+        Assert.Equal(2m, result.RealizedPnl);
+        Assert.Equal(PaperExitReason.TakeProfit, result.Journal.Single().ExitReason);
+    }
+
+    [Fact]
+    public async Task Mfe_mae_and_duration_are_recorded_for_an_open_position()
+    {
+        var source = PaperTradingTestData.Create();
+        var result = await PaperTradingTestData.Simulator().SimulateAsync(NewRequest(source, [
+            new(source.Plan.Instrument, Now.AddMinutes(1), 99.9m, 100m, 1),
+            new(source.Plan.Instrument, Now.AddMinutes(2), 101m, 101.1m, 2),
+            new(source.Plan.Instrument, Now.AddMinutes(3), 99m, 99.1m, 3)
+        ]));
+
+        Assert.NotNull(result.OpenPosition);
+        Assert.Equal(1m, result.Journal.Single().MaximumFavorableExcursion);
+        Assert.Equal(1m, result.Journal.Single().MaximumAdverseExcursion);
+        Assert.Equal(TimeSpan.Zero, result.Journal.Single().Duration);
+    }
+
+    [Fact]
+    public async Task Mid_price_spread_policy_is_explicit_and_deterministic()
+    {
+        var source = PaperTradingTestData.Create();
+        var result = await PaperTradingTestData.Simulator().SimulateAsync(NewRequest(source, [
+            new(source.Plan.Instrument, Now.AddMinutes(1), 99.9m, 100m, 1),
+            new(source.Plan.Instrument, Now.AddMinutes(2), 102m, 102.1m, 2)
+        ], new PaperTradingSimulationOptions { SpreadHandling = PaperSpreadHandling.UseMidPrice }));
+
+        Assert.Equal(99.95m, result.Fills[0].Price);
+        Assert.Equal(102.05m, result.Fills[1].Price);
+    }
+
+    [Fact]
     public async Task Ambiguous_tick_defaults_to_conservative_stop_first()
     {
         var source = PaperTradingTestData.Create();
@@ -120,6 +163,20 @@ public sealed class PaperTradingEngineTests
         Assert.Equal(PaperTradingStatus.Rejected, result.Status);
         Assert.Contains(result.Errors, error => error.Code == "AMBIGUOUS_TICK_REJECTED");
         Assert.NotEmpty(result.Blockers);
+    }
+
+    [Fact]
+    public async Task Ambiguous_tick_can_explicitly_choose_target_first()
+    {
+        var source = PaperTradingTestData.Create();
+        var request = NewRequest(source, [
+            new PaperTradingMarketTick(source.Plan.Instrument, Now.AddMinutes(1), 99.9m, 100m, 1),
+            new PaperTradingMarketTick(source.Plan.Instrument, Now.AddMinutes(2), 100m, 100.1m, 2, high: 103m, low: 89m)
+        ], new PaperTradingSimulationOptions { AmbiguousTriggerPolicy = PaperAmbiguousTriggerPolicy.TargetFirst });
+        var result = await PaperTradingTestData.Simulator().SimulateAsync(request);
+
+        Assert.Equal(PaperExitReason.TakeProfit, result.Journal.Single().ExitReason);
+        Assert.Contains(result.Timeline, item => item.Type == PaperTradingEventType.TakeProfitTriggered);
     }
 
     [Fact]
@@ -164,6 +221,15 @@ public sealed class PaperTradingEngineTests
 
         Assert.Equal(PaperTradingStatus.Invalid, result.Status);
         Assert.Contains(result.Errors, error => error.Code == "PLAN_ID_MISMATCH");
+    }
+
+    [Fact]
+    public void Request_rejects_a_tick_for_another_instrument()
+    {
+        var source = PaperTradingTestData.Create();
+        var tick = new PaperTradingMarketTick(new Instrument("GBPUSD"), Now, 100m, 100.1m, 1);
+
+        Assert.Throws<ArgumentException>(() => NewRequest(source, [tick]));
     }
 
     [Fact]
