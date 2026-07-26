@@ -1,92 +1,77 @@
-using Microsoft.EntityFrameworkCore;
-using TradeMind.KnowledgeHub.Application;
-using TradeMind.KnowledgeHub.Infrastructure;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
+using TradeMind.Api.Composition;
+using TradeMind.Api.Endpoints;
+using TradeMind.Api.Errors;
+using TradeMind.Api.Middleware;
+using TradeMind.Api.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOpenApi();
-builder.Services.AddProblemDetails();
-builder.Services.AddKnowledgeHub(builder.Configuration);
+
+builder.Services.AddTradeMindCore(builder.Configuration);
+builder.Services.AddTradeMindApi(builder.Configuration);
+builder.Services.AddTradeMindOpenApi(builder.Configuration);
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    var apiOptions = context.Configuration
+        .GetSection("TradeMind:Api")
+        .Get<ApiOptions>() ?? new ApiOptions();
+    options.Limits.MaxRequestBodySize = apiOptions.PayloadLimits.MaximumBodyBytes;
+    options.AddServerHeader = false;
+});
 
 var app = builder.Build();
-app.UseExceptionHandler();
 
-await using (var scope = app.Services.CreateAsyncScope())
+app.UseExceptionHandler(errorApp => errorApp.Run(ApiExceptionHandler.WriteAsync));
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestTimeoutMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
+
+var apiOptions = app.Services.GetRequiredService<IOptions<ApiOptions>>().Value;
+if (apiOptions.Security.EnableHttpsRedirection && !app.Environment.IsEnvironment("Test"))
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<KnowledgeHubDbContext>();
-    await dbContext.Database.MigrateAsync();
+    app.UseHttpsRedirection();
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+}
+
+if (apiOptions.Security.EnableSecurityHeaders)
+{
+    app.Use(async (context, next) =>
+    {
+        context.Response.OnStarting(() =>
+        {
+            context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            context.Response.Headers["X-Frame-Options"] = "DENY";
+            context.Response.Headers["Referrer-Policy"] = "no-referrer";
+            return Task.CompletedTask;
+        });
+        await next().ConfigureAwait(false);
+    });
+}
+
+if (apiOptions.OpenApi.Enabled && !app.Environment.IsProduction())
 {
     app.MapOpenApi();
 }
 
-app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+app.MapSystemEndpoints();
+app.MapHealthEndpoints();
+app.MapMarketContextEndpoints();
+app.MapExpertEndpoints();
+app.MapConsensusEndpoints();
+app.MapTradingDecisionEndpoints();
+app.MapRiskEndpoints();
+app.MapTradingPlanEndpoints();
+app.MapTradingWorkspaceEndpoints();
+app.MapTradingAssistantEndpoints();
+app.MapPaperTradingEndpoints();
+app.MapKnowledgeEndpoints();
 
-var knowledge = app.MapGroup("/knowledge");
-
-knowledge.MapPost("/sources", async (
-    IFormFile file,
-    string? title,
-    KnowledgeHubService service,
-    CancellationToken cancellationToken) =>
-{
-    if (file.Length == 0)
-    {
-        return Results.ValidationProblem(new Dictionary<string, string[]>
-        {
-            [nameof(file)] = ["The uploaded file is empty."]
-        });
-    }
-
-    await using var stream = file.OpenReadStream();
-    var id = await service.IngestAsync(
-        new IngestKnowledgeSourceRequest(title ?? file.FileName, file.FileName, stream),
-        cancellationToken);
-
-    return Results.Created($"/knowledge/sources/{id}", new { id });
-})
-.DisableAntiforgery()
-.Accepts<IFormFile>("multipart/form-data")
-.Produces(StatusCodes.Status201Created)
-.ProducesValidationProblem();
-
-knowledge.MapGet("/sources/{id:guid}", async (
-    Guid id,
-    KnowledgeHubService service,
-    CancellationToken cancellationToken) =>
-{
-    var source = await service.GetAsync(id, cancellationToken);
-    return source is null
-        ? Results.NotFound()
-        : Results.Ok(new
-        {
-            source.Id,
-            source.Title,
-            source.Type,
-            source.Status,
-            source.ImportedAtUtc,
-            source.FailureReason,
-            fragments = source.Fragments.Select(fragment => new
-            {
-                fragment.Id,
-                fragment.Sequence,
-                fragment.Content,
-                fragment.TokenCount
-            })
-        });
-});
-
-knowledge.MapGet("/search", async (
-    string q,
-    int? limit,
-    KnowledgeHubService service,
-    CancellationToken cancellationToken) =>
-{
-    var results = await service.SearchAsync(q, limit ?? 5, cancellationToken);
-    return Results.Ok(results);
-});
-
-app.Run();
+await app.RunAsync();
 
 public partial class Program;
