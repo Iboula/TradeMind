@@ -14,16 +14,18 @@ Build a modular platform that combines market data, AI reasoning, backtesting, a
 - Alerts and notifications
 - Performance analytics
 
-## Tech Stack (planned)
-- .NET
-- Blazor
-- PostgreSQL
-- Docker
-- Kubernetes
-- AI/LLM integrations
+## Current platform
+- .NET 9 modular monolith with Clean Architecture, DDD, and CQRS boundaries.
+- PostgreSQL with EF Core and pgvector for KnowledgeHub persistence and semantic search.
+- Docker Compose for local infrastructure and Testcontainers for PostgreSQL integration tests.
+- Provider-agnostic AI contracts; concrete providers stay outside core modules.
+- GitHub Actions with centralized package versions, dependency checks, Release build, tests, and coverage.
 
 ## Getting Started
-This repository is currently under active development. More documentation will be added as the project evolves.
+The architecture and engineering baseline is documented in [docs/architecture](docs/architecture/README.md).
+Start with [the dependency rules](docs/architecture/DEPENDENCY_RULES.md),
+[the engineering guide](docs/engineering/ARCHITECTURE.md), and
+[the development guide](docs/engineering/DEVELOPMENT.md).
 
 ## License
 MIT

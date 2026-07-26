@@ -10,6 +10,8 @@ TradeMind is a .NET 9 modular monolith. KnowledgeHub is exposed through an ASP.N
 - [Containers](CONTAINERS.md): deployable/runtime units and storage.
 - [Components](COMPONENTS.md): internal projects and layer responsibilities.
 - [Data Flow](DATA_FLOW.md): ingestion, retrieval, semantic search, startup, and test flows.
+- [Dependency Rules](DEPENDENCY_RULES.md): allowed layer direction, module boundaries, and package rules.
+- [Diagrams](DIAGRAMS.md): Mermaid views of system context, module flow, architecture boundaries, and CI.
 - [AI Orchestration](AI_ORCHESTRATION.md): provider-agnostic request pipeline and extension steps.
 - [Prompt Engine](PROMPT_ENGINE.md): versioned templates and deterministic rendering.
 - [Memory Engine](MEMORY_ENGINE.md): bounded conversational context and in-memory storage.
@@ -29,6 +31,7 @@ The system currently contains:
 - EF Core migrations.
 - Docker Compose for local PostgreSQL.
 - GitHub Actions for restore, build, and tests.
+- Central package, editor, dependency, and coverage quality gates.
 - Testcontainers for PostgreSQL/pgvector integration tests.
 - Provider-agnostic AI Application, Memory, Knowledge RAG, and Tool Engine projects.
 - Provider-agnostic versioned Agent Framework.

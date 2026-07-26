@@ -1,0 +1,10 @@
+# Default ownership for platform, architecture, and delivery changes.
+* @Iboula
+
+# Keep the dependency and CI guardrails visible to the repository owner.
+/.github/ @Iboula
+/docs/ @Iboula
+/scripts/ @Iboula
+/Directory.Build.props @Iboula
+/Directory.Packages.props @Iboula
+/.editorconfig @Iboula

@@ -4,58 +4,70 @@ on:
   push:
     branches: [main, "feature/**"]
   pull_request:
-    branches: [main]
+    branches: [main, "feature/**"]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  NUGET_XMLDOC_MODE: skip
 
 jobs:
-  build:
+  quality:
+    name: Restore, build, test and coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
-      - name: Restore
-        id: restore
+
+      - name: Restore solution
+        run: dotnet restore TradeMind.sln --verbosity minimal
+
+      - name: Restore repository tools
+        run: dotnet tool restore
+
+      - name: Validate dependency rules
+        shell: pwsh
+        run: ./scripts/validate-dependencies.ps1
+
+      - name: Build Release
+        run: dotnet build TradeMind.sln --configuration Release --no-restore --verbosity minimal
+
+      - name: Test with coverage
+        shell: pwsh
+        run: ./scripts/test-with-coverage.ps1 -Configuration Release -ResultsDirectory TestResults
+
+      - name: Generate Cobertura report
+        if: always()
+        run: >-
+          dotnet tool run reportgenerator
+          -reports:"TestResults/**/coverage.cobertura.xml"
+          -targetdir:"coverage"
+          -reporttypes:"Cobertura;HtmlInline_AzurePipelines;MarkdownSummaryGithub"
+          -filefilters:"-*RegexGenerator.g.cs"
+
+      - name: Publish coverage summary
+        if: always()
         shell: bash
-        continue-on-error: true
-        run: dotnet restore TradeMind.sln --verbosity diagnostic > restore.log 2>&1
-      - name: Upload restore diagnostics
+        run: |
+          if [ -f coverage/SummaryGithub.md ]; then
+            cat coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Coverage report was not generated." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload test and coverage artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: restore-diagnostics
-          path: restore.log
-          if-no-files-found: ignore
-      - name: Fail when restore failed
-        if: steps.restore.outcome == 'failure'
-        run: exit 1
-      - name: Build
-        id: build
-        shell: bash
-        continue-on-error: true
-        run: dotnet build TradeMind.sln --configuration Release --no-restore --verbosity diagnostic > build.log 2>&1
-      - name: Upload build diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-diagnostics
-          path: build.log
-          if-no-files-found: ignore
-      - name: Fail when build failed
-        if: steps.build.outcome == 'failure'
-        run: exit 1
-      - name: Test
-        id: test
-        shell: bash
-        continue-on-error: true
-        run: dotnet test TradeMind.sln --configuration Release --no-build --verbosity minimal > test.log 2>&1
-      - name: Upload test diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-diagnostics
-          path: test.log
-          if-no-files-found: ignore
-      - name: Fail when tests failed
-        if: steps.test.outcome == 'failure'
-        run: exit 1
+          name: test-and-coverage
+          path: |
+            TestResults
+            coverage
+          if-no-files-found: warn
