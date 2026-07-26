@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../TradeMind.KnowledgeHub.Domain/TradeMind.KnowledgeHub.Domain.csproj" />
+  </ItemGroup>
+</Project>

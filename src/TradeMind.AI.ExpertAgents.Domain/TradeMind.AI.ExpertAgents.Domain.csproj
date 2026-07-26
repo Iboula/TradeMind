@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.AI.Context.Domain\TradeMind.AI.Context.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

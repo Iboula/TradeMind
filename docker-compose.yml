@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: trademind-postgres
+    environment:
+      POSTGRES_DB: trademind
+      POSTGRES_USER: trademind
+      POSTGRES_PASSWORD: trademind
+    ports:
+      - "5432:5432"
+    volumes:
+      - trademind-postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U trademind -d trademind"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  trademind-postgres-data:

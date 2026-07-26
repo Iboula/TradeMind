@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>TradeMind.AI.TradingWorkspace.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.AI.Context.Domain\TradeMind.AI.Context.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Dispatch.Domain\TradeMind.AI.ExpertAgents.Dispatch.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Consensus.Domain\TradeMind.AI.ExpertAgents.Consensus.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Domain\TradeMind.AI.ExpertAgents.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.RiskEngine.Domain\TradeMind.AI.RiskEngine.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingDecisions.Domain\TradeMind.AI.TradingDecisions.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingPlans.Domain\TradeMind.AI.TradingPlans.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

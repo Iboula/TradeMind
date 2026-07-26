@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.4" />
+    <ProjectReference Include="..\TradeMind.AI.Abstractions\TradeMind.AI.Abstractions.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Application\TradeMind.AI.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Knowledge\TradeMind.AI.Knowledge.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Tools\TradeMind.AI.Tools.csproj" />
+  </ItemGroup>
+
+</Project>

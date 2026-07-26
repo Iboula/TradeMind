@@ -1,0 +1,193 @@
+using TradeMind.AI.Abstractions;
+
+namespace TradeMind.AI.Application;
+
+public sealed class PromptConstructionStep : IAIOrchestrationStep
+{
+    private readonly IPromptBuilder _promptBuilder;
+    private readonly IPromptRenderer _promptRenderer;
+    private readonly IEnumerable<IAIContextContributor> _contributors;
+    private readonly TimeProvider _timeProvider;
+
+    public PromptConstructionStep(
+        IPromptBuilder promptBuilder,
+        IPromptRenderer promptRenderer,
+        IEnumerable<IAIContextContributor> contributors,
+        TimeProvider timeProvider)
+    {
+        _promptBuilder = promptBuilder;
+        _promptRenderer = promptRenderer;
+        _contributors = contributors;
+        _timeProvider = timeProvider;
+    }
+
+    public string Name => AIOrchestrationStepNames.PromptConstruction;
+
+    public int Order => 200;
+
+    public async Task ExecuteAsync(
+        AIExecutionContext context,
+        CancellationToken cancellationToken)
+    {
+        var startTimestamp = _timeProvider.GetTimestamp();
+
+        foreach (var contributor in _contributors)
+        {
+            await contributor.ContributeAsync(context, cancellationToken).ConfigureAwait(false);
+        }
+
+        var chatRequest = context.Request.PromptTemplateId is null
+            ? BuildLegacyChatRequest(context)
+            : await BuildTemplateChatRequestAsync(context, cancellationToken).ConfigureAwait(false);
+
+        context.SetChatRequest(chatRequest);
+        context.Metrics.RecordPromptConstructionDuration(_timeProvider.GetElapsedTime(startTimestamp));
+    }
+
+    private ChatRequest BuildLegacyChatRequest(AIExecutionContext context)
+    {
+        var request = _promptBuilder
+            .WithSystemMessage(context.Request.SystemInstruction)
+            .AddUserMessage(context.Request.UserMessage)
+            .Build(
+                context.Request.Model,
+                context.Request.Temperature,
+                context.Request.MaxOutputTokens,
+                BuildMetadata(context));
+
+        return request with
+        {
+            Messages = InjectContextMessages(request.Messages, context)
+        };
+    }
+
+    private async Task<ChatRequest> BuildTemplateChatRequestAsync(
+        AIExecutionContext context,
+        CancellationToken cancellationToken)
+    {
+        var variables = new Dictionary<string, string>(context.Request.PromptVariables, StringComparer.Ordinal);
+        AddVariableIfMissing(variables, "systemInstruction", context.Request.SystemInstruction);
+        AddVariableIfMissing(variables, "userMessage", context.Request.UserMessage);
+
+        var result = await _promptRenderer.RenderAsync(
+            new PromptRenderRequest(
+                context.Request.PromptTemplateId!,
+                context.Request.Scenario,
+                variables,
+                context.Request.PromptTemplateVersion,
+                correlationId: context.Session.CorrelationId),
+            cancellationToken).ConfigureAwait(false);
+
+        context.SetPromptRenderResult(result);
+
+        var messages = result.Messages.Select(ToChatMessage).ToArray();
+
+        return new ChatRequest(
+            InjectContextMessages(messages, context),
+            string.IsNullOrWhiteSpace(context.Request.Model) ? null : context.Request.Model,
+            context.Request.Temperature,
+            context.Request.MaxOutputTokens,
+            BuildMetadata(context));
+    }
+
+    private static IReadOnlyList<ChatMessage> InjectContextMessages(
+        IReadOnlyList<ChatMessage> messages,
+        AIExecutionContext context)
+    {
+        var memoryMessages = GetChatMessages(context, AIExecutionContextItemKey.MemoryChatMessages);
+        var knowledgeMessages = GetChatMessages(context, AIExecutionContextItemKey.KnowledgeChatMessages);
+
+        if (memoryMessages.Count == 0 && knowledgeMessages.Count == 0)
+        {
+            return messages;
+        }
+
+        var output = messages.ToList();
+        var insertIndex = output.FindLastIndex(message => message.Role == ChatRole.User);
+        if (insertIndex < 0)
+        {
+            insertIndex = output.Count;
+        }
+
+        var contextMessages = OrderContextMessages(memoryMessages, knowledgeMessages);
+        output.InsertRange(insertIndex, contextMessages);
+        return output.ToArray();
+    }
+
+    private static IReadOnlyList<ChatMessage> GetChatMessages(
+        AIExecutionContext context,
+        AIExecutionContextItemKey key)
+    {
+        return context.Items.TryGetValue(key, out var value) && value is IReadOnlyList<ChatMessage> messages
+            ? messages
+            : [];
+    }
+
+    private static IReadOnlyList<ChatMessage> OrderContextMessages(
+        IReadOnlyList<ChatMessage> memoryMessages,
+        IReadOnlyList<ChatMessage> knowledgeMessages)
+    {
+        var ordered = new List<ChatMessage>();
+        var remainingMemory = memoryMessages;
+
+        if (memoryMessages.FirstOrDefault() is { Role: ChatRole.System } summary
+            && summary.Content.StartsWith("Conversation summary", StringComparison.Ordinal))
+        {
+            ordered.Add(summary);
+            remainingMemory = memoryMessages.Skip(1).ToArray();
+        }
+
+        ordered.AddRange(knowledgeMessages);
+        ordered.AddRange(remainingMemory);
+        return ordered;
+    }
+
+    private static ChatMessage ToChatMessage(PromptRenderedMessage message)
+    {
+        return new ChatMessage(
+            message.Role switch
+            {
+                PromptMessageRole.System => ChatRole.System,
+                PromptMessageRole.User => ChatRole.User,
+                PromptMessageRole.Assistant => ChatRole.Assistant,
+                PromptMessageRole.Tool => ChatRole.Tool,
+                _ => throw new ArgumentOutOfRangeException(nameof(message), "Unsupported prompt message role.")
+            },
+            message.Content);
+    }
+
+    private static IReadOnlyDictionary<string, string> BuildMetadata(AIExecutionContext context)
+    {
+        var metadata = new Dictionary<string, string>(
+            context.Request.Metadata,
+            StringComparer.OrdinalIgnoreCase)
+        {
+            ["SessionId"] = context.Session.SessionId,
+            ["CorrelationId"] = context.Session.CorrelationId,
+            ["Scenario"] = context.Session.Scenario
+        };
+
+        AddIfPresent(metadata, "ConversationId", context.Session.ConversationId);
+        AddIfPresent(metadata, "TenantId", context.Session.TenantId);
+        AddIfPresent(metadata, "UserId", context.Session.UserId);
+        AddIfPresent(metadata, "AgentId", context.Session.AgentId);
+
+        return metadata;
+    }
+
+    private static void AddIfPresent(IDictionary<string, string> metadata, string key, string? value)
+    {
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            metadata[key] = value;
+        }
+    }
+
+    private static void AddVariableIfMissing(IDictionary<string, string> variables, string key, string? value)
+    {
+        if (!variables.ContainsKey(key) && !string.IsNullOrWhiteSpace(value))
+        {
+            variables[key] = value;
+        }
+    }
+}
