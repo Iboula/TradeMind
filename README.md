@@ -27,5 +27,13 @@ Start with [the dependency rules](docs/architecture/DEPENDENCY_RULES.md),
 [the engineering guide](docs/engineering/ARCHITECTURE.md), and
 [the development guide](docs/engineering/DEVELOPMENT.md).
 
+### Run the API
+
+```powershell
+dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
+```
+
+The versioned analytical routes are documented in [docs/api](docs/api/README.md). OpenAPI is served at `/openapi/v1.json` outside Production when enabled. Process liveness is available at `/health/live`; configured dependency readiness is available at `/health/ready`. Sprint 24 does not implement authentication yet; the host deliberately does not provide fake authentication.
+
 ## License
 MIT

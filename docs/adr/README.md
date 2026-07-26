@@ -20,6 +20,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0012: Trading Coach Analysis MVP](ADR-0012-trading-coach-mvp.md)
 - [ADR-0013: Trading Journal Analytics](ADR-0013-trading-journal-analytics.md)
 - [ADR-0014: Core Stabilization and Quality Gates](ADR-0014-core-stabilization.md)
+- [ADR-0015: API Host and Contract Isolation](ADR-0015-api-host-contract-isolation.md)
 
 ## ADR format
 

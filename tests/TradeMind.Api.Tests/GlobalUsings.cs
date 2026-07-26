@@ -1,0 +1,15 @@
+global using System.Net;
+global using System.Net.Http.Json;
+global using System.Text;
+global using System.Text.Json;
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.AspNetCore.Mvc.Testing;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Microsoft.Extensions.Options;
+global using TradeMind.Api.Application;
+global using TradeMind.Api.Contracts.Common;
+global using TradeMind.Api.Mapping;
+global using TradeMind.Api.Middleware;
+global using Xunit;

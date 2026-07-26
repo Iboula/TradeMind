@@ -1,12 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Api</RootNamespace>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="../TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj" />
-    <ProjectReference Include="../TradeMind.KnowledgeHub.Infrastructure/TradeMind.KnowledgeHub.Infrastructure.csproj" />
-    <ProjectReference Include="..\TradeMind.AI.Infrastructure\TradeMind.AI.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Application\TradeMind.AI.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Context.Application\TradeMind.AI.Context.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Context.Infrastructure\TradeMind.AI.Context.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Consensus.Application\TradeMind.AI.ExpertAgents.Consensus.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Dispatch.Application\TradeMind.AI.ExpertAgents.Dispatch.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.ExpertAgents.Application\TradeMind.AI.ExpertAgents.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Knowledge\TradeMind.AI.Knowledge.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.PaperTrading.Application\TradeMind.AI.PaperTrading.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.RiskEngine.Application\TradeMind.AI.RiskEngine.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingAssistant\TradeMind.AI.TradingAssistant.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingDecisions.Application\TradeMind.AI.TradingDecisions.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingPlans.Application\TradeMind.AI.TradingPlans.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingWorkspace.Application\TradeMind.AI.TradingWorkspace.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.KnowledgeHub.Application\TradeMind.KnowledgeHub.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.KnowledgeHub.Infrastructure\TradeMind.KnowledgeHub.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+    <ProjectReference Include="..\TradeMind.MarketConnectors.Infrastructure\TradeMind.MarketConnectors.Infrastructure.csproj" />
   </ItemGroup>
+
 </Project>

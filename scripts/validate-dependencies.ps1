@@ -29,6 +29,26 @@ foreach ($projectFile in $projects) {
     if ($projectName -match '(?i)\.Domain$' -and $projectName -notmatch '(?i)TradeMind\.') {
         $violations.Add("${projectName}: project naming does not use the TradeMind module prefix.")
     }
+
+    if ($projectName -eq 'TradeMind.Api') {
+        foreach ($reference in $projectReferences) {
+            $referencePath = [string]$reference.Include
+            if ($referencePath -match '(?i)\.Domain\.csproj$') {
+                $violations.Add("${projectName}: API project must reference application contracts, not domain projects directly ($referencePath).")
+            }
+            if ($referencePath -match '(?i)(Broker|MT5|MetaTrader|OpenAI)') {
+                $violations.Add("${projectName}: API project must not reference broker, MT5 or concrete LLM projects ($referencePath).")
+            }
+        }
+
+        $endpointFiles = Get-ChildItem -Path (Join-Path $projectFile.DirectoryName 'Endpoints') -Recurse -Filter '*.cs' -ErrorAction SilentlyContinue
+        foreach ($endpointFile in $endpointFiles) {
+            $endpointText = Get-Content -Raw -LiteralPath $endpointFile.FullName
+            if ($endpointText -match '(?i)TradeMind\.[^\r\n]*(Infrastructure|\.Domain)') {
+                $violations.Add("${projectName}: endpoint code must not depend on infrastructure or domain implementation ($($endpointFile.Name)).")
+            }
+        }
+    }
 }
 
 if ($violations.Count -gt 0) {
