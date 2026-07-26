@@ -27,6 +27,10 @@ Start with [the dependency rules](docs/architecture/DEPENDENCY_RULES.md),
 [the engineering guide](docs/engineering/ARCHITECTURE.md), and
 [the development guide](docs/engineering/DEVELOPMENT.md).
 
+Durable analytical correlation is documented in [Persistence and Execution
+Sessions](docs/persistence/README.md), including PostgreSQL migrations,
+optimistic concurrency, audit, outbox, durable idempotency and replay manifests.
+
 ### Run the API
 
 ```powershell

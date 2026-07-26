@@ -30,6 +30,34 @@ foreach ($projectFile in $projects) {
         $violations.Add("${projectName}: project naming does not use the TradeMind module prefix.")
     }
 
+    if ($projectName -eq 'TradeMind.ExecutionSessions.Domain' -and $projectReferences.Count -gt 0) {
+        $violations.Add("${projectName}: the persistence domain must not reference another project.")
+    }
+
+    if ($projectName -eq 'TradeMind.ExecutionSessions.Application') {
+        foreach ($reference in $projectReferences) {
+            $referencePath = [string]$reference.Include
+            if ($referencePath -match '(?i)(Infrastructure|Api)') {
+                $violations.Add("${projectName}: application code must not reference infrastructure or API projects ($referencePath).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(EntityFramework|Npgsql|AspNetCore)') {
+                $violations.Add("${projectName}: application code must not reference database or HTTP packages ($($package.Include)).")
+            }
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.ExecutionSessions.Infrastructure') {
+        $allowedReferences = @('TradeMind.ExecutionSessions.Application', 'TradeMind.ExecutionSessions.Domain')
+        foreach ($reference in $projectReferences) {
+            $referenceName = [System.IO.Path]::GetFileNameWithoutExtension([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: infrastructure references an unexpected project ($referenceName).")
+            }
+        }
+    }
+
     if ($projectName -eq 'TradeMind.Api') {
         foreach ($reference in $projectReferences) {
             $referencePath = [string]$reference.Include
