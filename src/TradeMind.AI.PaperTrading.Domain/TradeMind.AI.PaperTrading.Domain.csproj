@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>TradeMind.AI.PaperTrading.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingPlans.Domain\TradeMind.AI.TradingPlans.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.AI.TradingWorkspace.Domain\TradeMind.AI.TradingWorkspace.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
