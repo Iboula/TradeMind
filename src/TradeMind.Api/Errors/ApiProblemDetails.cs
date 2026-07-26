@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using TradeMind.Api.Application;
 using TradeMind.Api.Contracts.Common;
 using TradeMind.Api.Middleware;
+using TradeMind.ExecutionSessions.Application;
+using TradeMind.ExecutionSessions.Domain;
 
 namespace TradeMind.Api.Errors;
 
@@ -54,6 +56,21 @@ public static class ApiExceptionHandler
                 return;
             case ApiModuleNotConfiguredException notConfigured:
                 await ApiProblemDetails.WriteAsync(context, StatusCodes.Status501NotImplemented, "Module endpoint is not configured", $"The {notConfigured.Module} application facade is not configured for this host.").ConfigureAwait(false);
+                return;
+            case ExecutionSessionNotConfiguredException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status501NotImplemented, "Execution session persistence is not configured", "Execution session endpoints require PostgreSQL persistence configuration.").ConfigureAwait(false);
+                return;
+            case ExecutionSessionNotFoundException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status404NotFound, "Execution session not found", "The requested execution session does not exist.").ConfigureAwait(false);
+                return;
+            case ExecutionSessionConcurrencyException concurrency:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status409Conflict, "Execution session concurrency conflict", concurrency.Message).ConfigureAwait(false);
+                return;
+            case ExecutionSessionTransitionException transition:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status422UnprocessableEntity, "Invalid execution session transition", transition.Message).ConfigureAwait(false);
+                return;
+            case ExecutionSessionDomainException transition:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status422UnprocessableEntity, "Invalid execution session transition", transition.Message).ConfigureAwait(false);
                 return;
             case OperationCanceledException:
                 await ApiProblemDetails.WriteAsync(context, StatusCodes.Status408RequestTimeout, "Request cancelled", "The operation was cancelled before a response was completed.").ConfigureAwait(false);
