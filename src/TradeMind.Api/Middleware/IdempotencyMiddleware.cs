@@ -21,7 +21,8 @@ public sealed record CapturedResponse(int StatusCode, string? ContentType, byte[
 public sealed record IdempotencyExecutionResult(
     CapturedResponse Response,
     bool IsReplay,
-    bool IsConflict);
+    bool IsConflict,
+    bool IsInProgress = false);
 
 public sealed class InMemoryIdempotencyStore(
     IOptions<ApiOptions> options,
@@ -108,6 +109,7 @@ public sealed class IdempotencyMiddleware(
     ILogger<IdempotencyMiddleware> logger)
 {
     public const string HeaderName = "Idempotency-Key";
+    public const string ReplayItemKey = "TradeMind.IdempotencyReplay";
     private readonly ApiOptions _apiOptions = options.Value;
     private readonly IdempotencyOptions _options = options.Value.Idempotency;
 
@@ -152,7 +154,14 @@ public sealed class IdempotencyMiddleware(
 
         if (result.IsReplay)
         {
+            context.Items[ReplayItemKey] = true;
             logger.LogInformation("Idempotency response replayed. RequestHashPrefix={RequestHashPrefix}, CorrelationId={CorrelationId}", hash[..12], context.Items[CorrelationIdMiddleware.ItemKey]);
+        }
+
+        if (result.IsInProgress)
+        {
+            await ApiProblemDetails.WriteAsync(context, StatusCodes.Status409Conflict, "Idempotency operation in progress", "The idempotency key is currently being processed. Retry after the original operation completes.").ConfigureAwait(false);
+            return;
         }
 
         await WriteCapturedResponseAsync(context, result.Response).ConfigureAwait(false);

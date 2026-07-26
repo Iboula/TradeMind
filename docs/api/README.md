@@ -27,6 +27,26 @@ Versioned routes use `/api/v1`:
 - `POST /api/v1/trading-assistant/ask`
 - `POST /api/v1/paper-trading/simulate`
 
+Execution Sessions are available when PostgreSQL persistence is configured:
+
+- `POST /api/v1/execution-sessions/`
+- `GET /api/v1/execution-sessions/{sessionId}`
+- `GET /api/v1/execution-sessions/{sessionId}/timeline`
+- `GET /api/v1/execution-sessions/{sessionId}/replay-manifest`
+- `GET /api/v1/execution-sessions/` with indexed search filters and pagination
+- `POST /api/v1/execution-sessions/{sessionId}/artifacts`
+- `POST /api/v1/execution-sessions/{sessionId}/stages`
+- `POST /api/v1/execution-sessions/{sessionId}/complete`
+- `POST /api/v1/execution-sessions/{sessionId}/fail`
+- `POST /api/v1/execution-sessions/{sessionId}/cancel`
+
+Create and cancel require `Idempotency-Key`. `X-Execution-Session-ID` can be
+sent to correlate a successful pipeline response with an existing session; the
+host validates the session before invoking the endpoint and echoes the header.
+Pipeline artifact linking is best-effort after a successful response. It is
+skipped for idempotency replays and for the Execution Sessions routes
+themselves.
+
 KnowledgeHub source and search routes are also available under `/api/v1/knowledge` when a KnowledgeHub connection is configured. `GET /api/v1/system/version` exposes non-sensitive version metadata.
 
 The pipeline routes are composition endpoints. They accept versioned transport envelopes and invoke the corresponding application facade. A module that is not configured returns a structured `501` response; the host never fabricates a business result.
@@ -41,7 +61,10 @@ OpenAPI is available at `/openapi/v1.json` outside Production when enabled. Swag
 ## Cross-cutting behavior
 
 - `X-Correlation-ID` is accepted when it matches the configured safe character policy and is generated otherwise.
-- `Idempotency-Key` is required for workspace, assistant and paper-trading commands. The Sprint 24 store is in-memory and therefore single-instance only.
+- `Idempotency-Key` is required for workspace, assistant, paper-trading and
+  Execution Sessions create/cancel commands. PostgreSQL persistence uses a
+  durable unique-key store; the in-memory store remains the explicit fallback
+  when persistence is disabled.
 - Request and response bodies are not logged by default.
 - Validation and unexpected failures use RFC-style ProblemDetails without stack traces, file paths or connection strings.
 - Request bodies are bounded by `TradeMind:Api:PayloadLimits:MaximumBodyBytes`.

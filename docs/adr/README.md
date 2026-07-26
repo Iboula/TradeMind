@@ -21,6 +21,7 @@ An ADR should be added or updated when a decision affects architecture, persiste
 - [ADR-0013: Trading Journal Analytics](ADR-0013-trading-journal-analytics.md)
 - [ADR-0014: Core Stabilization and Quality Gates](ADR-0014-core-stabilization.md)
 - [ADR-0015: API Host and Contract Isolation](ADR-0015-api-host-contract-isolation.md)
+- [ADR-0016: Execution Sessions and Durable Persistence](ADR-0016-execution-sessions-and-durable-persistence.md)
 
 ## ADR format
 

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using TradeMind.KnowledgeHub.Infrastructure;
 using TradeMind.MarketConnectors.Infrastructure;
+using TradeMind.ExecutionSessions.Infrastructure.Persistence;
 
 namespace TradeMind.Api.Health;
 
@@ -24,6 +25,14 @@ public sealed class ConfiguredDependencyHealthCheck(
         if (!string.IsNullOrWhiteSpace(marketConnection))
         {
             await CheckDatabaseAsync<MarketConnectorsDbContext>("MarketConnectors", failures, cancellationToken).ConfigureAwait(false);
+        }
+
+        var persistenceProvider = configuration["TradeMind:Persistence:Provider"];
+        var persistenceConnectionName = configuration["TradeMind:Persistence:ConnectionStringName"] ?? "TradeMind";
+        if (string.Equals(persistenceProvider, "PostgreSql", StringComparison.OrdinalIgnoreCase)
+            && !string.IsNullOrWhiteSpace(configuration.GetConnectionString(persistenceConnectionName)))
+        {
+            await CheckDatabaseAsync<ExecutionSessionsDbContext>("ExecutionSessions", failures, cancellationToken).ConfigureAwait(false);
         }
 
         return failures.Count == 0

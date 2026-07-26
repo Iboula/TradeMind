@@ -5,6 +5,8 @@ using TradeMind.Api.Endpoints;
 using TradeMind.Api.Errors;
 using TradeMind.Api.Middleware;
 using TradeMind.Api.OpenApi;
+using TradeMind.ExecutionSessions.Infrastructure;
+using TradeMind.ExecutionSessions.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +24,20 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 
 var app = builder.Build();
 
+var persistenceOptions = app.Configuration
+    .GetSection(ExecutionSessionsPersistenceOptions.SectionName)
+    .Get<ExecutionSessionsPersistenceOptions>() ?? new ExecutionSessionsPersistenceOptions();
+if (string.Equals(persistenceOptions.Provider, "PostgreSql", StringComparison.OrdinalIgnoreCase)
+    && persistenceOptions.ApplyMigrationsOnStartup)
+{
+    await app.Services.ApplyExecutionSessionsMigrationsAsync();
+}
+
 app.UseExceptionHandler(errorApp => errorApp.Run(ApiExceptionHandler.WriteAsync));
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<RequestTimeoutMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<ExecutionSessionHeaderMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
 var apiOptions = app.Services.GetRequiredService<IOptions<ApiOptions>>().Value;
@@ -71,6 +83,7 @@ app.MapTradingWorkspaceEndpoints();
 app.MapTradingAssistantEndpoints();
 app.MapPaperTradingEndpoints();
 app.MapKnowledgeEndpoints();
+app.MapExecutionSessionEndpoints();
 
 await app.RunAsync();
 

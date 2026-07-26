@@ -4,6 +4,8 @@ using Microsoft.Extensions.Options;
 using TradeMind.Api.Application;
 using TradeMind.Api.Health;
 using TradeMind.Api.Middleware;
+using TradeMind.ExecutionSessions.Application;
+using TradeMind.ExecutionSessions.Application.Abstractions;
 
 namespace TradeMind.Api.Composition;
 
@@ -21,8 +23,17 @@ public static class ApiServiceRegistration
             .ValidateDataAnnotations()
             .ValidateOnStart();
         services.AddSingleton<IValidateOptions<ApiOptions>, ApiOptionsValidator>();
-        services.AddSingleton<IIdempotencyStore, InMemoryIdempotencyStore>();
+        services.AddSingleton<IIdempotencyStore>(serviceProvider =>
+            serviceProvider.GetService<IPersistentIdempotencyStore>() is { } durableStore
+                ? new PostgreSqlIdempotencyStoreAdapter(durableStore)
+                : new InMemoryIdempotencyStore(
+                    serviceProvider.GetRequiredService<IOptions<ApiOptions>>(),
+                    serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddScoped<ITradeMindApiApplication, TradeMindApiApplication>();
+        services.AddScoped<IExecutionSessionApiApplication>(serviceProvider =>
+            serviceProvider.GetService<IExecutionSessionService>() is { } service
+                ? new ExecutionSessionApiApplication(service, serviceProvider.GetRequiredService<TimeProvider>())
+                : new ExecutionSessionNotConfiguredApiApplication());
 
         services.ConfigureHttpJsonOptions(options =>
         {

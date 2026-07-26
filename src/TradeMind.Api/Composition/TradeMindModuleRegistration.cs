@@ -13,6 +13,8 @@ using TradeMind.AI.TradingPlans.Application;
 using TradeMind.AI.TradingWorkspace.Application;
 using TradeMind.KnowledgeHub.Infrastructure;
 using TradeMind.MarketConnectors.Infrastructure;
+using TradeMind.ExecutionSessions.Infrastructure;
+using TradeMind.ExecutionSessions.Infrastructure.Persistence;
 
 namespace TradeMind.Api.Composition;
 
@@ -52,6 +54,19 @@ public static class TradeMindModuleRegistration
         if (marketConnectorsConfigured)
         {
             services.AddMarketConnectorCore(configuration);
+        }
+
+        var persistence = configuration.GetSection(ExecutionSessionsPersistenceOptions.SectionName)
+            .Get<ExecutionSessionsPersistenceOptions>() ?? new ExecutionSessionsPersistenceOptions();
+        if (string.Equals(persistence.Provider, "PostgreSql", StringComparison.OrdinalIgnoreCase))
+        {
+            var connectionString = configuration.GetConnectionString(persistence.ConnectionStringName);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException($"Connection string '{persistence.ConnectionStringName}' is required when TradeMind persistence uses PostgreSql.");
+            }
+
+            services.AddExecutionSessions(configuration);
         }
 
         return services;
