@@ -61,6 +61,10 @@ OpenAPI is available at `/openapi/v1.json` outside Production when enabled. Swag
 ## Cross-cutting behavior
 
 - `X-Correlation-ID` is accepted when it matches the configured safe character policy and is generated otherwise.
+- JWT bearer and scoped `X-TradeMind-Api-Key` authentication are documented in
+  [the Identity foundation](../identity/README.md). Protected routes use
+  permission policies and resolved tenant scope; anonymous identity metadata is
+  limited to a safe contract.
 - `Idempotency-Key` is required for workspace, assistant, paper-trading and
   Execution Sessions create/cancel commands. PostgreSQL persistence uses a
   durable unique-key store; the in-memory store remains the explicit fallback
@@ -68,7 +72,9 @@ OpenAPI is available at `/openapi/v1.json` outside Production when enabled. Swag
 - Request and response bodies are not logged by default.
 - Validation and unexpected failures use RFC-style ProblemDetails without stack traces, file paths or connection strings.
 - Request bodies are bounded by `TradeMind:Api:PayloadLimits:MaximumBodyBytes`.
-- HTTPS redirection is enabled outside the Test environment, HSTS is enabled in Production, and authentication is intentionally deferred to the platform integration phase.
+- HTTPS redirection is enabled outside the Test environment, HSTS is enabled in
+  Production, and development authentication is available only in explicit
+  Test configuration.
 
 ## Architecture boundary
 

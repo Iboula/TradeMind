@@ -23,7 +23,11 @@ flowchart LR
 
 Domain projects do not reference Application, Infrastructure, API, EF Core,
 Npgsql, pgvector, HTTP frameworks, broker SDKs, or concrete AI providers.
-Application projects depend on domain contracts and ports. Infrastructure owns
+Application projects depend on domain contracts and ports. Identity Application
+is restricted to Identity Domain and framework-neutral options/DI abstractions;
+it cannot reference ASP.NET, EF Core, Npgsql or JWT packages. Identity
+Infrastructure is the only Identity layer allowed to reference those adapters.
+Infrastructure owns
 adapters such as EF Core, PostgreSQL, pgvector, Docker-facing dependencies, and
 provider SDKs. The API composes modules; it does not become a shared domain
 layer.
@@ -55,7 +59,8 @@ connector.
 ## Enforcement
 
 The `scripts/validate-dependencies.ps1` check validates the highest-risk rules:
-domain package isolation, domain-to-outer-layer references, and project naming.
+domain package isolation, domain-to-outer-layer references, Identity layer
+direction, API endpoint isolation and project naming.
 It runs in CI and should also be run locally before opening a pull request.
 The solution build, warnings-as-errors policy, and tests remain the final
 verification of the dependency graph.

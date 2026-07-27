@@ -28,10 +28,11 @@ identity and non-monotonic timestamps are rejected by the domain model.
 ## Identity and isolation
 
 The optional tenant and user values are persisted on the aggregate and are
-included in the API resource. Search and retrieval must be scoped by the host
-authorization boundary before being exposed to a tenant. Sprint 25 provides
-the storage fields and correlation behavior; authentication and authorization
-remain a later platform phase.
+included in the API resource. Search, retrieval, timeline and updates are
+scoped by a provider-neutral access scope at the repository query boundary. The
+API host supplies that scope from the authenticated tenant context, so a
+cross-tenant identifier cannot become a read or write side channel. Existing
+rows migrated from earlier releases receive explicit `system` ownership values.
 
 ## Artifacts
 
