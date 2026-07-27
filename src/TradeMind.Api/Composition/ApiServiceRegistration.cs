@@ -6,6 +6,10 @@ using TradeMind.Api.Health;
 using TradeMind.Api.Middleware;
 using TradeMind.ExecutionSessions.Application;
 using TradeMind.ExecutionSessions.Application.Abstractions;
+using TradeMind.Identity.Application;
+using TradeMind.Identity.Application.Abstractions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using TradeMind.ExecutionSessions.Infrastructure;
 
 namespace TradeMind.Api.Composition;
 
@@ -32,8 +36,12 @@ public static class ApiServiceRegistration
         services.AddScoped<ITradeMindApiApplication, TradeMindApiApplication>();
         services.AddScoped<IExecutionSessionApiApplication>(serviceProvider =>
             serviceProvider.GetService<IExecutionSessionService>() is { } service
-                ? new ExecutionSessionApiApplication(service, serviceProvider.GetRequiredService<TimeProvider>())
+                ? new ExecutionSessionApiApplication(service, serviceProvider.GetRequiredService<TimeProvider>(),
+                    serviceProvider.GetRequiredService<ICurrentActor>(), serviceProvider.GetRequiredService<ICurrentTenant>(),
+                    serviceProvider.GetRequiredService<IOptions<IdentityOptions>>().Value)
                 : new ExecutionSessionNotConfiguredApiApplication());
+        services.RemoveAll<IExecutionSessionAccessScope>();
+        services.AddScoped<IExecutionSessionAccessScope, ApiExecutionSessionAccessScope>();
 
         services.ConfigureHttpJsonOptions(options =>
         {
@@ -47,6 +55,17 @@ public static class ApiServiceRegistration
             .AddCheck<ConfiguredDependencyHealthCheck>("configured-dependencies", tags: ["ready"]);
         return services;
     }
+}
+
+internal sealed class ApiExecutionSessionAccessScope(
+    TradeMind.Identity.Application.Abstractions.ICurrentTenant currentTenant,
+    Microsoft.Extensions.Options.IOptions<TradeMind.Identity.Application.IdentityOptions> options) : IExecutionSessionAccessScope
+{
+    private readonly TradeMind.Identity.Domain.Tenancy.TenantContext? _context = currentTenant.Context;
+    public string? OrganizationId => _context?.OrganizationId.Value;
+    public string? TenantId => _context?.TenantId.Value;
+    public bool IsRestricted => options.Value.Enabled;
+    public bool IsAdministrativeOverride => _context?.IsAdministrativeOverride == true;
 }
 
 public sealed class ApiOptionsValidator : IValidateOptions<ApiOptions>

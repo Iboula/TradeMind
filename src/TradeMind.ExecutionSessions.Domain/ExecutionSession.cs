@@ -11,6 +11,9 @@ public sealed class ExecutionSession
         string? idempotencyKeyHash,
         string? tenantId,
         string? userId,
+        string? organizationId,
+        string? createdByActorId,
+        string? createdByActorType,
         string instrument,
         string timeframe,
         DateTimeOffset startedAtUtc,
@@ -49,6 +52,9 @@ public sealed class ExecutionSession
         IdempotencyKeyHash = NormalizeOptional(idempotencyKeyHash, 128);
         TenantId = NormalizeOptional(tenantId, 128);
         UserId = NormalizeOptional(userId, 128);
+        OrganizationId = NormalizeOptional(organizationId, 128);
+        CreatedByActorId = NormalizeOptional(createdByActorId, 128);
+        CreatedByActorType = NormalizeOptional(createdByActorType, 32);
         Instrument = NormalizeRequired(instrument, 128, nameof(instrument));
         Timeframe = NormalizeRequired(timeframe, 32, nameof(timeframe));
         StartedAtUtc = startedAtUtc;
@@ -74,6 +80,9 @@ public sealed class ExecutionSession
     public string? IdempotencyKeyHash { get; }
     public string? TenantId { get; }
     public string? UserId { get; }
+    public string? OrganizationId { get; }
+    public string? CreatedByActorId { get; }
+    public string? CreatedByActorType { get; }
     public string Instrument { get; }
     public string Timeframe { get; }
     public DateTimeOffset StartedAtUtc { get; }
@@ -106,13 +115,19 @@ public sealed class ExecutionSession
         string? idempotencyKeyHash = null,
         string? tenantId = null,
         string? userId = null,
-        int schemaVersion = 1) =>
+        int schemaVersion = 1,
+        string? organizationId = null,
+        string? createdByActorId = null,
+        string? createdByActorType = null) =>
         new(
             id,
             correlationId,
             idempotencyKeyHash,
             tenantId,
             userId,
+            organizationId,
+            createdByActorId,
+            createdByActorType,
             instrument,
             timeframe,
             startedAtUtc,
@@ -153,8 +168,11 @@ public sealed class ExecutionSession
         IReadOnlyDictionary<string, string>? metadata,
         IEnumerable<ExecutionSessionArtifactReference> artifactReferences,
         IEnumerable<ExecutionSessionTimelineEntry> timelineEntries,
-        long concurrencyVersion) =>
-        new(id, correlationId, idempotencyKeyHash, tenantId, userId, instrument, timeframe, startedAtUtc, updatedAtUtc,
+        long concurrencyVersion,
+        string? organizationId = null,
+        string? createdByActorId = null,
+        string? createdByActorType = null) =>
+        new(id, correlationId, idempotencyKeyHash, tenantId, userId, organizationId, createdByActorId, createdByActorType, instrument, timeframe, startedAtUtc, updatedAtUtc,
             completedAtUtc, status, currentStage, schemaVersion, coreVersion, apiVersion, triggerType, source, failure,
             metadata, artifactReferences, timelineEntries, concurrencyVersion);
 

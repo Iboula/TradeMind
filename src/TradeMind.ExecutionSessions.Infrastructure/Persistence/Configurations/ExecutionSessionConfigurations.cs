@@ -15,6 +15,9 @@ public sealed class ExecutionSessionConfiguration : IEntityTypeConfiguration<Exe
         entity.Property(item => item.IdempotencyKeyHash).HasColumnName("idempotency_key_hash").HasMaxLength(128);
         entity.Property(item => item.TenantId).HasColumnName("tenant_id").HasMaxLength(128);
         entity.Property(item => item.UserId).HasColumnName("user_id").HasMaxLength(128);
+        entity.Property(item => item.OrganizationId).HasColumnName("organization_id").HasMaxLength(128);
+        entity.Property(item => item.CreatedByActorId).HasColumnName("created_by_actor_id").HasMaxLength(128);
+        entity.Property(item => item.CreatedByActorType).HasColumnName("created_by_actor_type").HasMaxLength(32);
         entity.Property(item => item.Instrument).HasColumnName("instrument").HasMaxLength(128).IsRequired();
         entity.Property(item => item.Timeframe).HasColumnName("timeframe").HasMaxLength(32).IsRequired();
         entity.Property(item => item.StartedAtUtc).HasColumnName("started_at_utc").IsRequired();
@@ -37,6 +40,8 @@ public sealed class ExecutionSessionConfiguration : IEntityTypeConfiguration<Exe
         entity.HasIndex(item => new { item.Instrument, item.StartedAtUtc }).HasDatabaseName("ix_execution_sessions_instrument_started");
         entity.HasIndex(item => item.CurrentStage).HasDatabaseName("ix_execution_sessions_current_stage");
         entity.HasIndex(item => item.IdempotencyKeyHash).HasDatabaseName("ix_execution_sessions_idempotency_hash").HasFilter("idempotency_key_hash IS NOT NULL");
+        entity.HasIndex(item => new { item.OrganizationId, item.TenantId, item.StartedAtUtc }).HasDatabaseName("ix_execution_sessions_organization_tenant_started");
+        entity.HasIndex(item => item.CreatedByActorId).HasDatabaseName("ix_execution_sessions_created_by_actor");
         entity.HasMany(item => item.Artifacts).WithOne().HasForeignKey(item => item.SessionId).OnDelete(DeleteBehavior.Cascade);
         entity.HasMany(item => item.Timeline).WithOne().HasForeignKey(item => item.SessionId).OnDelete(DeleteBehavior.Cascade);
     }

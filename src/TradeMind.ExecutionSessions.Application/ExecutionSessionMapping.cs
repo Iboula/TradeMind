@@ -19,6 +19,9 @@ public static class ExecutionSessionMapper
         session.IdempotencyKeyHash,
         session.TenantId,
         session.UserId,
+        session.OrganizationId,
+        session.CreatedByActorId,
+        session.CreatedByActorType,
         session.Instrument,
         session.Timeframe,
         session.StartedAtUtc,
@@ -196,7 +199,8 @@ public sealed class StartExecutionSessionHandler(
         {
             var session = ExecutionSession.Start(id, new ExecutionCorrelationId(request.CorrelationId), request.Instrument, request.Timeframe,
                 request.TriggerType, request.Source, request.CoreVersion, request.ApiVersion, startedAt, request.Metadata,
-                request.IdempotencyKeyHash, request.TenantId, request.UserId, request.SchemaVersion);
+                request.IdempotencyKeyHash, request.TenantId, request.UserId, request.SchemaVersion,
+                request.OrganizationId, request.CreatedByActorId, request.CreatedByActorType);
             var createdAudit = ExecutionSessionOperationSupport.Audit(session, ExecutionSessionAuditEventType.SessionCreated,
                 startedAt, null, null);
             session.Begin(startedAt);

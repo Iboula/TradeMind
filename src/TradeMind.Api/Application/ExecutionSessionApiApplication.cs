@@ -5,6 +5,8 @@ using TradeMind.ExecutionSessions.Application;
 using TradeMind.ExecutionSessions.Application.Commands;
 using TradeMind.ExecutionSessions.Application.DTOs;
 using TradeMind.ExecutionSessions.Domain;
+using TradeMind.Identity.Application;
+using TradeMind.Identity.Application.Abstractions;
 
 namespace TradeMind.Api.Application;
 
@@ -23,16 +25,19 @@ public interface IExecutionSessionApiApplication
     Task<ExecutionSessionApiResource> LinkPipelineArtifactAsync(Guid sessionId, string stage, string artifactId, byte[] responseBody, CancellationToken cancellationToken);
 }
 
-public sealed class ExecutionSessionApiApplication(IExecutionSessionService service, TimeProvider timeProvider) : IExecutionSessionApiApplication
+public sealed class ExecutionSessionApiApplication(IExecutionSessionService service, TimeProvider timeProvider, ICurrentActor currentActor, ICurrentTenant currentTenant, IdentityOptions identityOptions) : IExecutionSessionApiApplication
 {
     public async Task<ExecutionSessionApiResource> StartAsync(CreateExecutionSessionApiRequest request, CancellationToken cancellationToken)
     {
         ValidateSchema(request.SchemaVersion);
         var trigger = ParseEnum<ExecutionSessionTriggerType>(request.TriggerType, nameof(request.TriggerType));
+        var actor = currentActor.Identity;
+        var tenant = currentTenant.Context;
         var result = await service.StartAsync(new StartExecutionSessionCommand(
             request.SessionId is null ? null : new ExecutionSessionId(request.SessionId.Value), request.CorrelationId, request.Instrument,
             request.Timeframe, trigger, request.Source, request.CoreVersion, request.ApiVersion, request.StartedAtUtc,
-            request.Metadata, request.IdempotencyKeyHash, request.TenantId, request.UserId, request.SchemaVersion), cancellationToken).ConfigureAwait(false);
+            request.Metadata, request.IdempotencyKeyHash, tenant?.TenantId.Value ?? (identityOptions.Enabled ? null : "system"), actor.UserId?.Value,
+            request.SchemaVersion, tenant?.OrganizationId.Value ?? (identityOptions.Enabled ? null : "system"), actor.IsAuthenticated ? actor.ActorId : "system", actor.IsAuthenticated ? actor.ActorType.ToString() : "System"), cancellationToken).ConfigureAwait(false);
         return Map(result);
     }
 
@@ -121,7 +126,7 @@ public sealed class ExecutionSessionApiApplication(IExecutionSessionService serv
     }
 
     private static ExecutionSessionApiResource Map(ExecutionSessionDto result) => new(result.Id, result.CorrelationId, result.IdempotencyKeyHash,
-        result.TenantId, result.UserId, result.Instrument, result.Timeframe, result.StartedAtUtc, result.UpdatedAtUtc, result.CompletedAtUtc,
+        result.TenantId, result.UserId, result.OrganizationId, result.CreatedByActorId, result.CreatedByActorType, result.Instrument, result.Timeframe, result.StartedAtUtc, result.UpdatedAtUtc, result.CompletedAtUtc,
         result.Status, result.CurrentStage, result.SchemaVersion, result.CoreVersion, result.ApiVersion, result.TriggerType, result.Source,
         result.Failure is null ? null : new(result.Failure.Code, result.Failure.Message, result.Failure.Details), result.Metadata,
         result.ArtifactReferences.Select(Map).ToArray(), result.TimelineEntries.Select(item => new ExecutionSessionApiTimeline(item.TimelineId, item.EventType,

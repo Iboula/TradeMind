@@ -7,11 +7,12 @@ using TradeMind.ExecutionSessions.Infrastructure.Persistence.Entities;
 
 namespace TradeMind.ExecutionSessions.Infrastructure.Persistence.Repositories;
 
-public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbContext) : IExecutionSessionRepository
+public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbContext, IExecutionSessionAccessScope? accessScope = null) : IExecutionSessionRepository
 {
+    private readonly IExecutionSessionAccessScope _accessScope = accessScope ?? new UnrestrictedExecutionSessionAccessScope();
     public async Task<ExecutionSession?> GetAsync(ExecutionSessionId id, CancellationToken cancellationToken)
     {
-        var entity = await dbContext.ExecutionSessions.AsNoTracking()
+        var entity = await ApplyScope(dbContext.ExecutionSessions.AsNoTracking())
             .AsSplitQuery()
             .Include(item => item.Artifacts)
             .Include(item => item.Timeline)
@@ -27,7 +28,7 @@ public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbCont
 
     public async Task UpdateAsync(ExecutionSession session, long expectedConcurrencyVersion, CancellationToken cancellationToken)
     {
-        var current = await dbContext.ExecutionSessions
+        var current = await ApplyScope(dbContext.ExecutionSessions)
             .Include(item => item.Artifacts)
             .Include(item => item.Timeline)
             .SingleOrDefaultAsync(item => item.Id == session.Id.Value, cancellationToken)
@@ -38,6 +39,9 @@ public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbCont
         current.IdempotencyKeyHash = session.IdempotencyKeyHash;
         current.TenantId = session.TenantId;
         current.UserId = session.UserId;
+        current.OrganizationId = session.OrganizationId;
+        current.CreatedByActorId = session.CreatedByActorId;
+        current.CreatedByActorType = session.CreatedByActorType;
         current.Instrument = session.Instrument;
         current.Timeframe = session.Timeframe;
         current.StartedAtUtc = session.StartedAtUtc;
@@ -80,7 +84,7 @@ public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbCont
 
     public async Task<ExecutionSessionTimelineDto[]> GetTimelineAsync(ExecutionSessionId id, CancellationToken cancellationToken)
     {
-        var exists = await dbContext.ExecutionSessions.AnyAsync(item => item.Id == id.Value, cancellationToken).ConfigureAwait(false);
+        var exists = await ApplyScope(dbContext.ExecutionSessions).AnyAsync(item => item.Id == id.Value, cancellationToken).ConfigureAwait(false);
         if (!exists) throw new ExecutionSessionNotFoundException(id);
         var rows = await dbContext.Timeline.AsNoTracking()
             .Where(item => item.SessionId == id.Value)
@@ -95,7 +99,7 @@ public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbCont
 
     public async Task<ExecutionSessionSearchPage> SearchAsync(ExecutionSessionSearchFilter filter, CancellationToken cancellationToken)
     {
-        var query = dbContext.ExecutionSessions.AsNoTracking().AsQueryable();
+        var query = ApplyScope(dbContext.ExecutionSessions.AsNoTracking().AsQueryable());
         if (filter.Status is not null) query = query.Where(item => item.Status == filter.Status.Value.ToString());
         if (!string.IsNullOrWhiteSpace(filter.Instrument)) query = query.Where(item => item.Instrument == filter.Instrument.Trim());
         if (filter.StartedFromUtc is not null) query = query.Where(item => item.StartedAtUtc >= filter.StartedFromUtc.Value);
@@ -115,6 +119,13 @@ public sealed class ExecutionSessionRepository(ExecutionSessionsDbContext dbCont
             .ConfigureAwait(false);
         return new ExecutionSessionSearchPage(items, filter.Page, filter.PageSize, total);
     }
+
+    private IQueryable<ExecutionSessionEntity> ApplyScope(IQueryable<ExecutionSessionEntity> query) =>
+        !_accessScope.IsRestricted
+            ? query
+            : string.IsNullOrWhiteSpace(_accessScope.OrganizationId) || string.IsNullOrWhiteSpace(_accessScope.TenantId)
+                ? query.Where(_ => false)
+                : query.Where(item => item.OrganizationId == _accessScope.OrganizationId && item.TenantId == _accessScope.TenantId);
 }
 
 internal static class ExecutionSessionEntityMapper
@@ -126,6 +137,9 @@ internal static class ExecutionSessionEntityMapper
         IdempotencyKeyHash = session.IdempotencyKeyHash,
         TenantId = session.TenantId,
         UserId = session.UserId,
+        OrganizationId = session.OrganizationId,
+        CreatedByActorId = session.CreatedByActorId,
+        CreatedByActorType = session.CreatedByActorType,
         Instrument = session.Instrument,
         Timeframe = session.Timeframe,
         StartedAtUtc = session.StartedAtUtc,
@@ -174,6 +188,7 @@ internal static class ExecutionSessionEntityMapper
             entity.TenantId, entity.UserId, entity.Instrument, entity.Timeframe, entity.StartedAtUtc, entity.UpdatedAtUtc,
             entity.CompletedAtUtc, Enum.Parse<ExecutionSessionStatus>(entity.Status), Enum.Parse<ExecutionSessionStage>(entity.CurrentStage),
             entity.SchemaVersion, entity.CoreVersion, entity.ApiVersion, Enum.Parse<ExecutionSessionTriggerType>(entity.TriggerType),
-            entity.Source, failure, ExecutionSessionSerialization.Deserialize(entity.MetadataJson), artifacts, timeline, entity.ConcurrencyVersion);
+            entity.Source, failure, ExecutionSessionSerialization.Deserialize(entity.MetadataJson), artifacts, timeline, entity.ConcurrencyVersion,
+            entity.OrganizationId, entity.CreatedByActorId, entity.CreatedByActorType);
     }
 }

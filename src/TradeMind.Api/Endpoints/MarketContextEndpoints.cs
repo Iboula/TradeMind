@@ -1,6 +1,7 @@
 using TradeMind.AI.Context.Application;
 using TradeMind.Api.Application;
 using TradeMind.Api.Contracts.MarketContext;
+using TradeMind.Api.Authorization;
 
 namespace TradeMind.Api.Endpoints;
 
@@ -28,6 +29,7 @@ public static class MarketContextEndpoints
         })
         .WithName("BuildMarketContext")
         .WithTags("Market Context")
+        .RequireAuthorization(IdentityPolicies.MarketContextBuild)
         .Produces(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status500InternalServerError);

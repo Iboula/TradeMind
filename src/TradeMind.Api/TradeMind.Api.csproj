@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
     <PackageReference Include="MediatR" />
@@ -32,6 +33,8 @@
     <ProjectReference Include="..\TradeMind.MarketConnectors.Infrastructure\TradeMind.MarketConnectors.Infrastructure.csproj" />
     <ProjectReference Include="..\TradeMind.ExecutionSessions.Application\TradeMind.ExecutionSessions.Application.csproj" />
     <ProjectReference Include="..\TradeMind.ExecutionSessions.Infrastructure\TradeMind.ExecutionSessions.Infrastructure.csproj" />
+    <ProjectReference Include="..\TradeMind.Identity.Application\TradeMind.Identity.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.Identity.Infrastructure\TradeMind.Identity.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
