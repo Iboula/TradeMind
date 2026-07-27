@@ -58,6 +58,38 @@ foreach ($projectFile in $projects) {
         }
     }
 
+    if ($projectName -eq 'TradeMind.Identity.Domain') {
+        if ($projectReferences.Count -gt 0) {
+            $references = ($projectReferences | ForEach-Object { $_.Include }) -join ', '
+            $violations.Add("${projectName}: identity domain must not reference another project ($references).")
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.Identity.Application') {
+        $allowedReferences = @('TradeMind.Identity.Domain')
+        foreach ($reference in $projectReferences) {
+            $referenceName = [System.IO.Path]::GetFileNameWithoutExtension([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: identity application references an unexpected project ($referenceName).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(AspNetCore|EntityFramework|Npgsql|JwtBearer|IdentityModel)') {
+                $violations.Add("${projectName}: identity application must remain provider-neutral ($($package.Include)).")
+            }
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.Identity.Infrastructure') {
+        $allowedReferences = @('TradeMind.Identity.Application', 'TradeMind.Identity.Domain')
+        foreach ($reference in $projectReferences) {
+            $referenceName = [System.IO.Path]::GetFileNameWithoutExtension([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: identity infrastructure references an unexpected project ($referenceName).")
+            }
+        }
+    }
+
     if ($projectName -eq 'TradeMind.Api') {
         foreach ($reference in $projectReferences) {
             $referencePath = [string]$reference.Include
