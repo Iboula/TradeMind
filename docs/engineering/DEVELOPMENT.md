@@ -22,6 +22,9 @@ This document describes the local development workflow for TradeMind.
 - `src/TradeMind.AI.Tools`: provider-agnostic tool definitions, registry, discovery, authorization, validation, controlled execution, result composition, and deterministic demonstration tools.
 - `src/TradeMind.AI.Agents`: provider-agnostic versioned agent definitions, registry, discovery, authorization, policy mapping, execution, metrics, and built-in declarative agents.
 - `src/TradeMind.AI.Infrastructure`: concrete AI provider registration and SDK adapters.
+- `src/TradeMind.Identity.Domain`, `src/TradeMind.Identity.Application`, and
+  `src/TradeMind.Identity.Infrastructure`: provider-neutral identity contracts,
+  policy authorization, API-key lifecycle, JWT mapping and PostgreSQL adapters.
 - `src/TradeMind.Trading.Coaching`: provider-agnostic trading journal validation, metrics, rules, scoring, structured coaching agent, and business service.
 - `src/TradeMind.Trading.Analytics`: provider-agnostic multi-trade validation, deduplication, descriptive statistics, trends, data quality, structured journal-analysis agent, and business service.
 - `tests/TradeMind.AI.Tests`: AI provider registration and orchestration tests.
@@ -42,7 +45,10 @@ Start the local database with:
 docker compose up -d postgres
 ```
 
-The API applies EF Core migrations during startup. Integration tests apply migrations inside their Testcontainers database.
+The API applies Execution Sessions and Identity EF Core migrations during startup
+only when the corresponding `ApplyMigrationsOnStartup` option and connection
+string are explicitly configured. Integration tests apply migrations inside
+isolated Testcontainers databases.
 
 ## Running the solution
 
@@ -75,6 +81,11 @@ dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
 The API expects a `ConnectionStrings:KnowledgeHub` connection string. Local development may use appsettings, user secrets, environment variables, or Docker Compose defaults. Real secrets must not be committed.
 
 AI provider configuration lives under the `AI` section. The checked-in OpenAI API key value is intentionally empty. Use environment variable `AI__OpenAI__ApiKey`, user secrets, or a future secret store for real credentials.
+
+Identity production configuration requires a real JWT authority and, when API
+keys are enabled, `ConnectionStrings:Identity`. The raw API-key secret is never
+configured; it is generated and displayed once by the create/rotate operation.
+Test authentication must remain disabled outside the Test environment.
 
 AI product features should compose provider and orchestration registrations together:
 

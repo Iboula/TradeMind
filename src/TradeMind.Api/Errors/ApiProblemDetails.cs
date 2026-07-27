@@ -4,6 +4,8 @@ using TradeMind.Api.Contracts.Common;
 using TradeMind.Api.Middleware;
 using TradeMind.ExecutionSessions.Application;
 using TradeMind.ExecutionSessions.Domain;
+using TradeMind.Identity.Application;
+using TradeMind.Api.Authentication;
 
 namespace TradeMind.Api.Errors;
 
@@ -37,7 +39,7 @@ public static class ApiProblemDetails
             problem.Extensions["errors"] = errors;
         }
 
-        await context.Response.WriteAsJsonAsync(problem, TradeMind.Api.Mapping.ApiJson.Options).ConfigureAwait(false);
+        await context.Response.WriteAsJsonAsync(problem, TradeMind.Api.Mapping.ApiJson.Options, "application/problem+json").ConfigureAwait(false);
     }
 }
 
@@ -71,6 +73,24 @@ public static class ApiExceptionHandler
                 return;
             case ExecutionSessionDomainException transition:
                 await ApiProblemDetails.WriteAsync(context, StatusCodes.Status422UnprocessableEntity, "Invalid execution session transition", transition.Message).ConfigureAwait(false);
+                return;
+            case IdentityAuthorizationException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status403Forbidden, "Forbidden", "The authenticated actor is not permitted to perform this operation.").ConfigureAwait(false);
+                return;
+            case ApiKeyNotFoundException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status404NotFound, "API key not found", "The requested API key is not available in the current tenant.").ConfigureAwait(false);
+                return;
+            case ApiKeyLimitExceededException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status422UnprocessableEntity, "API key limit reached", "The organization has reached its active API key limit.").ConfigureAwait(false);
+                return;
+            case TradeMind.Identity.Infrastructure.Persistence.IdentityPersistenceNotConfiguredException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status501NotImplemented, "Identity persistence is not configured", "Identity management requires PostgreSQL persistence configuration.").ConfigureAwait(false);
+                return;
+            case IdentityConcurrencyException concurrency:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status409Conflict, "Identity concurrency conflict", concurrency.Message).ConfigureAwait(false);
+                return;
+            case TenantSelectionException:
+                await ApiProblemDetails.WriteAsync(context, StatusCodes.Status403Forbidden, "Invalid tenant selection", "The requested tenant is not authorized for this identity.").ConfigureAwait(false);
                 return;
             case OperationCanceledException:
                 await ApiProblemDetails.WriteAsync(context, StatusCodes.Status408RequestTimeout, "Request cancelled", "The operation was cancelled before a response was completed.").ConfigureAwait(false);

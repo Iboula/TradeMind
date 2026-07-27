@@ -7,6 +7,9 @@ public sealed class ExecutionSessionEntity
     public string? IdempotencyKeyHash { get; set; }
     public string? TenantId { get; set; }
     public string? UserId { get; set; }
+    public string? OrganizationId { get; set; }
+    public string? CreatedByActorId { get; set; }
+    public string? CreatedByActorType { get; set; }
     public string Instrument { get; set; } = null!;
     public string Timeframe { get; set; } = null!;
     public DateTimeOffset StartedAtUtc { get; set; }

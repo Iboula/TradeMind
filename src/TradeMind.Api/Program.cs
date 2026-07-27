@@ -1,16 +1,19 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using TradeMind.Api.Composition;
+using TradeMind.Api.Authentication;
 using TradeMind.Api.Endpoints;
 using TradeMind.Api.Errors;
 using TradeMind.Api.Middleware;
 using TradeMind.Api.OpenApi;
 using TradeMind.ExecutionSessions.Infrastructure;
 using TradeMind.ExecutionSessions.Infrastructure.Persistence;
+using TradeMind.Identity.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTradeMindCore(builder.Configuration);
+builder.Services.AddTradeMindIdentity(builder.Configuration, builder.Environment);
 builder.Services.AddTradeMindApi(builder.Configuration);
 builder.Services.AddTradeMindOpenApi(builder.Configuration);
 builder.WebHost.ConfigureKestrel((context, options) =>
@@ -33,10 +36,36 @@ if (string.Equals(persistenceOptions.Provider, "PostgreSql", StringComparison.Or
     await app.Services.ApplyExecutionSessionsMigrationsAsync();
 }
 
+var identityOptions = app.Configuration
+    .GetSection("TradeMind:Identity")
+    .Get<TradeMind.Identity.Application.IdentityOptions>() ?? new();
+if (identityOptions.ApplyMigrationsOnStartup
+    && !string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Identity")))
+{
+    await app.Services.ApplyIdentityMigrationsAsync();
+}
+
 app.UseExceptionHandler(errorApp => errorApp.Run(ApiExceptionHandler.WriteAsync));
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<RequestTimeoutMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+app.Use(async (context, next) =>
+{
+    await next().ConfigureAwait(false);
+    if (context.Response.StatusCode is 401 or 403 && !context.Response.HasStarted)
+    {
+        context.Response.Headers.Remove("Content-Length");
+        var title = context.Response.StatusCode == StatusCodes.Status401Unauthorized ? "Authentication required" : "Forbidden";
+        var detail = context.Response.StatusCode == StatusCodes.Status401Unauthorized
+            ? "A valid identity credential is required to access this resource."
+            : "The authenticated actor is not permitted to perform this operation.";
+        await ApiProblemDetails.WriteAsync(context, context.Response.StatusCode, title, detail).ConfigureAwait(false);
+    }
+});
+app.UseAuthentication();
+app.UseMiddleware<TenantResolutionMiddleware>();
+app.UseAuthorization();
+app.UseRateLimiter();
 app.UseMiddleware<ExecutionSessionHeaderMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
@@ -83,6 +112,7 @@ app.MapTradingWorkspaceEndpoints();
 app.MapTradingAssistantEndpoints();
 app.MapPaperTradingEndpoints();
 app.MapKnowledgeEndpoints();
+app.MapIdentityEndpoints();
 app.MapExecutionSessionEndpoints();
 
 await app.RunAsync();

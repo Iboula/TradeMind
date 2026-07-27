@@ -4,6 +4,7 @@ using TradeMind.Api.Contracts.Common;
 using TradeMind.Api.Contracts.ExecutionSessions;
 using TradeMind.Api.Middleware;
 using TradeMind.ExecutionSessions.Application.DTOs;
+using TradeMind.Api.Authorization;
 
 namespace TradeMind.Api.Endpoints;
 
@@ -28,25 +29,25 @@ public static class ExecutionSessionEndpoints
             {
                 return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", exception.Message);
             }
-        }).WithMetadata(new IdempotencyMetadata.Required());
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsCreate).WithMetadata(new IdempotencyMetadata.Required());
 
         group.MapGet("/{sessionId:guid}", async (Guid sessionId, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             var result = await application.GetAsync(sessionId, cancellationToken).ConfigureAwait(false);
             return Results.Ok(Response(context, result));
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsRead);
 
         group.MapGet("/{sessionId:guid}/timeline", async (Guid sessionId, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             var timeline = await application.GetTimelineAsync(sessionId, cancellationToken).ConfigureAwait(false);
             return Results.Ok(new { items = timeline, metadata = Metadata(context) });
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsReadAudit);
 
         group.MapGet("/{sessionId:guid}/replay-manifest", async (Guid sessionId, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             var manifest = await application.GetReplayManifestAsync(sessionId, cancellationToken).ConfigureAwait(false);
             return Results.Ok(manifest with { Metadata = Metadata(context) });
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsReplay);
 
         group.MapGet("/", async ([AsParameters] ExecutionSessionSearchApiQuery query, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
@@ -59,42 +60,42 @@ public static class ExecutionSessionEndpoints
                 totalCount = result.TotalCount,
                 metadata = Metadata(context)
             });
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsSearch);
 
         group.MapPost("/{sessionId:guid}/artifacts", async (Guid sessionId, LinkExecutionArtifactApiRequest? request, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             if (request is null) return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", "A JSON request is required.");
             var result = await application.LinkArtifactAsync(sessionId, request, cancellationToken).ConfigureAwait(false);
             return Results.Ok(result);
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsAdvance);
 
         group.MapPost("/{sessionId:guid}/stages", async (Guid sessionId, AdvanceExecutionStageApiRequest? request, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             if (request is null) return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", "A JSON request is required.");
             var result = await application.AdvanceStageAsync(sessionId, request, cancellationToken).ConfigureAwait(false);
             return Results.Ok(result);
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsAdvance);
 
         group.MapPost("/{sessionId:guid}/complete", async (Guid sessionId, ExecutionSessionMutationApiRequest? request, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             if (request is null) return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", "A JSON request is required.");
             var result = await application.CompleteAsync(sessionId, request, cancellationToken).ConfigureAwait(false);
             return Results.Ok(Response(context, result));
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsAdvance);
 
         group.MapPost("/{sessionId:guid}/fail", async (Guid sessionId, FailExecutionSessionApiRequest? request, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             if (request is null) return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", "A JSON request is required.");
             var result = await application.FailAsync(sessionId, request, cancellationToken).ConfigureAwait(false);
             return Results.Ok(result);
-        });
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsFail);
 
         group.MapPost("/{sessionId:guid}/cancel", async (Guid sessionId, ExecutionSessionMutationApiRequest? request, HttpContext context, IExecutionSessionApiApplication application, CancellationToken cancellationToken) =>
         {
             if (request is null) return EndpointHelpers.Problem(StatusCodes.Status400BadRequest, "Invalid request", "A JSON request is required.");
             var result = await application.CancelAsync(sessionId, request, cancellationToken).ConfigureAwait(false);
             return Results.Ok(Response(context, result));
-        }).WithMetadata(new IdempotencyMetadata.Required());
+        }).RequireAuthorization(IdentityPolicies.ExecutionSessionsCancel).WithMetadata(new IdempotencyMetadata.Required());
     }
 
     private static ExecutionSessionApiResponse Response(HttpContext context, ExecutionSessionApiResource resource) =>

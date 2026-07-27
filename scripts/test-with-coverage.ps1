@@ -34,4 +34,9 @@ foreach ($testProject in $testProjects) {
     }
 }
 
-Write-Host "All $($testProjects.Count) test projects passed sequentially."
+$coverageFiles = Get-ChildItem -Path $resultsPath -Recurse -Filter 'coverage.cobertura.xml' -File
+if ($coverageFiles.Count -lt $testProjects.Count) {
+    throw "Coverage collection produced $($coverageFiles.Count) files for $($testProjects.Count) test projects."
+}
+
+Write-Host "All $($testProjects.Count) test projects passed sequentially with $($coverageFiles.Count) coverage files."

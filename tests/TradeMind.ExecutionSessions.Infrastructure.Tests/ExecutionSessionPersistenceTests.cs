@@ -89,6 +89,25 @@ public sealed class ExecutionSessionPersistenceTests(PostgreSqlExecutionSessions
     }
 
     [Fact]
+    public async Task Repository_scope_hides_other_tenants_and_missing_scope()
+    {
+        var owned = ExecutionSession.Start(new ExecutionSessionId(Guid.NewGuid()), new ExecutionCorrelationId("scope-owned"), "EURUSD", "M15",
+            ExecutionSessionTriggerType.Api, "integration", "v1", "v1", Now, organizationId: "org-1", tenantId: "tenant-1");
+        var other = ExecutionSession.Start(new ExecutionSessionId(Guid.NewGuid()), new ExecutionCorrelationId("scope-other"), "EURUSD", "M15",
+            ExecutionSessionTriggerType.Api, "integration", "v1", "v1", Now, organizationId: "org-1", tenantId: "tenant-2");
+        await PersistAsync(owned);
+        await PersistAsync(other);
+
+        await using var context = fixture.CreateDbContext();
+        var scoped = new ExecutionSessionRepository(context, new FixedScope("org-1", "tenant-1"));
+        Assert.NotNull(await scoped.GetAsync(owned.Id, CancellationToken.None));
+        Assert.Null(await scoped.GetAsync(other.Id, CancellationToken.None));
+
+        var missingScope = new ExecutionSessionRepository(context, new FixedScope(null, null));
+        Assert.Null(await missingScope.GetAsync(owned.Id, CancellationToken.None));
+    }
+
+    [Fact]
     public async Task Concurrent_updates_use_postgresql_optimistic_concurrency()
     {
         var session = CreateSession("concurrency");
@@ -194,4 +213,12 @@ public sealed class ExecutionSessionPersistenceTests(PostgreSqlExecutionSessions
     private static ExecutionSessionAuditEntry Audit(ExecutionSession session, ExecutionSessionAuditEventType eventType) =>
         new(Guid.NewGuid(), session.Id, eventType, Now, session.CorrelationId, ExecutionSessionActorType.System, null,
             null, session.Status, null, session.CurrentStage, null, new Dictionary<string, string>());
+
+    private sealed class FixedScope(string? organizationId, string? tenantId) : IExecutionSessionAccessScope
+    {
+        public string? OrganizationId { get; } = organizationId;
+        public string? TenantId { get; } = tenantId;
+        public bool IsRestricted => true;
+        public bool IsAdministrativeOverride => false;
+    }
 }

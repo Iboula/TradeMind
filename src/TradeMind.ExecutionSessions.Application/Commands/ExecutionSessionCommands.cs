@@ -18,7 +18,10 @@ public sealed record StartExecutionSessionCommand(
     string? IdempotencyKeyHash = null,
     string? TenantId = null,
     string? UserId = null,
-    int SchemaVersion = 1) : IRequest<ExecutionSessionDto>;
+    int SchemaVersion = 1,
+    string? OrganizationId = null,
+    string? CreatedByActorId = null,
+    string? CreatedByActorType = null) : IRequest<ExecutionSessionDto>;
 
 public sealed record LinkExecutionArtifactCommand(
     ExecutionSessionId SessionId,

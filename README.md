@@ -19,6 +19,8 @@ Build a modular platform that combines market data, AI reasoning, backtesting, a
 - PostgreSQL with EF Core and pgvector for KnowledgeHub persistence and semantic search.
 - Docker Compose for local infrastructure and Testcontainers for PostgreSQL integration tests.
 - Provider-agnostic AI contracts; concrete providers stay outside core modules.
+- Provider-neutral identity and authorization foundations with JWT resource-server validation,
+  scoped PostgreSQL API keys, tenant resolution and repository-level ownership filters.
 - GitHub Actions with centralized package versions, dependency checks, Release build, tests, and coverage.
 
 ## Getting Started
@@ -37,7 +39,7 @@ optimistic concurrency, audit, outbox, durable idempotency and replay manifests.
 dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
 ```
 
-The versioned analytical routes are documented in [docs/api](docs/api/README.md). OpenAPI is served at `/openapi/v1.json` outside Production when enabled. Process liveness is available at `/health/live`; configured dependency readiness is available at `/health/ready`. Sprint 24 does not implement authentication yet; the host deliberately does not provide fake authentication.
+The versioned analytical routes are documented in [docs/api](docs/api/README.md). OpenAPI is served at `/openapi/v1.json` outside Production when enabled and declares JWT bearer plus `X-TradeMind-Api-Key` schemes. Process liveness is available at `/health/live`; configured dependency readiness is available at `/health/ready`. Identity operations and their security boundaries are documented in [docs/identity](docs/identity/README.md). Test authentication is available only in the Test environment and is disabled by default.
 
 ## License
 MIT

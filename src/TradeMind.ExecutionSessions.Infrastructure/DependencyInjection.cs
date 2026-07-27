@@ -67,6 +67,7 @@ public static class DependencyInjection
         services.TryAddScoped<IExecutionSessionRepository, ExecutionSessionRepository>();
         services.TryAddScoped<IExecutionSessionUnitOfWork, ExecutionSessionUnitOfWork>();
         services.TryAddScoped<IExecutionSessionReplayReader, ExecutionSessionReplayReader>();
+        services.TryAddScoped<IExecutionSessionAccessScope, UnrestrictedExecutionSessionAccessScope>();
         services.TryAddSingleton<IPersistentIdempotencyStore, PostgreSqlIdempotencyStore>();
         return services;
     }

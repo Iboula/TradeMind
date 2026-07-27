@@ -45,6 +45,10 @@ dotnet test TradeMind.sln --configuration Release --no-build
 ```
 
 The solution includes both unit and integration test projects, so CI executes both through `dotnet test TradeMind.sln`.
+The coverage workflow also runs every test project sequentially with Coverlet,
+including Identity and PostgreSQL/Testcontainers projects, then merges all
+Cobertura files with ReportGenerator. A missing coverage artifact is treated as
+a CI failure rather than silently producing an incomplete report.
 
 ## Local validation
 

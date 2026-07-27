@@ -43,6 +43,15 @@ jobs:
         shell: pwsh
         run: ./scripts/test-with-coverage.ps1 -Configuration Release -ResultsDirectory TestResults
 
+      - name: Verify coverage inputs
+        shell: pwsh
+        run: |
+          $coverageFiles = Get-ChildItem TestResults -Recurse -Filter coverage.cobertura.xml -File
+          if ($coverageFiles.Count -eq 0) {
+            throw "No Coverlet Cobertura files were produced."
+          }
+          "Coverlet produced $($coverageFiles.Count) Cobertura files."
+
       - name: Generate Cobertura report
         if: always()
         run: >-

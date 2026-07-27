@@ -121,6 +121,14 @@ public sealed class TradingCoachParserAndSafetyTests
             parameter => parameter.ParameterType.Name.StartsWith("ILogger", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public void Case072_Long_adversarial_text_is_evaluated_without_regex_timeout()
+    {
+        var content = string.Concat("price ", new string('a', 100_000), " will remain uncertain");
+
+        Assert.False(TradingCoachSafetyPolicy.ContainsProhibitedContent(content));
+    }
+
     private TradingCoachAnalysis Parse(string json) => _parser.Parse(
         json,
         Guid.Parse("11111111-1111-1111-1111-111111111111"),
