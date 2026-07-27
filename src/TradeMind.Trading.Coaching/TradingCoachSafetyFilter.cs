@@ -119,6 +119,6 @@ public static class TradingCoachSafetyPolicy
 
     private static Regex Create(string pattern) => new(
         pattern,
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant,
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.NonBacktracking,
         TimeSpan.FromMilliseconds(100));
 }
