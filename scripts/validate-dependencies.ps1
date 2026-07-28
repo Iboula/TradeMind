@@ -90,6 +90,32 @@ foreach ($projectFile in $projects) {
         }
     }
 
+    if ($projectName -eq 'TradeMind.Observability.Abstractions') {
+        if ($packageReferences.Count -gt 0) {
+            $packages = ($packageReferences | ForEach-Object { $_.Include }) -join ', '
+            $violations.Add("${projectName}: provider-neutral telemetry contracts must not reference packages ($packages).")
+        }
+        if ($projectReferences.Count -gt 0) {
+            $references = ($projectReferences | ForEach-Object { $_.Include }) -join ', '
+            $violations.Add("${projectName}: telemetry contracts must not reference another project ($references).")
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.Observability') {
+        $allowedReferences = @('TradeMind.Observability.Abstractions')
+        foreach ($reference in $projectReferences) {
+            $referenceName = [System.IO.Path]::GetFileNameWithoutExtension([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: runtime observability references an unexpected project ($referenceName).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(Broker|MT5|OpenAI|Npgsql)') {
+                $violations.Add("${projectName}: observability must not reference broker, MT5, LLM or provider-specific database packages ($($package.Include)).")
+            }
+        }
+    }
+
     if ($projectName -eq 'TradeMind.Api') {
         foreach ($reference in $projectReferences) {
             $referencePath = [string]$reference.Include
