@@ -29,6 +29,9 @@ public static class TradeMindPermissions
     public const string AdministrationManageOrganizations = "TradeMind.Administration.ManageOrganizations";
     public const string AdministrationManageUsers = "TradeMind.Administration.ManageUsers";
     public const string AdministrationReadAudit = "TradeMind.Administration.ReadAudit";
+    public const string ObservabilityReadDiagnostics = "TradeMind.Observability.ReadDiagnostics";
+    public const string ObservabilityReadMetrics = "TradeMind.Observability.ReadMetrics";
+    public const string ObservabilityReadTelemetry = "TradeMind.Observability.ReadTelemetry";
 
     public static IReadOnlyList<Permission> All { get; } = typeof(TradeMindPermissions)
         .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)

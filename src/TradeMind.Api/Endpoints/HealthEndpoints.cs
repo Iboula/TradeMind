@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using TradeMind.Api.Contracts.Common;
+using TradeMind.Api.Health;
 
 namespace TradeMind.Api.Endpoints;
 
@@ -28,6 +29,23 @@ public static class HealthEndpoints
                 : StatusCodes.Status503ServiceUnavailable);
         })
             .WithName("ReadyHealth")
+            .WithTags("Health")
+            .Produces<HealthResponse>();
+
+        endpoints.MapGet("/health/startup", async (
+            HealthCheckService healthChecks,
+            TimeProvider timeProvider,
+            CancellationToken cancellationToken) =>
+        {
+            var report = await healthChecks.CheckHealthAsync(
+                check => check.Tags.Contains("startup", StringComparer.Ordinal),
+                cancellationToken).ConfigureAwait(false);
+            var statusCode = report.Status == HealthStatus.Healthy
+                ? StatusCodes.Status200OK
+                : StatusCodes.Status503ServiceUnavailable;
+            return Results.Json(new HealthResponse(report.Status.ToString(), "startup", timeProvider.GetUtcNow()), statusCode: statusCode);
+        })
+            .WithName("StartupHealth")
             .WithTags("Health")
             .Produces<HealthResponse>();
 

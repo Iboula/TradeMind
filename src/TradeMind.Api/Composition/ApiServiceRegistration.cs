@@ -10,6 +10,8 @@ using TradeMind.Identity.Application;
 using TradeMind.Identity.Application.Abstractions;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TradeMind.ExecutionSessions.Infrastructure;
+using TradeMind.Observability.Health;
+using TradeMind.Observability.OpenTelemetry;
 
 namespace TradeMind.Api.Composition;
 
@@ -52,7 +54,11 @@ public static class ApiServiceRegistration
         });
         services.AddProblemDetails();
         services.AddHealthChecks()
-            .AddCheck<ConfiguredDependencyHealthCheck>("configured-dependencies", tags: ["ready"]);
+            .AddCheck<ConfiguredDependencyHealthCheck>("configured-dependencies", tags: ["ready"])
+            .AddCheck<ObservabilityHealthCheck>("observability", tags: ["ready"])
+            .AddCheck<StartupHealthCheck>("startup", tags: ["startup"])
+            .AddCheck<ReadinessHealthCheck>("readiness", tags: ["ready"]);
+        services.AddSingleton<StartupHealthCheckState>();
         return services;
     }
 }
