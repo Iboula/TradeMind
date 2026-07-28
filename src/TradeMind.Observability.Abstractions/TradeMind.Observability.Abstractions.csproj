@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Observability.Abstractions</RootNamespace>
+  </PropertyGroup>
+</Project>
