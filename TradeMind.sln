@@ -1,149 +1,145 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11612.153
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Domain", "src/TradeMind.KnowledgeHub.Domain/TradeMind.KnowledgeHub.Domain.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D101}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Domain", "src\TradeMind.KnowledgeHub.Domain\TradeMind.KnowledgeHub.Domain.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Application", "src/TradeMind.KnowledgeHub.Application/TradeMind.KnowledgeHub.Application.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D102}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Application", "src\TradeMind.KnowledgeHub.Application\TradeMind.KnowledgeHub.Application.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D102}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Infrastructure", "src/TradeMind.KnowledgeHub.Infrastructure/TradeMind.KnowledgeHub.Infrastructure.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D103}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Infrastructure", "src\TradeMind.KnowledgeHub.Infrastructure\TradeMind.KnowledgeHub.Infrastructure.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api", "src/TradeMind.Api/TradeMind.Api.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D104}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api", "src\TradeMind.Api\TradeMind.Api.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Tests", "tests/TradeMind.KnowledgeHub.Tests/TradeMind.KnowledgeHub.Tests.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D105}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.Tests", "tests\TradeMind.KnowledgeHub.Tests\TradeMind.KnowledgeHub.Tests.csproj", "{A5D7E105-1B33-41D9-9879-514E82A0D105}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.IntegrationTests", "tests/TradeMind.KnowledgeHub.IntegrationTests/TradeMind.KnowledgeHub.IntegrationTests.csproj", "{7F233C19-E537-43F7-A344-DA9A5ECD1B48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.KnowledgeHub.IntegrationTests", "tests\TradeMind.KnowledgeHub.IntegrationTests\TradeMind.KnowledgeHub.IntegrationTests.csproj", "{7F233C19-E537-43F7-A344-DA9A5ECD1B48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Abstractions", "src/TradeMind.AI.Abstractions/TradeMind.AI.Abstractions.csproj", "{047F1EC1-5A79-4F05-8F32-D38A9EA0A528}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Abstractions", "src\TradeMind.AI.Abstractions\TradeMind.AI.Abstractions.csproj", "{047F1EC1-5A79-4F05-8F32-D38A9EA0A528}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Infrastructure", "src/TradeMind.AI.Infrastructure/TradeMind.AI.Infrastructure.csproj", "{FC744E2E-6428-42D5-910A-8A85CF4A3A38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Infrastructure", "src\TradeMind.AI.Infrastructure\TradeMind.AI.Infrastructure.csproj", "{FC744E2E-6428-42D5-910A-8A85CF4A3A38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tests", "tests/TradeMind.AI.Tests/TradeMind.AI.Tests.csproj", "{CCA20B18-BEF5-4650-A704-A3291C588D87}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tests", "tests\TradeMind.AI.Tests\TradeMind.AI.Tests.csproj", "{CCA20B18-BEF5-4650-A704-A3291C588D87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Application", "src/TradeMind.AI.Application/TradeMind.AI.Application.csproj", "{8FD89FAC-8602-4722-AB74-4D4855BD8295}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Application", "src\TradeMind.AI.Application\TradeMind.AI.Application.csproj", "{8FD89FAC-8602-4722-AB74-4D4855BD8295}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Memory", "src/TradeMind.AI.Memory/TradeMind.AI.Memory.csproj", "{5D1EBC8D-01C1-4507-A8A2-9A6BBAAA55FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Memory", "src\TradeMind.AI.Memory\TradeMind.AI.Memory.csproj", "{5D1EBC8D-01C1-4507-A8A2-9A6BBAAA55FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Knowledge", "src/TradeMind.AI.Knowledge/TradeMind.AI.Knowledge.csproj", "{6DF1DD37-84DA-4A7B-8412-663210508ADA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Knowledge", "src\TradeMind.AI.Knowledge\TradeMind.AI.Knowledge.csproj", "{6DF1DD37-84DA-4A7B-8412-663210508ADA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tools", "src/TradeMind.AI.Tools/TradeMind.AI.Tools.csproj", "{D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Tools", "src\TradeMind.AI.Tools\TradeMind.AI.Tools.csproj", "{D9700F5D-6FE1-4D61-AE0E-9C9D65C724C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Agents", "src/TradeMind.AI.Agents/TradeMind.AI.Agents.csproj", "{AD3D8EC7-F845-4F06-896F-BDAAA92B321F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Agents", "src\TradeMind.AI.Agents\TradeMind.AI.Agents.csproj", "{AD3D8EC7-F845-4F06-896F-BDAAA92B321F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching", "src/TradeMind.Trading.Coaching/TradeMind.Trading.Coaching.csproj", "{3B2A4E31-6C52-4A72-A71B-95A3D41E0C11}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching", "src\TradeMind.Trading.Coaching\TradeMind.Trading.Coaching.csproj", "{3B2A4E31-6C52-4A72-A71B-95A3D41E0C11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching.Tests", "tests/TradeMind.Trading.Coaching.Tests/TradeMind.Trading.Coaching.Tests.csproj", "{4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Coaching.Tests", "tests\TradeMind.Trading.Coaching.Tests\TradeMind.Trading.Coaching.Tests.csproj", "{4C3B5F42-7D63-4B83-B82C-A6B4E52F1D22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics", "src/TradeMind.Trading.Analytics/TradeMind.Trading.Analytics.csproj", "{DA9A97AC-219F-4B2D-A162-72A1E112B4BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics", "src\TradeMind.Trading.Analytics\TradeMind.Trading.Analytics.csproj", "{DA9A97AC-219F-4B2D-A162-72A1E112B4BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics.Tests", "tests/TradeMind.Trading.Analytics.Tests/TradeMind.Trading.Analytics.Tests.csproj", "{740BEF96-4E85-423B-8094-5D519F112D1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Trading.Analytics.Tests", "tests\TradeMind.Trading.Analytics.Tests\TradeMind.Trading.Analytics.Tests.csproj", "{740BEF96-4E85-423B-8094-5D519F112D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Market.Abstractions", "src/TradeMind.Market.Abstractions/TradeMind.Market.Abstractions.csproj", "{F4A16E97-4E0D-40B2-A781-1157A8C00B21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Market.Abstractions", "src\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj", "{F4A16E97-4E0D-40B2-A781-1157A8C00B21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Market.Abstractions.Tests", "tests/TradeMind.Market.Abstractions.Tests/TradeMind.Market.Abstractions.Tests.csproj", "{2C68F148-22FB-4B7D-A733-BA5CB797D4E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Market.Abstractions.Tests", "tests\TradeMind.Market.Abstractions.Tests\TradeMind.Market.Abstractions.Tests.csproj", "{2C68F148-22FB-4B7D-A733-BA5CB797D4E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Domain", "src/TradeMind.MarketConnectors.Domain/TradeMind.MarketConnectors.Domain.csproj", "{DE03F42F-AC18-4D79-BE55-E694E6019301}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Domain", "src\TradeMind.MarketConnectors.Domain\TradeMind.MarketConnectors.Domain.csproj", "{DE03F42F-AC18-4D79-BE55-E694E6019301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Application", "src/TradeMind.MarketConnectors.Application/TradeMind.MarketConnectors.Application.csproj", "{D68BE181-6AF4-4B22-B8AA-C8E188B79602}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Application", "src\TradeMind.MarketConnectors.Application\TradeMind.MarketConnectors.Application.csproj", "{D68BE181-6AF4-4B22-B8AA-C8E188B79602}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Infrastructure", "src/TradeMind.MarketConnectors.Infrastructure/TradeMind.MarketConnectors.Infrastructure.csproj", "{507E54A0-870B-4706-A9BE-83EE24A03F03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Infrastructure", "src\TradeMind.MarketConnectors.Infrastructure\TradeMind.MarketConnectors.Infrastructure.csproj", "{507E54A0-870B-4706-A9BE-83EE24A03F03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Tests", "tests/TradeMind.MarketConnectors.Tests/TradeMind.MarketConnectors.Tests.csproj", "{5A7C8D91-C15E-49DE-A0CB-837683C31104}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.Tests", "tests\TradeMind.MarketConnectors.Tests\TradeMind.MarketConnectors.Tests.csproj", "{5A7C8D91-C15E-49DE-A0CB-837683C31104}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.IntegrationTests", "tests/TradeMind.MarketConnectors.IntegrationTests/TradeMind.MarketConnectors.IntegrationTests.csproj", "{82D5117E-3C71-43CA-95E3-8AA3F4AE1505}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.MarketConnectors.IntegrationTests", "tests\TradeMind.MarketConnectors.IntegrationTests\TradeMind.MarketConnectors.IntegrationTests.csproj", "{82D5117E-3C71-43CA-95E3-8AA3F4AE1505}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Domain", "src/TradeMind.AI.Context.Domain/TradeMind.AI.Context.Domain.csproj", "{CC8C7C22-367E-4262-80A8-6757D0B84C89}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Domain", "src\TradeMind.AI.Context.Domain\TradeMind.AI.Context.Domain.csproj", "{CC8C7C22-367E-4262-80A8-6757D0B84C89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Application", "src/TradeMind.AI.Context.Application/TradeMind.AI.Context.Application.csproj", "{242F555A-0C2D-497A-8B47-D451FB1087CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Application", "src\TradeMind.AI.Context.Application\TradeMind.AI.Context.Application.csproj", "{242F555A-0C2D-497A-8B47-D451FB1087CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Infrastructure", "src/TradeMind.AI.Context.Infrastructure/TradeMind.AI.Context.Infrastructure.csproj", "{AE49EEB9-14D1-4A10-B7B8-DC3FB91B0586}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Infrastructure", "src\TradeMind.AI.Context.Infrastructure\TradeMind.AI.Context.Infrastructure.csproj", "{AE49EEB9-14D1-4A10-B7B8-DC3FB91B0586}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Tests", "tests/TradeMind.AI.Context.Tests/TradeMind.AI.Context.Tests.csproj", "{C210C57C-6AC8-41E9-A9BD-575F6AE30EDD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.Tests", "tests\TradeMind.AI.Context.Tests\TradeMind.AI.Context.Tests.csproj", "{C210C57C-6AC8-41E9-A9BD-575F6AE30EDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.IntegrationTests", "tests/TradeMind.AI.Context.IntegrationTests/TradeMind.AI.Context.IntegrationTests.csproj", "{A2932B93-7628-46BA-B716-321D8BED82E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.Context.IntegrationTests", "tests\TradeMind.AI.Context.IntegrationTests\TradeMind.AI.Context.IntegrationTests.csproj", "{A2932B93-7628-46BA-B716-321D8BED82E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Domain", "src/TradeMind.AI.ExpertAgents.Domain/TradeMind.AI.ExpertAgents.Domain.csproj", "{BE6FF168-4D58-4468-BF2F-1DB9C33DD14A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Domain", "src\TradeMind.AI.ExpertAgents.Domain\TradeMind.AI.ExpertAgents.Domain.csproj", "{BE6FF168-4D58-4468-BF2F-1DB9C33DD14A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Application", "src/TradeMind.AI.ExpertAgents.Application/TradeMind.AI.ExpertAgents.Application.csproj", "{D82B1E69-7F2A-4CCF-899C-75882EF00E82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Application", "src\TradeMind.AI.ExpertAgents.Application\TradeMind.AI.ExpertAgents.Application.csproj", "{D82B1E69-7F2A-4CCF-899C-75882EF00E82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Tests", "tests/TradeMind.AI.ExpertAgents.Tests/TradeMind.AI.ExpertAgents.Tests.csproj", "{C50A7C05-70B0-4803-9DDE-62DB353AD7A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Tests", "tests\TradeMind.AI.ExpertAgents.Tests\TradeMind.AI.ExpertAgents.Tests.csproj", "{C50A7C05-70B0-4803-9DDE-62DB353AD7A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Domain", "src/TradeMind.AI.ExpertAgents.Dispatch.Domain/TradeMind.AI.ExpertAgents.Dispatch.Domain.csproj", "{E99A5771-B6A9-4A5D-BA90-A4D3400ECE1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Domain", "src\TradeMind.AI.ExpertAgents.Dispatch.Domain\TradeMind.AI.ExpertAgents.Dispatch.Domain.csproj", "{E99A5771-B6A9-4A5D-BA90-A4D3400ECE1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Application", "src/TradeMind.AI.ExpertAgents.Dispatch.Application/TradeMind.AI.ExpertAgents.Dispatch.Application.csproj", "{2F1C21C9-96F6-455F-B6F2-B349EC734DF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Application", "src\TradeMind.AI.ExpertAgents.Dispatch.Application\TradeMind.AI.ExpertAgents.Dispatch.Application.csproj", "{2F1C21C9-96F6-455F-B6F2-B349EC734DF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Tests", "tests/TradeMind.AI.ExpertAgents.Dispatch.Tests/TradeMind.AI.ExpertAgents.Dispatch.Tests.csproj", "{161AE459-930B-4252-A22E-7116F4160D7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Dispatch.Tests", "tests\TradeMind.AI.ExpertAgents.Dispatch.Tests\TradeMind.AI.ExpertAgents.Dispatch.Tests.csproj", "{161AE459-930B-4252-A22E-7116F4160D7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Domain", "src/TradeMind.AI.ExpertAgents.Consensus.Domain/TradeMind.AI.ExpertAgents.Consensus.Domain.csproj", "{B221C61B-B380-4522-8217-C76771F55B69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Domain", "src\TradeMind.AI.ExpertAgents.Consensus.Domain\TradeMind.AI.ExpertAgents.Consensus.Domain.csproj", "{B221C61B-B380-4522-8217-C76771F55B69}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Application", "src/TradeMind.AI.ExpertAgents.Consensus.Application/TradeMind.AI.ExpertAgents.Consensus.Application.csproj", "{23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Application", "src\TradeMind.AI.ExpertAgents.Consensus.Application\TradeMind.AI.ExpertAgents.Consensus.Application.csproj", "{23C6AE5C-FF56-44DC-90E6-C52ABC71C22D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Tests", "tests/TradeMind.AI.ExpertAgents.Consensus.Tests/TradeMind.AI.ExpertAgents.Consensus.Tests.csproj", "{29D71967-6777-4CBB-9F12-292C6A56C1B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.ExpertAgents.Consensus.Tests", "tests\TradeMind.AI.ExpertAgents.Consensus.Tests\TradeMind.AI.ExpertAgents.Consensus.Tests.csproj", "{29D71967-6777-4CBB-9F12-292C6A56C1B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Domain", "src/TradeMind.AI.TradingDecisions.Domain/TradeMind.AI.TradingDecisions.Domain.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Domain", "src\TradeMind.AI.TradingDecisions.Domain\TradeMind.AI.TradingDecisions.Domain.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Application", "src/TradeMind.AI.TradingDecisions.Application/TradeMind.AI.TradingDecisions.Application.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Application", "src\TradeMind.AI.TradingDecisions.Application\TradeMind.AI.TradingDecisions.Application.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0102}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Tests", "tests/TradeMind.AI.TradingDecisions.Tests/TradeMind.AI.TradingDecisions.Tests.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingDecisions.Tests", "tests\TradeMind.AI.TradingDecisions.Tests\TradeMind.AI.TradingDecisions.Tests.csproj", "{D4A1D101-2C14-4A91-8E11-1A6C6DCD0103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Domain", "src/TradeMind.AI.RiskEngine.Domain/TradeMind.AI.RiskEngine.Domain.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0201}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Domain", "src\TradeMind.AI.RiskEngine.Domain\TradeMind.AI.RiskEngine.Domain.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0201}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Application", "src/TradeMind.AI.RiskEngine.Application/TradeMind.AI.RiskEngine.Application.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0202}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Application", "src\TradeMind.AI.RiskEngine.Application\TradeMind.AI.RiskEngine.Application.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0202}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Tests", "tests/TradeMind.AI.RiskEngine.Tests/TradeMind.AI.RiskEngine.Tests.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0203}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.RiskEngine.Tests", "tests\TradeMind.AI.RiskEngine.Tests\TradeMind.AI.RiskEngine.Tests.csproj", "{E5B2E202-3D25-4B92-9F22-2B7D7EDE0203}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Domain", "src/TradeMind.AI.TradingPlans.Domain/TradeMind.AI.TradingPlans.Domain.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0301}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Domain", "src\TradeMind.AI.TradingPlans.Domain\TradeMind.AI.TradingPlans.Domain.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Application", "src/TradeMind.AI.TradingPlans.Application/TradeMind.AI.TradingPlans.Application.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0302}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Application", "src\TradeMind.AI.TradingPlans.Application\TradeMind.AI.TradingPlans.Application.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0302}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Tests", "tests/TradeMind.AI.TradingPlans.Tests/TradeMind.AI.TradingPlans.Tests.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingPlans.Tests", "tests\TradeMind.AI.TradingPlans.Tests\TradeMind.AI.TradingPlans.Tests.csproj", "{F6C3F313-4E36-4CA3-A033-3C8E8FEF0303}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Domain", "src/TradeMind.AI.TradingWorkspace.Domain/TradeMind.AI.TradingWorkspace.Domain.csproj", "{14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Domain", "src\TradeMind.AI.TradingWorkspace.Domain\TradeMind.AI.TradingWorkspace.Domain.csproj", "{14F6C8DE-C0BF-4099-8FCB-57D2B81E32E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Application", "src/TradeMind.AI.TradingWorkspace.Application/TradeMind.AI.TradingWorkspace.Application.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A483}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Application", "src\TradeMind.AI.TradingWorkspace.Application\TradeMind.AI.TradingWorkspace.Application.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A483}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Tests", "tests/TradeMind.AI.TradingWorkspace.Tests/TradeMind.AI.TradingWorkspace.Tests.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A484}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingWorkspace.Tests", "tests\TradeMind.AI.TradingWorkspace.Tests\TradeMind.AI.TradingWorkspace.Tests.csproj", "{F44E97D2-B2C9-424F-AC2B-3FE3E461A484}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingAssistant", "src/TradeMind.AI.TradingAssistant/TradeMind.AI.TradingAssistant.csproj", "{B7A7B7A7-2201-4222-9001-000000000001}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingAssistant", "src\TradeMind.AI.TradingAssistant\TradeMind.AI.TradingAssistant.csproj", "{B7A7B7A7-2201-4222-9001-000000000001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingAssistant.Tests", "tests/TradeMind.AI.TradingAssistant.Tests/TradeMind.AI.TradingAssistant.Tests.csproj", "{B7A7B7A7-2201-4222-9001-000000000002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.TradingAssistant.Tests", "tests\TradeMind.AI.TradingAssistant.Tests\TradeMind.AI.TradingAssistant.Tests.csproj", "{B7A7B7A7-2201-4222-9001-000000000002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Domain", "src/TradeMind.AI.PaperTrading.Domain/TradeMind.AI.PaperTrading.Domain.csproj", "{A7B7A7B7-2201-4222-9001-000000000001}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Domain", "src\TradeMind.AI.PaperTrading.Domain\TradeMind.AI.PaperTrading.Domain.csproj", "{A7B7A7B7-2201-4222-9001-000000000001}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Application", "src/TradeMind.AI.PaperTrading.Application/TradeMind.AI.PaperTrading.Application.csproj", "{A7B7A7B7-2201-4222-9001-000000000002}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Application", "src\TradeMind.AI.PaperTrading.Application\TradeMind.AI.PaperTrading.Application.csproj", "{A7B7A7B7-2201-4222-9001-000000000002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Tests", "tests/TradeMind.AI.PaperTrading.Tests/TradeMind.AI.PaperTrading.Tests.csproj", "{A7B7A7B7-2201-4222-9001-000000000003}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.AI.PaperTrading.Tests", "tests\TradeMind.AI.PaperTrading.Tests\TradeMind.AI.PaperTrading.Tests.csproj", "{A7B7A7B7-2201-4222-9001-000000000003}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api.Tests", "tests/TradeMind.Api.Tests/TradeMind.Api.Tests.csproj", "{EC1EB6E9-C45E-49A7-A499-3B9A984764CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Api.Tests", "tests\TradeMind.Api.Tests\TradeMind.Api.Tests.csproj", "{EC1EB6E9-C45E-49A7-A499-3B9A984764CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Domain", "src/TradeMind.ExecutionSessions.Domain/TradeMind.ExecutionSessions.Domain.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010101}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Domain", "src\TradeMind.ExecutionSessions.Domain\TradeMind.ExecutionSessions.Domain.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010101}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Application", "src/TradeMind.ExecutionSessions.Application/TradeMind.ExecutionSessions.Application.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010102}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Application", "src\TradeMind.ExecutionSessions.Application\TradeMind.ExecutionSessions.Application.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010102}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Infrastructure", "src/TradeMind.ExecutionSessions.Infrastructure/TradeMind.ExecutionSessions.Infrastructure.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010103}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Infrastructure", "src\TradeMind.ExecutionSessions.Infrastructure\TradeMind.ExecutionSessions.Infrastructure.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Domain.Tests", "tests/TradeMind.ExecutionSessions.Domain.Tests/TradeMind.ExecutionSessions.Domain.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010201}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Domain.Tests", "tests\TradeMind.ExecutionSessions.Domain.Tests\TradeMind.ExecutionSessions.Domain.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010201}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Application.Tests", "tests/TradeMind.ExecutionSessions.Application.Tests/TradeMind.ExecutionSessions.Application.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010202}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Application.Tests", "tests\TradeMind.ExecutionSessions.Application.Tests\TradeMind.ExecutionSessions.Application.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010202}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Infrastructure.Tests", "tests/TradeMind.ExecutionSessions.Infrastructure.Tests/TradeMind.ExecutionSessions.Infrastructure.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010203}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.ExecutionSessions.Infrastructure.Tests", "tests\TradeMind.ExecutionSessions.Infrastructure.Tests\TradeMind.ExecutionSessions.Infrastructure.Tests.csproj", "{A1B2C3D4-E5F6-4711-8211-010101010203}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Domain", "src\TradeMind.Identity.Domain\TradeMind.Identity.Domain.csproj", "{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Observability.Abstractions", "src\TradeMind.Observability.Abstractions\TradeMind.Observability.Abstractions.csproj", "{0945A981-2320-4B4C-AFF9-89E7D31500A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Application", "src\TradeMind.Identity.Application\TradeMind.Identity.Application.csproj", "{B1BF561E-08FF-410A-85B2-892F9B7F60CB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Infrastructure", "src\TradeMind.Identity.Infrastructure\TradeMind.Identity.Infrastructure.csproj", "{E0C11103-8E04-4765-B136-D4F459A080FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Observability", "src\TradeMind.Observability\TradeMind.Observability.csproj", "{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Domain.Tests", "tests\TradeMind.Identity.Domain.Tests\TradeMind.Identity.Domain.Tests.csproj", "{BF661568-0FD9-4679-B7AD-7243FEDFBA66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Observability.Tests", "tests\TradeMind.Observability.Tests\TradeMind.Observability.Tests.csproj", "{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Application.Tests", "tests\TradeMind.Identity.Application.Tests\TradeMind.Identity.Application.Tests.csproj", "{A50542A6-78EB-42E7-97E5-E3BAE1473C67}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Identity.Infrastructure.Tests", "tests\TradeMind.Identity.Infrastructure.Tests\TradeMind.Identity.Infrastructure.Tests.csproj", "{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Observability.ArchitectureTests", "tests\TradeMind.Observability.ArchitectureTests\TradeMind.Observability.ArchitectureTests.csproj", "{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -911,88 +907,65 @@ Global
 		{A1B2C3D4-E5F6-4711-8211-010101010203}.Release|x64.Build.0 = Release|Any CPU
 		{A1B2C3D4-E5F6-4711-8211-010101010203}.Release|x86.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-E5F6-4711-8211-010101010203}.Release|x86.Build.0 = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|x64.Build.0 = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Debug|x86.Build.0 = Debug|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|x64.ActiveCfg = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|x64.Build.0 = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|x86.ActiveCfg = Release|Any CPU
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A}.Release|x86.Build.0 = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|x64.Build.0 = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Debug|x86.Build.0 = Debug|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|x64.ActiveCfg = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|x64.Build.0 = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|x86.ActiveCfg = Release|Any CPU
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB}.Release|x86.Build.0 = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|x64.Build.0 = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Debug|x86.Build.0 = Debug|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|x64.ActiveCfg = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|x64.Build.0 = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|x86.ActiveCfg = Release|Any CPU
-		{E0C11103-8E04-4765-B136-D4F459A080FE}.Release|x86.Build.0 = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|x64.Build.0 = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Debug|x86.Build.0 = Debug|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|x64.ActiveCfg = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|x64.Build.0 = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|x86.ActiveCfg = Release|Any CPU
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66}.Release|x86.Build.0 = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|x64.Build.0 = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Debug|x86.Build.0 = Debug|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|x64.ActiveCfg = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|x64.Build.0 = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|x86.ActiveCfg = Release|Any CPU
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67}.Release|x86.Build.0 = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|x64.Build.0 = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Debug|x86.Build.0 = Debug|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|x64.ActiveCfg = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|x64.Build.0 = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|x86.ActiveCfg = Release|Any CPU
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00}.Release|x86.Build.0 = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|x64.Build.0 = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Debug|x86.Build.0 = Debug|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|x64.ActiveCfg = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|x64.Build.0 = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|x86.ActiveCfg = Release|Any CPU
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3}.Release|x86.Build.0 = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Debug|x86.Build.0 = Debug|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|x64.Build.0 = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|x86.ActiveCfg = Release|Any CPU
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2}.Release|x86.Build.0 = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|x64.Build.0 = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Debug|x86.Build.0 = Debug|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|x64.ActiveCfg = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|x64.Build.0 = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|x86.ActiveCfg = Release|Any CPU
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D}.Release|x86.Build.0 = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|x64.Build.0 = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Debug|x86.Build.0 = Debug|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|x64.ActiveCfg = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|x64.Build.0 = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|x86.ActiveCfg = Release|Any CPU
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A68FF9FE-268D-40DA-AEDF-80A1FC3B407A} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{B1BF561E-08FF-410A-85B2-892F9B7F60CB} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{E0C11103-8E04-4765-B136-D4F459A080FE} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
-		{BF661568-0FD9-4679-B7AD-7243FEDFBA66} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{A50542A6-78EB-42E7-97E5-E3BAE1473C67} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
-		{4A5A9569-3AC2-4ACA-8BA1-6EC10644BF00} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{0945A981-2320-4B4C-AFF9-89E7D31500A3} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{F1A9CB75-28CD-4266-9A7E-8C779789E0D2} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{9D40F479-0A02-4BCB-BFC5-FA40C23BF31D} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{51D5EC97-D6A9-44AA-A456-2E0BDA41DCD4} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A95ACA7-D6D7-42FC-BBF2-90B6BDF8E43E}
 	EndGlobalSection
 EndGlobal

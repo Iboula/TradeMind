@@ -9,12 +9,15 @@ using TradeMind.Api.OpenApi;
 using TradeMind.ExecutionSessions.Infrastructure;
 using TradeMind.ExecutionSessions.Infrastructure.Persistence;
 using TradeMind.Identity.Infrastructure;
+using TradeMind.Observability.OpenTelemetry;
+using TradeMind.Api.Health;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTradeMindCore(builder.Configuration);
 builder.Services.AddTradeMindIdentity(builder.Configuration, builder.Environment);
 builder.Services.AddTradeMindApi(builder.Configuration);
+builder.Services.AddTradeMindObservability(builder.Configuration, builder.Environment.EnvironmentName);
 builder.Services.AddTradeMindOpenApi(builder.Configuration);
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
@@ -44,6 +47,7 @@ if (identityOptions.ApplyMigrationsOnStartup
 {
     await app.Services.ApplyIdentityMigrationsAsync();
 }
+app.Services.GetRequiredService<StartupHealthCheckState>().MarkReady();
 
 app.UseExceptionHandler(errorApp => errorApp.Run(ApiExceptionHandler.WriteAsync));
 app.UseMiddleware<CorrelationIdMiddleware>();
@@ -67,6 +71,7 @@ app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.UseMiddleware<ExecutionSessionHeaderMiddleware>();
+app.UseMiddleware<RequestTelemetryMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
 var apiOptions = app.Services.GetRequiredService<IOptions<ApiOptions>>().Value;
@@ -102,6 +107,13 @@ if (apiOptions.OpenApi.Enabled && !app.Environment.IsProduction())
 
 app.MapSystemEndpoints();
 app.MapHealthEndpoints();
+var observabilityOptions = app.Configuration
+    .GetSection(OpenTelemetryOptions.SectionName)
+    .Get<OpenTelemetryOptions>() ?? new OpenTelemetryOptions();
+if (observabilityOptions.Enabled && observabilityOptions.Metrics.Enabled && observabilityOptions.Metrics.Prometheus.Enabled)
+{
+    app.MapPrometheusScrapingEndpoint(observabilityOptions.Metrics.Prometheus.Endpoint);
+}
 app.MapMarketContextEndpoints();
 app.MapExpertEndpoints();
 app.MapConsensusEndpoints();

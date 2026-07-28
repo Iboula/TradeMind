@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using TradeMind.Identity.Application;
 using TradeMind.Identity.Application.Abstractions;
 using TradeMind.Identity.Infrastructure.Security;
+using TradeMind.Observability.Abstractions;
 
 namespace TradeMind.Api.Authentication;
 
@@ -17,7 +18,8 @@ public sealed class ApiKeyAuthenticationHandler(
     UrlEncoder encoder,
     TimeProvider timeProvider,
     IApiKeyCredentialValidator validator,
-    IOptions<IdentityOptions> identityOptions) : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder, new TimeProviderSystemClock(timeProvider))
+    IOptions<IdentityOptions> identityOptions,
+    ITradeMindMetrics metrics) : AuthenticationHandler<ApiKeyAuthenticationOptions>(options, logger, encoder, new TimeProviderSystemClock(timeProvider))
 {
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -26,11 +28,20 @@ public sealed class ApiKeyAuthenticationHandler(
         var headerName = identityOptions.Value.ApiKeys.HeaderName;
         if (!Request.Headers.TryGetValue(headerName, out var values) || string.IsNullOrWhiteSpace(values.SingleOrDefault())) return AuthenticateResult.NoResult();
         var raw = values.SingleOrDefault()!;
-        if (!ApiKeySecretGenerator.TryParse(raw, out var publicKeyId, out var secretPart)) return AuthenticateResult.Fail("Invalid credentials.");
+        metrics.IncrementCounter(TelemetryMetricNames.AuthenticationAttempts, 1, new MetricDimensions(AuthenticationMethod: "api_key"));
+        if (!ApiKeySecretGenerator.TryParse(raw, out var publicKeyId, out var secretPart))
+        {
+            metrics.IncrementCounter(TelemetryMetricNames.AuthenticationFailures, 1, new MetricDimensions(AuthenticationMethod: "api_key", Outcome: "Rejected"));
+            return AuthenticateResult.Fail("Invalid credentials.");
+        }
         try
         {
             var actor = await validator.ValidateAsync(publicKeyId, secretPart, Context.RequestAborted).ConfigureAwait(false);
-            if (actor is null) return AuthenticateResult.Fail("Invalid credentials.");
+            if (actor is null)
+            {
+                metrics.IncrementCounter(TelemetryMetricNames.AuthenticationFailures, 1, new MetricDimensions(AuthenticationMethod: "api_key", Outcome: "Rejected"));
+                return AuthenticateResult.Fail("Invalid credentials.");
+            }
             Context.Items[IdentityHttpContextKeys.Actor] = actor;
             var claims = new List<Claim>
             {
@@ -51,6 +62,7 @@ public sealed class ApiKeyAuthenticationHandler(
         }
         catch
         {
+            metrics.IncrementCounter(TelemetryMetricNames.AuthenticationFailures, 1, new MetricDimensions(AuthenticationMethod: "api_key", Outcome: "Rejected"));
             return AuthenticateResult.Fail("Invalid credentials.");
         }
     }

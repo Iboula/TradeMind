@@ -36,6 +36,23 @@ jobs:
         shell: pwsh
         run: ./scripts/validate-dependencies.ps1
 
+      - name: Validate observability assets
+        shell: pwsh
+        run: |
+          $dashboard = Get-Content observability/grafana/dashboards/trademind-overview.json -Raw | ConvertFrom-Json
+          if ($dashboard.title -ne 'TradeMind Overview') {
+            throw 'The TradeMind Grafana dashboard has an unexpected title.'
+          }
+          $compose = Get-Content docker-compose.observability.yml -Raw
+          if ($compose -match '(?i)(password|secret|token|api[_-]?key|connectionstring)') {
+            throw 'Observability compose configuration must not contain credentials or secrets.'
+          }
+          $collector = Get-Content observability/otel-collector-config.yml -Raw
+          if ($collector -notmatch '(?m)^\s*otlp:\s*$' -or $collector -notmatch '(?m)^\s*debug:\s*$') {
+            throw 'The OTLP collector configuration is incomplete.'
+          }
+          docker compose -f docker-compose.observability.yml config --quiet
+
       - name: Build Release
         run: dotnet build TradeMind.sln --configuration Release --no-restore --verbosity minimal
 

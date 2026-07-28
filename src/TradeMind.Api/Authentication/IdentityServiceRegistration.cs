@@ -11,6 +11,7 @@ using TradeMind.Identity.Domain.Permissions;
 using TradeMind.Identity.Infrastructure;
 using TradeMind.Identity.Infrastructure.Authentication.Jwt;
 using TradeMind.Api.Errors;
+using TradeMind.Observability.Abstractions;
 
 namespace TradeMind.Api.Authentication;
 
@@ -65,6 +66,8 @@ public static class IdentityServiceRegistration
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.OnRejected = async (context, cancellationToken) =>
             {
+                context.HttpContext.RequestServices.GetService<ITradeMindMetrics>()?.IncrementCounter(
+                    TelemetryMetricNames.RateLimitRejections, 1, new MetricDimensions(Outcome: "Rejected"));
                 context.HttpContext.Response.Headers.RetryAfter = identity.RateLimiting.WindowSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 await ApiProblemDetails.WriteAsync(context.HttpContext, StatusCodes.Status429TooManyRequests, "Too many requests", "The request rate limit was exceeded.").ConfigureAwait(false);
             };

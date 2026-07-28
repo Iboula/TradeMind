@@ -28,7 +28,7 @@ public static class RolePermissionMapping
             TradeMindPermissions.ExecutionSessionsRead, TradeMindPermissions.ExecutionSessionsSearch, TradeMindPermissions.PaperTradingSimulate),
         [TradeMindRoles.RiskManager] = Set(TradeMindPermissions.RiskEvaluate, TradeMindPermissions.TradingPlansGenerate, TradeMindPermissions.ExecutionSessionsRead),
         [TradeMindRoles.Auditor] = Set(TradeMindPermissions.ExecutionSessionsRead, TradeMindPermissions.ExecutionSessionsSearch, TradeMindPermissions.ExecutionSessionsReplay,
-            TradeMindPermissions.ExecutionSessionsReadAudit, TradeMindPermissions.AdministrationReadAudit),
+            TradeMindPermissions.ExecutionSessionsReadAudit, TradeMindPermissions.AdministrationReadAudit, TradeMindPermissions.ObservabilityReadTelemetry),
         [TradeMindRoles.OrganizationAdministrator] = Set(TradeMindPermissions.AdministrationManageOrganizations, TradeMindPermissions.AdministrationManageUsers,
             TradeMindPermissions.ApiKeysCreate, TradeMindPermissions.ApiKeysRead, TradeMindPermissions.ApiKeysRevoke, TradeMindPermissions.ApiKeysRotate),
         [TradeMindRoles.PlatformAdministrator] = new PermissionSet(TradeMindPermissions.All),

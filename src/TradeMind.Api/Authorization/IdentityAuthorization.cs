@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using TradeMind.Identity.Application;
 using TradeMind.Identity.Application.Abstractions;
 using TradeMind.Identity.Domain.Permissions;
+using TradeMind.Observability.Abstractions;
 
 namespace TradeMind.Api.Authorization;
 
@@ -35,6 +36,9 @@ public static class IdentityPolicies
     public static string ApiKeysRead => ForPermission("TradeMind.ApiKeys.Read");
     public static string ApiKeysRevoke => ForPermission("TradeMind.ApiKeys.Revoke");
     public static string ApiKeysRotate => ForPermission("TradeMind.ApiKeys.Rotate");
+    public static string ObservabilityReadDiagnostics => ForPermission("TradeMind.Observability.ReadDiagnostics");
+    public static string ObservabilityReadMetrics => ForPermission("TradeMind.Observability.ReadMetrics");
+    public static string ObservabilityReadTelemetry => ForPermission("TradeMind.Observability.ReadTelemetry");
 
     public static string ForPermission(string permission) => $"TradeMind.Permission.{permission}";
 
@@ -44,12 +48,17 @@ public static class IdentityPolicies
 public sealed class PermissionAuthorizationHandler(
     ICurrentActor currentActor,
     TradeMind.Identity.Application.Abstractions.IAuthorizationService identityAuthorization,
-    IOptions<IdentityOptions> options) : AuthorizationHandler<PermissionRequirement>
+    IOptions<IdentityOptions> options,
+    ITradeMindMetrics metrics) : AuthorizationHandler<PermissionRequirement>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PermissionRequirement requirement)
     {
         if (!options.Value.Enabled || identityAuthorization.Evaluate(currentActor.Identity, requirement.Permission).IsAllowed)
             context.Succeed(requirement);
+        else
+            metrics.IncrementCounter(TelemetryMetricNames.AuthorizationDenials, 1, new MetricDimensions(
+                Outcome: "Rejected",
+                ActorType: currentActor.Identity.ActorType.ToString()));
         return Task.CompletedTask;
     }
 }
