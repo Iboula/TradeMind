@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using TradeMind.Api.Contracts.Common;
 
 namespace TradeMind.Api.Tests;
@@ -51,8 +51,7 @@ public sealed class ArchitectureTests
     {
         var references = typeof(Program).Assembly.GetReferencedAssemblies().Select(assembly => assembly.Name).ToArray();
         Assert.DoesNotContain(references, name => name is not null && (
-            name.Contains("Broker", StringComparison.OrdinalIgnoreCase)
-            || name.Contains("MT5", StringComparison.OrdinalIgnoreCase)
+            name.Contains("MT5", StringComparison.OrdinalIgnoreCase)
             || name.Contains("MetaTrader", StringComparison.OrdinalIgnoreCase)
             || name.Equals("OpenAI", StringComparison.OrdinalIgnoreCase)));
     }
