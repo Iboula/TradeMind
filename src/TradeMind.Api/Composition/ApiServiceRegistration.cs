@@ -1,9 +1,9 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
-using TradeMind.Api.Application;
 using TradeMind.Api.Health;
 using TradeMind.Api.Middleware;
+using TradeMind.Api.Application;
 using TradeMind.ExecutionSessions.Application;
 using TradeMind.ExecutionSessions.Application.Abstractions;
 using TradeMind.Identity.Application;
@@ -36,6 +36,7 @@ public static class ApiServiceRegistration
                     serviceProvider.GetRequiredService<IOptions<ApiOptions>>(),
                     serviceProvider.GetRequiredService<TimeProvider>()));
         services.AddScoped<ITradeMindApiApplication, TradeMindApiApplication>();
+        services.AddScoped<BrokerApiApplication>();
         services.AddScoped<IExecutionSessionApiApplication>(serviceProvider =>
             serviceProvider.GetService<IExecutionSessionService>() is { } service
                 ? new ExecutionSessionApiApplication(service, serviceProvider.GetRequiredService<TimeProvider>(),

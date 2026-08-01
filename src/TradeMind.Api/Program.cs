@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http.Json;
+﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using TradeMind.Api.Composition;
 using TradeMind.Api.Authentication;
@@ -11,6 +11,9 @@ using TradeMind.ExecutionSessions.Infrastructure.Persistence;
 using TradeMind.Identity.Infrastructure;
 using TradeMind.Observability.OpenTelemetry;
 using TradeMind.Api.Health;
+using TradeMind.Brokers.Application;
+using TradeMind.Brokers.Infrastructure;
+using TradeMind.Brokers.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,8 @@ builder.Services.AddTradeMindCore(builder.Configuration);
 builder.Services.AddTradeMindIdentity(builder.Configuration, builder.Environment);
 builder.Services.AddTradeMindApi(builder.Configuration);
 builder.Services.AddTradeMindObservability(builder.Configuration, builder.Environment.EnvironmentName);
+builder.Services.AddTradeMindBrokersApplication(builder.Configuration);
+builder.Services.AddTradeMindBrokersInfrastructure(builder.Configuration);
 builder.Services.AddTradeMindOpenApi(builder.Configuration);
 builder.WebHost.ConfigureKestrel((context, options) =>
 {
@@ -46,6 +51,11 @@ if (identityOptions.ApplyMigrationsOnStartup
     && !string.IsNullOrWhiteSpace(app.Configuration.GetConnectionString("Identity")))
 {
     await app.Services.ApplyIdentityMigrationsAsync();
+}
+var brokerPersistenceOptions = app.Configuration.GetSection("TradeMind:Brokers:Persistence").Get<BrokerPersistenceOptions>() ?? new BrokerPersistenceOptions();
+if (brokerPersistenceOptions.Enabled && brokerPersistenceOptions.ApplyMigrationsOnStartup && !string.IsNullOrWhiteSpace(brokerPersistenceOptions.ConnectionString))
+{
+    await app.Services.ApplyBrokerMigrationsAsync();
 }
 app.Services.GetRequiredService<StartupHealthCheckState>().MarkReady();
 
@@ -126,6 +136,7 @@ app.MapPaperTradingEndpoints();
 app.MapKnowledgeEndpoints();
 app.MapIdentityEndpoints();
 app.MapExecutionSessionEndpoints();
+app.MapBrokerEndpoints();
 
 await app.RunAsync();
 

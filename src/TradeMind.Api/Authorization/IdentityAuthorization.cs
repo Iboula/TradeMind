@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using TradeMind.Identity.Application;
 using TradeMind.Identity.Application.Abstractions;
@@ -39,6 +39,19 @@ public static class IdentityPolicies
     public static string ObservabilityReadDiagnostics => ForPermission("TradeMind.Observability.ReadDiagnostics");
     public static string ObservabilityReadMetrics => ForPermission("TradeMind.Observability.ReadMetrics");
     public static string ObservabilityReadTelemetry => ForPermission("TradeMind.Observability.ReadTelemetry");
+    public static string BrokersRead => ForPermission("TradeMind.Brokers.Read");
+    public static string BrokersReadAccounts => ForPermission("TradeMind.Brokers.ReadAccounts");
+    public static string BrokersReadOrders => ForPermission("TradeMind.Brokers.ReadOrders");
+    public static string BrokersReadPositions => ForPermission("TradeMind.Brokers.ReadPositions");
+    public static string BrokersExecuteSimulation => ForPermission("TradeMind.Brokers.ExecuteSimulation");
+    public static string BrokersExecuteDemo => ForPermission("TradeMind.Brokers.ExecuteDemo");
+    public static string BrokersExecuteLive => ForPermission("TradeMind.Brokers.ExecuteLive");
+    public static string BrokersModifyOrders => ForPermission("TradeMind.Brokers.ModifyOrders");
+    public static string BrokersCancelOrders => ForPermission("TradeMind.Brokers.CancelOrders");
+    public static string BrokersClosePositions => ForPermission("TradeMind.Brokers.ClosePositions");
+    public static string BrokersReconcile => ForPermission("TradeMind.Brokers.Reconcile");
+    public static string BrokersReadAudit => ForPermission("TradeMind.Brokers.ReadAudit");
+    public static string BrokersManageConnectors => ForPermission("TradeMind.Brokers.ManageConnectors");
 
     public static string ForPermission(string permission) => $"TradeMind.Permission.{permission}";
 

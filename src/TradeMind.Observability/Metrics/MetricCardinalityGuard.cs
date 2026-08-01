@@ -1,4 +1,4 @@
-using TradeMind.Observability.Abstractions;
+﻿using TradeMind.Observability.Abstractions;
 
 namespace TradeMind.Observability.Metrics;
 
@@ -7,6 +7,7 @@ public static class MetricCardinalityGuard
     private static readonly IReadOnlySet<string> AllowedDimensions = new HashSet<string>(StringComparer.Ordinal)
     {
         "module", "operation", "stage", "outcome", "status_class", "authentication_method", "actor_type", "environment", "service_version"
+        , "connector", "mode", "error_category", "asset_class"
     };
 
     public static void ValidateDimensions(IReadOnlyDictionary<string, string?> dimensions)
@@ -33,5 +34,13 @@ public static class MetricCardinalityGuard
             ["actor_type"] = dimensions.ActorType,
             ["environment"] = dimensions.Environment,
             ["service_version"] = dimensions.ServiceVersion
+            ,
+            ["connector"] = dimensions.Connector
+            ,
+            ["mode"] = dimensions.Mode
+            ,
+            ["error_category"] = dimensions.ErrorCategory
+            ,
+            ["asset_class"] = dimensions.AssetClass
         };
 }

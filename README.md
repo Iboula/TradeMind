@@ -23,6 +23,8 @@ Build a modular platform that combines market data, AI reasoning, backtesting, a
   scoped PostgreSQL API keys, tenant resolution and repository-level ownership filters.
 - Provider-neutral OpenTelemetry observability with correlated traces, bounded metrics,
   redacted health probes, optional OTLP export, Prometheus exposition and local Grafana assets.
+- Provider-neutral broker execution contracts with simulation-only in-memory execution,
+  PostgreSQL idempotency, audit and read-only reconciliation; no live connector is included.
 - GitHub Actions with centralized package versions, dependency checks, Release build, tests, and coverage.
 
 ## Getting Started
@@ -44,6 +46,8 @@ dotnet run --project src/TradeMind.Api/TradeMind.Api.csproj
 The versioned analytical routes are documented in [docs/api](docs/api/README.md). OpenAPI is served at `/openapi/v1.json` outside Production when enabled and declares JWT bearer plus `X-TradeMind-Api-Key` schemes. Process liveness is available at `/health/live`; configured dependency readiness is available at `/health/ready`. Identity operations and their security boundaries are documented in [docs/identity](docs/identity/README.md). Test authentication is available only in the Test environment and is disabled by default.
 
 Observability conventions, exporters, health probes and local dashboards are documented in [docs/observability](docs/observability/README.md). Prometheus metrics are exposed at `/metrics` when enabled; OTLP export remains optional and disabled by default.
+
+Broker contracts, execution safety, idempotency and future adapter boundaries are documented in [docs/brokers](docs/brokers/README.md). Sprint 28 ships no broker SDK, credentials or live order execution.
 
 ## License
 MIT

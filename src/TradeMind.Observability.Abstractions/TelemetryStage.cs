@@ -1,4 +1,4 @@
-namespace TradeMind.Observability.Abstractions;
+﻿namespace TradeMind.Observability.Abstractions;
 
 public enum TelemetryStage
 {
@@ -20,5 +20,6 @@ public enum TelemetryStage
     Outbox,
     Replay,
     Database,
-    Health
+    Health,
+    Broker
 }

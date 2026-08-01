@@ -1,4 +1,4 @@
-namespace TradeMind.Observability.Abstractions;
+﻿namespace TradeMind.Observability.Abstractions;
 
 public sealed record MetricDimensions(
     string? Module = null,
@@ -9,4 +9,8 @@ public sealed record MetricDimensions(
     string? AuthenticationMethod = null,
     string? ActorType = null,
     string? Environment = null,
-    string? ServiceVersion = null);
+    string? ServiceVersion = null,
+    string? Connector = null,
+    string? Mode = null,
+    string? ErrorCategory = null,
+    string? AssetClass = null);

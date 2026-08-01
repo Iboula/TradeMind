@@ -37,6 +37,9 @@
     <ProjectReference Include="..\TradeMind.Identity.Application\TradeMind.Identity.Application.csproj" />
     <ProjectReference Include="..\TradeMind.Identity.Infrastructure\TradeMind.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\TradeMind.Observability\TradeMind.Observability.csproj" />
+    <ProjectReference Include="..\TradeMind.Brokers.Application\TradeMind.Brokers.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.Brokers.Domain\TradeMind.Brokers.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.Brokers.Infrastructure\TradeMind.Brokers.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
