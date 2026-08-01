@@ -1,4 +1,4 @@
-using TradeMind.AI.Application;
+﻿using TradeMind.AI.Application;
 using TradeMind.AI.Context.Infrastructure;
 using TradeMind.AI.ExpertAgents.Consensus.Application;
 using TradeMind.AI.ExpertAgents.Dispatch.Application;
@@ -38,7 +38,7 @@ public static class TradeMindModuleRegistration
             services.AddTradeMindKnowledgeRag();
         }
 
-        services.AddTradeMindContextEngine();
+        services.AddTradeMindContextEngine(registerKnowledgeProvider: knowledgeHubConfigured);
         services.AddTradeMindExpertAgents();
         services.AddTradeMindExpertAgentDispatcher();
         services.AddTradeMindConsensus();

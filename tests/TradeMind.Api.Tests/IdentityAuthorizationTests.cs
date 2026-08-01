@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -106,6 +106,9 @@ public sealed class IdentityApiFactory : WebApplicationFactory<Program>
         builder.UseSetting("TradeMind:Identity:Development:EnableTestAuthentication", "true");
         builder.UseSetting("TradeMind:Identity:RateLimiting:Enabled", "false");
         builder.UseSetting("TradeMind:Api:Security:EnableHttpsRedirection", "false");
+        builder.UseSetting("ConnectionStrings:KnowledgeHub", string.Empty);
+        builder.UseSetting("ConnectionStrings:MarketConnectors", string.Empty);
+        builder.UseSetting("ConnectionStrings:Identity", string.Empty);
         builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["ConnectionStrings:KnowledgeHub"] = string.Empty,

@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TradeMind.AI.Context.Application;
@@ -9,7 +9,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddTradeMindContextEngine(
         this IServiceCollection services,
-        Action<ContextEngineOptions>? configure = null)
+        Action<ContextEngineOptions>? configure = null,
+        bool registerKnowledgeProvider = true)
     {
         ArgumentNullException.ThrowIfNull(services);
         var options = services.AddOptions<ContextEngineOptions>();
@@ -25,7 +26,11 @@ public static class DependencyInjection
         services.TryAddScoped<IContextProviderRegistry, ContextProviderRegistry>();
         services.TryAddScoped<IMarketContextBuilder, MarketContextBuilder>();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IContextProvider, MarketSnapshotContextProvider>());
-        services.TryAddEnumerable(ServiceDescriptor.Scoped<IContextProvider, KnowledgeContextProvider>());
+        if (registerKnowledgeProvider)
+        {
+            services.TryAddEnumerable(ServiceDescriptor.Scoped<IContextProvider, KnowledgeContextProvider>());
+        }
+
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IContextProvider, MemoryContextProvider>());
         services.AddMediatR(configuration =>
             configuration.RegisterServicesFromAssemblyContaining<ApplicationAssemblyMarker>());
