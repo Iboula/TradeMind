@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Brokers.MetaTrader5.Bridge.Contracts</RootNamespace>
+  </PropertyGroup>
+</Project>
