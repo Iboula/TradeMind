@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using TradeMind.Brokers.MetaTrader5.Bridge.Contracts.Protocol;
 
@@ -36,6 +37,37 @@ public sealed class MT5BridgeHostOptions
     public int MaximumSupportedTerminalBuild { get; set; } = 99999;
     public string SupportedTerminalArchitecture { get; set; } = "x64";
     public string ExpectedTerminalProtocolVersion { get; set; } = "1.0";
+}
+
+internal static class MT5BridgeHostOptionsCompatibility
+{
+    private const string LegacyBridgeSection = "TradeMind:Brokers:MetaTrader5:Bridge";
+    private const string LegacyTerminalSection = LegacyBridgeSection + ":Terminal";
+    private const string LegacyTokenKey = LegacyBridgeSection + ":Authentication:Token";
+
+    public static void Apply(MT5BridgeHostOptions options, IConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(configuration);
+        if (configuration.GetSection(MT5BridgeHostOptions.SectionName).Exists()) return;
+
+        var mode = configuration[$"{LegacyTerminalSection}:Mode"];
+        if (!string.IsNullOrWhiteSpace(mode)) options.GatewayMode = mode.Equals("Real", StringComparison.OrdinalIgnoreCase) ? "Real" : "Simulation";
+        options.TerminalPath = configuration[$"{LegacyTerminalSection}:TerminalPath"] ?? options.TerminalPath;
+        if (Uri.TryCreate(configuration[$"{LegacyBridgeSection}:Endpoint"], UriKind.Absolute, out var endpoint)) options.TerminalBridgeEndpoint = endpoint;
+        if (bool.TryParse(configuration[$"{LegacyTerminalSection}:AutoStart"], out var autoStart)) options.AutoStartTerminal = autoStart;
+        if (bool.TryParse(configuration[$"{LegacyBridgeSection}:AllowLive"], out var allowLive)) options.AllowLive = allowLive;
+        if (bool.TryParse(configuration[$"{LegacyTerminalSection}:AllowLive"], out allowLive)) options.AllowLive = options.AllowLive || allowLive;
+        if (bool.TryParse(configuration[$"{LegacyBridgeSection}:RequireTls"], out var requireTls))
+        {
+            options.RequireTls = requireTls;
+            options.AllowInsecureDemoTransport = !requireTls;
+        }
+        if (int.TryParse(configuration[$"{LegacyBridgeSection}:HandshakeTimeoutSeconds"], out var handshakeTimeout)) options.TerminalStartupTimeoutSeconds = handshakeTimeout;
+        if (int.TryParse(configuration[$"{LegacyBridgeSection}:HeartbeatIntervalSeconds"], out var heartbeatInterval)) options.TerminalHeartbeatIntervalSeconds = heartbeatInterval;
+        if (int.TryParse(configuration[$"{LegacyBridgeSection}:ReconnectAttempts"], out var reconnectAttempts)) options.ReconnectMaximumAttempts = reconnectAttempts;
+        options.TerminalBridgeTokenConfigurationKey = LegacyTokenKey;
+    }
 }
 
 public sealed class MT5BridgeHostOptionsValidator : IValidateOptions<MT5BridgeHostOptions>

@@ -7,7 +7,7 @@ using TradeMind.Brokers.MetaTrader5.Bridge.Host.Security;
 using TradeMind.Brokers.MetaTrader5.Bridge.Host.Terminal;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddOptions<MT5BridgeHostOptions>().Bind(builder.Configuration.GetSection(MT5BridgeHostOptions.SectionName)).ValidateOnStart();
+builder.Services.AddOptions<MT5BridgeHostOptions>().Bind(builder.Configuration.GetSection(MT5BridgeHostOptions.SectionName)).Configure(options => MT5BridgeHostOptionsCompatibility.Apply(options, builder.Configuration)).ValidateOnStart();
 builder.Services.AddSingleton<IValidateOptions<MT5BridgeHostOptions>, MT5BridgeHostOptionsValidator>();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton<MT5BridgeHostRuntime>();

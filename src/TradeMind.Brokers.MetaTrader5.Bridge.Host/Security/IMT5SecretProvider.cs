@@ -17,6 +17,7 @@ internal sealed class ConfigurationMT5SecretProvider(IConfiguration configuratio
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
         return configuration[key]
-            ?? configuration[$"TradeMind:Brokers:MetaTrader5:BridgeHost:{key}"];
+            ?? configuration[$"TradeMind:Brokers:MetaTrader5:BridgeHost:{key}"]
+            ?? configuration["TradeMind:Brokers:MetaTrader5:Bridge:Authentication:Token"];
     }
 }

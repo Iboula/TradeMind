@@ -28,3 +28,7 @@ $env:MT5_REAL_TESTS = "true"
 ```
 
 The example value above is instructional only and must never be committed as a credential.
+
+## Existing User Secrets compatibility
+
+The host also accepts the Sprint 30 names under `TradeMind:Brokers:MetaTrader5:Bridge`. The terminal values `Terminal:Mode`, `Terminal:TerminalPath` and `Terminal:AutoStart` map to the Sprint 31 gateway options. `Bridge:Endpoint` is used as the terminal-side bridge endpoint, and `Bridge:Authentication:Token` is consumed only through the secret provider. New `BridgeHost` keys take precedence when present.

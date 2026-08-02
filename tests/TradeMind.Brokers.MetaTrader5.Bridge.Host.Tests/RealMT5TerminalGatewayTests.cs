@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using TradeMind.Brokers.MetaTrader5.Bridge.Host.Configuration;
 using TradeMind.Brokers.MetaTrader5.Bridge.Host.Security;
@@ -18,6 +19,28 @@ public sealed class RealMT5TerminalGatewayTests
         Assert.False(real.Succeeded);
         Assert.Contains(real.Failures!, failure => failure.Contains("TerminalPath", StringComparison.Ordinal));
         Assert.Contains(real.Failures!, failure => failure.Contains("TerminalBridgeEndpoint", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Existing_bridge_user_secrets_are_mapped_to_the_sprint31_host_options()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["TradeMind:Brokers:MetaTrader5:Bridge:Terminal:Mode"] = "Real",
+            ["TradeMind:Brokers:MetaTrader5:Bridge:Terminal:TerminalPath"] = "C:/Terminal/terminal64.exe",
+            ["TradeMind:Brokers:MetaTrader5:Bridge:Terminal:AutoStart"] = "true",
+            ["TradeMind:Brokers:MetaTrader5:Bridge:Endpoint"] = "https://localhost:5001",
+            ["TradeMind:Brokers:MetaTrader5:Bridge:Authentication:Token"] = "configured-at-runtime"
+        }).Build();
+        var options = new MT5BridgeHostOptions();
+
+        MT5BridgeHostOptionsCompatibility.Apply(options, configuration);
+
+        Assert.Equal("Real", options.GatewayMode);
+        Assert.Equal("C:/Terminal/terminal64.exe", options.TerminalPath);
+        Assert.True(options.AutoStartTerminal);
+        Assert.Equal(new Uri("https://localhost:5001"), options.TerminalBridgeEndpoint);
+        Assert.Equal("TradeMind:Brokers:MetaTrader5:Bridge:Authentication:Token", options.TerminalBridgeTokenConfigurationKey);
     }
 
     [Fact]
