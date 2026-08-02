@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace TradeMind.Brokers.MetaTrader5.Bridge.Host.Terminal;
 
-internal sealed class DeterministicSimulatedTerminalGateway(TimeProvider timeProvider) : IMT5TerminalGateway
+internal sealed class SimulatedMT5TerminalGateway(TimeProvider timeProvider) : IMT5TerminalGateway
 {
     private readonly object sync = new();
     private readonly Dictionary<string, SimulatedOrder> orders = new(StringComparer.Ordinal);
@@ -13,6 +13,19 @@ internal sealed class DeterministicSimulatedTerminalGateway(TimeProvider timePro
 
     public string TerminalVersion => "simulation-terminal-1.0";
     public bool IsAvailable => started;
+    public MT5TerminalGatewaySnapshot Snapshot => new(
+        started ? MT5TerminalConnectionState.Connected : MT5TerminalConnectionState.Disconnected,
+        TerminalVersion,
+        0,
+        "simulation",
+        "1.0",
+        "Demo",
+        true,
+        false,
+        TimeSpan.FromMilliseconds(1),
+        started ? timeProvider.GetUtcNow() : null,
+        null,
+        0);
 
     public Task StartAsync(CancellationToken cancellationToken)
     {

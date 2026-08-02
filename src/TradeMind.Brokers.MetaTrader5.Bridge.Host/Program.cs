@@ -11,7 +11,21 @@ builder.Services.AddOptions<MT5BridgeHostOptions>().Bind(builder.Configuration.G
 builder.Services.AddSingleton<IValidateOptions<MT5BridgeHostOptions>, MT5BridgeHostOptionsValidator>();
 builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 builder.Services.AddSingleton<MT5BridgeHostRuntime>();
-builder.Services.AddSingleton<IMT5TerminalGateway, DeterministicSimulatedTerminalGateway>();
+builder.Services.AddSingleton<IMT5SecretProvider, ConfigurationMT5SecretProvider>();
+builder.Services.AddHttpClient("mt5-terminal", client => client.Timeout = Timeout.InfiniteTimeSpan);
+builder.Services.AddSingleton<IMT5TerminalDiscovery, MT5TerminalDiscovery>();
+builder.Services.AddSingleton<IMT5TerminalProcessController, MT5TerminalProcessController>();
+builder.Services.AddSingleton<IMT5TerminalTransport, HttpMT5TerminalTransport>();
+builder.Services.AddSingleton<MT5TerminalExecutionSafetyPolicy>();
+builder.Services.AddSingleton<RealMT5TerminalGateway>();
+builder.Services.AddSingleton<SimulatedMT5TerminalGateway>();
+builder.Services.AddSingleton<IMT5TerminalGateway>(serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<MT5BridgeHostOptions>>().Value;
+    return MT5TerminalGatewayModeParser.TryParse(options.GatewayMode, out var mode) && mode == MT5TerminalGatewayMode.Real
+        ? serviceProvider.GetRequiredService<RealMT5TerminalGateway>()
+        : serviceProvider.GetRequiredService<SimulatedMT5TerminalGateway>();
+});
 builder.Services.AddSingleton<IReplayProtector, InMemoryReplayProtector>();
 builder.Services.AddSingleton<IBridgeIdempotencyStore, InMemoryBridgeIdempotencyStore>();
 builder.Services.AddSingleton<BridgeSecurityValidator>();
