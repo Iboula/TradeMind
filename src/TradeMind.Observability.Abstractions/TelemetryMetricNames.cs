@@ -41,4 +41,10 @@ public static class TelemetryMetricNames
     public const string BrokerReconciliationRuns = "trademind.brokers.reconciliation_runs";
     public const string BrokerReconciliationMismatches = "trademind.brokers.reconciliation_mismatches";
     public const string BrokerIdempotencyHits = "trademind.brokers.idempotency_hits";
+    public const string Mt5Connections = "trademind.mt5.connections";
+    public const string Mt5Reconnects = "trademind.mt5.reconnects";
+    public const string Mt5Latency = "trademind.mt5.latency";
+    public const string Mt5Requests = "trademind.mt5.requests";
+    public const string Mt5Failures = "trademind.mt5.failures";
+    public const string Mt5Heartbeats = "trademind.mt5.heartbeat";
 }

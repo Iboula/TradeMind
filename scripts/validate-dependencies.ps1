@@ -154,6 +154,34 @@ foreach ($projectFile in $projects) {
         }
     }
 
+    if ($projectName -eq 'TradeMind.Brokers.MetaTrader5') {
+        $allowedReferences = @('TradeMind.Brokers.Application', 'TradeMind.Brokers.Domain', 'TradeMind.Observability.Abstractions')
+        foreach ($reference in $projectReferences) {
+            $referenceName = Get-ReferencedProjectName ([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: MT5 adapter references an unexpected project ($referenceName).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(MetaTrader|MQL5|MT5|BrokerSdk)') {
+                $violations.Add("${projectName}: MT5 adapter must not reference an external broker SDK ($($package.Include)).")
+            }
+        }
+    }
+
+    if ($projectName -notmatch '(?i)MetaTrader5') {
+        foreach ($reference in $projectReferences) {
+            if ([string]$reference.Include -match '(?i)(MetaTrader|MQL5|MT5)') {
+                $violations.Add("${projectName}: MT5 dependencies must remain isolated inside the adapter project ($($reference.Include)).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(MetaTrader|MQL5|MT5)') {
+                $violations.Add("${projectName}: MT5 packages must remain isolated inside the adapter project ($($package.Include)).")
+            }
+        }
+    }
+
     if ($projectName -eq 'TradeMind.Api') {
         foreach ($reference in $projectReferences) {
             $referencePath = [string]$reference.Include

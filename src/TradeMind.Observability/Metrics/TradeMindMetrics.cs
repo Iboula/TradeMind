@@ -44,6 +44,12 @@ public sealed class TradeMindMetrics : ITradeMindMetrics
     private readonly Counter<long> _brokerReconciliationMismatches = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerReconciliationMismatches, "mismatches");
     private readonly Counter<long> _brokerIdempotencyHits = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerIdempotencyHits, "hits");
     private readonly Histogram<double> _brokerOperationDuration = TradeMindMeter.Meter.CreateHistogram<double>(TelemetryMetricNames.BrokerOperationDuration, "s");
+    private readonly Counter<long> _mt5Connections = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Connections, "connections");
+    private readonly Counter<long> _mt5Reconnects = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Reconnects, "reconnects");
+    private readonly Counter<long> _mt5Requests = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Requests, "requests");
+    private readonly Counter<long> _mt5Failures = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Failures, "failures");
+    private readonly Counter<long> _mt5Heartbeats = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Heartbeats, "heartbeats");
+    private readonly Histogram<double> _mt5Latency = TradeMindMeter.Meter.CreateHistogram<double>(TelemetryMetricNames.Mt5Latency, "s");
     private long _activeExecutionSessions;
 
     public TradeMindMetrics()
@@ -112,6 +118,11 @@ public sealed class TradeMindMetrics : ITradeMindMetrics
         TelemetryMetricNames.BrokerReconciliationRuns => _brokerReconciliationRuns,
         TelemetryMetricNames.BrokerReconciliationMismatches => _brokerReconciliationMismatches,
         TelemetryMetricNames.BrokerIdempotencyHits => _brokerIdempotencyHits,
+        TelemetryMetricNames.Mt5Connections => _mt5Connections,
+        TelemetryMetricNames.Mt5Reconnects => _mt5Reconnects,
+        TelemetryMetricNames.Mt5Requests => _mt5Requests,
+        TelemetryMetricNames.Mt5Failures => _mt5Failures,
+        TelemetryMetricNames.Mt5Heartbeats => _mt5Heartbeats,
         _ => throw new ArgumentException($"Unknown TradeMind counter '{name}'.", nameof(name))
     };
 
@@ -125,6 +136,7 @@ public sealed class TradeMindMetrics : ITradeMindMetrics
         TelemetryMetricNames.DatabaseOperationDuration => _databaseDuration,
         TelemetryMetricNames.OutboxProcessingDuration => _outboxDuration,
         TelemetryMetricNames.BrokerOperationDuration => _brokerOperationDuration,
+        TelemetryMetricNames.Mt5Latency => _mt5Latency,
         _ => throw new ArgumentException($"Unknown TradeMind histogram '{name}'.", nameof(name))
     };
 }
