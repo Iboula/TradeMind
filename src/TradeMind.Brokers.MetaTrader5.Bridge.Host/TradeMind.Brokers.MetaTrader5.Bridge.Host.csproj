@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Brokers.MetaTrader5.Bridge.Host</RootNamespace>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Brokers.MetaTrader5.Bridge.Contracts\TradeMind.Brokers.MetaTrader5.Bridge.Contracts.csproj" />
+    <ProjectReference Include="..\TradeMind.Observability.Abstractions\TradeMind.Observability.Abstractions.csproj" />
+  </ItemGroup>
+</Project>

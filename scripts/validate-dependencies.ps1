@@ -169,6 +169,49 @@ foreach ($projectFile in $projects) {
         }
     }
 
+    if ($projectName -eq 'TradeMind.Brokers.MetaTrader5.Bridge.Contracts') {
+        if ($packageReferences.Count -gt 0 -or $projectReferences.Count -gt 0) {
+            $violations.Add("${projectName}: bridge contracts must remain transport and infrastructure neutral.")
+        }
+        $contractFiles = Get-ChildItem -Path $projectFile.DirectoryName -Recurse -Filter '*.cs'
+        foreach ($contractFile in $contractFiles) {
+            $contractText = Get-Content -Raw -LiteralPath $contractFile.FullName
+            if ($contractText -match '(?i)(Microsoft\.AspNetCore|EntityFramework|Npgsql|TradeMind\.Brokers\.MetaTrader5(?!\.Bridge\.Contracts))') {
+                $violations.Add("${projectName}: contract code references a forbidden infrastructure or broker type ($($contractFile.Name)).")
+            }
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.Brokers.MetaTrader5.Bridge.Client') {
+        $allowedReferences = @('TradeMind.Brokers.MetaTrader5', 'TradeMind.Brokers.MetaTrader5.Bridge.Contracts', 'TradeMind.Observability.Abstractions')
+        foreach ($reference in $projectReferences) {
+            $referenceName = Get-ReferencedProjectName ([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: bridge client references an unexpected project ($referenceName).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(EntityFramework|Npgsql|AspNetCore|MetaTrader|MQL5|BrokerSdk)') {
+                $violations.Add("${projectName}: bridge client must not reference database, ASP.NET or native MT5 packages ($($package.Include)).")
+            }
+        }
+    }
+
+    if ($projectName -eq 'TradeMind.Brokers.MetaTrader5.Bridge.Host') {
+        $allowedReferences = @('TradeMind.Brokers.MetaTrader5.Bridge.Contracts', 'TradeMind.Observability.Abstractions')
+        foreach ($reference in $projectReferences) {
+            $referenceName = Get-ReferencedProjectName ([string]$reference.Include)
+            if ($referenceName -notin $allowedReferences) {
+                $violations.Add("${projectName}: bridge host references an unexpected project ($referenceName).")
+            }
+        }
+        foreach ($package in $packageReferences) {
+            if ([string]$package.Include -match '(?i)(EntityFramework|Npgsql|MetaTrader|MQL5|BrokerSdk|OpenAI)') {
+                $violations.Add("${projectName}: bridge host must not reference persistence, native MT5 or LLM packages ($($package.Include)).")
+            }
+        }
+    }
+
     if ($projectName -notmatch '(?i)MetaTrader5') {
         foreach ($reference in $projectReferences) {
             if ([string]$reference.Include -match '(?i)(MetaTrader|MQL5|MT5)') {

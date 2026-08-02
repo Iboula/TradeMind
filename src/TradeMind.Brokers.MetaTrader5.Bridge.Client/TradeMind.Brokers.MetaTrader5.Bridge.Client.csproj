@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Brokers.MetaTrader5.Bridge.Client</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Brokers.MetaTrader5\TradeMind.Brokers.MetaTrader5.csproj" />
+    <ProjectReference Include="..\TradeMind.Brokers.MetaTrader5.Bridge.Contracts\TradeMind.Brokers.MetaTrader5.Bridge.Contracts.csproj" />
+    <ProjectReference Include="..\TradeMind.Observability.Abstractions\TradeMind.Observability.Abstractions.csproj" />
+  </ItemGroup>
+</Project>
