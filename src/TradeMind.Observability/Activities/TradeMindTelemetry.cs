@@ -48,6 +48,7 @@ public sealed class TradeMindTelemetry : ITradeMindTelemetry
         TelemetryStage.TradingWorkspace => TelemetryActivityNames.TradingWorkspace,
         TelemetryStage.TradingAssistant => TelemetryActivityNames.TradingAssistant,
         TelemetryStage.PaperTrading => TelemetryActivityNames.PaperTrading,
+        TelemetryStage.Broker => TelemetryActivityNames.MetaTrader5,
         TelemetryStage.Outbox => TelemetryActivityNames.Outbox,
         TelemetryStage.Replay => TelemetryActivityNames.Replay,
         _ => TelemetryActivityNames.Source

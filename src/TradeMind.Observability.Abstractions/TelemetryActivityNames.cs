@@ -17,10 +17,11 @@ public static class TelemetryActivityNames
     public const string TradingWorkspace = "TradeMind.TradingWorkspace";
     public const string TradingAssistant = "TradeMind.TradingAssistant";
     public const string PaperTrading = "TradeMind.PaperTrading";
+    public const string MetaTrader5 = "TradeMind.MT5";
     public const string Outbox = "TradeMind.Outbox";
     public const string Replay = "TradeMind.Replay";
 
     public static IReadOnlyList<string> All { get; } =
     [Api, Identity, ExecutionSessions, Persistence, MarketConnectors, MarketContext, Experts, Consensus,
-        TradingDecisions, Risk, TradingPlans, TradingWorkspace, TradingAssistant, PaperTrading, Outbox, Replay];
+        TradingDecisions, Risk, TradingPlans, TradingWorkspace, TradingAssistant, PaperTrading, MetaTrader5, Outbox, Replay];
 }
