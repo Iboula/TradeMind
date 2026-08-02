@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Brokers.MetaTrader5</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Brokers.Application\TradeMind.Brokers.Application.csproj" />
+    <ProjectReference Include="..\TradeMind.Brokers.Domain\TradeMind.Brokers.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.Observability.Abstractions\TradeMind.Observability.Abstractions.csproj" />
+  </ItemGroup>
+</Project>
