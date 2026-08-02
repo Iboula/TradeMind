@@ -1,4 +1,4 @@
-namespace TradeMind.Observability.Abstractions;
+﻿namespace TradeMind.Observability.Abstractions;
 
 public static class TelemetryMetricNames
 {
@@ -30,4 +30,15 @@ public static class TelemetryMetricNames
     public const string DatabaseOperationDuration = "trademind.database.operation.duration";
     public const string OutboxProcessingDuration = "trademind.outbox.processing.duration";
     public const string ActiveExecutionSessions = "trademind.execution_sessions.active";
+    public const string BrokerOperations = "trademind.brokers.operations";
+    public const string BrokerFailures = "trademind.brokers.failures";
+    public const string BrokerOperationDuration = "trademind.brokers.operation.duration";
+    public const string BrokerOrdersSubmitted = "trademind.brokers.orders_submitted";
+    public const string BrokerOrdersRejected = "trademind.brokers.orders_rejected";
+    public const string BrokerOrdersFilled = "trademind.brokers.orders_filled";
+    public const string BrokerPositionsOpened = "trademind.brokers.positions_opened";
+    public const string BrokerPositionsClosed = "trademind.brokers.positions_closed";
+    public const string BrokerReconciliationRuns = "trademind.brokers.reconciliation_runs";
+    public const string BrokerReconciliationMismatches = "trademind.brokers.reconciliation_mismatches";
+    public const string BrokerIdempotencyHits = "trademind.brokers.idempotency_hits";
 }

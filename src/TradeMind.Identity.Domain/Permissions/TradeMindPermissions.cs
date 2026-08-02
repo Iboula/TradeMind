@@ -1,4 +1,4 @@
-namespace TradeMind.Identity.Domain.Permissions;
+﻿namespace TradeMind.Identity.Domain.Permissions;
 
 public static class TradeMindPermissions
 {
@@ -32,6 +32,19 @@ public static class TradeMindPermissions
     public const string ObservabilityReadDiagnostics = "TradeMind.Observability.ReadDiagnostics";
     public const string ObservabilityReadMetrics = "TradeMind.Observability.ReadMetrics";
     public const string ObservabilityReadTelemetry = "TradeMind.Observability.ReadTelemetry";
+    public const string BrokersRead = "TradeMind.Brokers.Read";
+    public const string BrokersReadAccounts = "TradeMind.Brokers.ReadAccounts";
+    public const string BrokersReadOrders = "TradeMind.Brokers.ReadOrders";
+    public const string BrokersReadPositions = "TradeMind.Brokers.ReadPositions";
+    public const string BrokersExecuteSimulation = "TradeMind.Brokers.ExecuteSimulation";
+    public const string BrokersExecuteDemo = "TradeMind.Brokers.ExecuteDemo";
+    public const string BrokersExecuteLive = "TradeMind.Brokers.ExecuteLive";
+    public const string BrokersModifyOrders = "TradeMind.Brokers.ModifyOrders";
+    public const string BrokersCancelOrders = "TradeMind.Brokers.CancelOrders";
+    public const string BrokersClosePositions = "TradeMind.Brokers.ClosePositions";
+    public const string BrokersReconcile = "TradeMind.Brokers.Reconcile";
+    public const string BrokersReadAudit = "TradeMind.Brokers.ReadAudit";
+    public const string BrokersManageConnectors = "TradeMind.Brokers.ManageConnectors";
 
     public static IReadOnlyList<Permission> All { get; } = typeof(TradeMindPermissions)
         .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)

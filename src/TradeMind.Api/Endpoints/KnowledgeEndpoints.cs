@@ -1,3 +1,4 @@
+﻿using Microsoft.AspNetCore.Mvc;
 using TradeMind.Api.Contracts.KnowledgeHub;
 using TradeMind.KnowledgeHub.Application;
 
@@ -16,9 +17,9 @@ public static class KnowledgeEndpoints
     {
         var group = endpoints.MapGroup(prefix).WithTags("KnowledgeHub");
         group.MapPost("/sources", async (
-            IFormFile file,
-            string? title,
-            KnowledgeHubService service,
+            [FromForm] IFormFile file,
+            [FromForm] string? title,
+            [FromServices] KnowledgeHubService service,
             CancellationToken cancellationToken) =>
         {
             if (file.Length == 0)
@@ -42,7 +43,7 @@ public static class KnowledgeEndpoints
 
         group.MapGet("/sources/{id:guid}", async (
             Guid id,
-            KnowledgeHubService service,
+            [FromServices] KnowledgeHubService service,
             CancellationToken cancellationToken) =>
         {
             var source = await service.GetAsync(id, cancellationToken).ConfigureAwait(false);
@@ -67,7 +68,7 @@ public static class KnowledgeEndpoints
         group.MapGet("/search", async (
             string q,
             int? limit,
-            KnowledgeHubService service,
+            [FromServices] KnowledgeHubService service,
             CancellationToken cancellationToken) =>
         {
             var results = await service.SearchAsync(q, limit ?? 5, cancellationToken).ConfigureAwait(false);
