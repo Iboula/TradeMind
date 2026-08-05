@@ -181,6 +181,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Brokers.MetaTrade
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Brokers.MetaTrader5.Bridge.Host.Tests", "tests\TradeMind.Brokers.MetaTrader5.Bridge.Host.Tests\TradeMind.Brokers.MetaTrader5.Bridge.Host.Tests.csproj", "{199EA943-DBEB-4556-8096-B1B47C53141E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Brokers.MetaTrader5.TerminalBridge", "src\TradeMind.Brokers.MetaTrader5.TerminalBridge\TradeMind.Brokers.MetaTrader5.TerminalBridge.csproj", "{6417A25C-09AD-4106-916B-A3844F8C95D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeMind.Brokers.MetaTrader5.TerminalBridge.Tests", "tests\TradeMind.Brokers.MetaTrader5.TerminalBridge.Tests\TradeMind.Brokers.MetaTrader5.TerminalBridge.Tests.csproj", "{71EF65AD-1767-4C31-AF69-716C673F132E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1235,6 +1239,30 @@ Global
 		{199EA943-DBEB-4556-8096-B1B47C53141E}.Release|x64.Build.0 = Release|Any CPU
 		{199EA943-DBEB-4556-8096-B1B47C53141E}.Release|x86.ActiveCfg = Release|Any CPU
 		{199EA943-DBEB-4556-8096-B1B47C53141E}.Release|x86.Build.0 = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|x64.Build.0 = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Debug|x86.Build.0 = Debug|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|x64.ActiveCfg = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|x64.Build.0 = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|x86.ActiveCfg = Release|Any CPU
+		{6417A25C-09AD-4106-916B-A3844F8C95D9}.Release|x86.Build.0 = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|x64.Build.0 = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Debug|x86.Build.0 = Debug|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|x64.ActiveCfg = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|x64.Build.0 = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|x86.ActiveCfg = Release|Any CPU
+		{71EF65AD-1767-4C31-AF69-716C673F132E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1264,6 +1292,8 @@ Global
 		{AA1A6E21-438E-46F3-AA30-17948903A27E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{FC218F2D-F6B8-43CF-BCD9-7B319A6D7268} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{199EA943-DBEB-4556-8096-B1B47C53141E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{6417A25C-09AD-4106-916B-A3844F8C95D9} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{71EF65AD-1767-4C31-AF69-716C673F132E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3A95ACA7-D6D7-42FC-BBF2-90B6BDF8E43E}

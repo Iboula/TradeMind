@@ -1,7 +1,11 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using TradeMind.Brokers.MetaTrader5.Bridge.Contracts.Protocol;
 using TradeMind.Brokers.MetaTrader5.Bridge.Host.Configuration;
 using TradeMind.Brokers.MetaTrader5.Bridge.Host.Security;
 
@@ -48,10 +52,20 @@ internal sealed class HttpMT5TerminalTransport(
     {
         if (configuration.TerminalBridgeEndpoint is null) return default;
         using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(configuration.TerminalBridgeEndpoint, relativePath));
-        request.Content = JsonContent.Create(body, options: JsonOptions);
+        var json = JsonSerializer.Serialize(body, JsonOptions);
+        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
         var token = configuration.RequireTerminalBridgeAuthentication ? secrets.GetSecret(configuration.TerminalBridgeTokenConfigurationKey) : null;
         if (configuration.RequireTerminalBridgeAuthentication && string.IsNullOrWhiteSpace(token)) return default;
-        if (!string.IsNullOrWhiteSpace(token)) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var timestamp = timeProvider.GetUtcNow().ToUnixTimeSeconds().ToString(CultureInfo.InvariantCulture);
+            var nonce = Convert.ToHexString(RandomNumberGenerator.GetBytes(24)).ToLowerInvariant();
+            request.Headers.TryAddWithoutValidation(BridgeRequestSigning.TimestampHeader, timestamp);
+            request.Headers.TryAddWithoutValidation(BridgeRequestSigning.NonceHeader, nonce);
+            request.Headers.TryAddWithoutValidation(BridgeRequestSigning.SignatureVersionHeader, BridgeRequestSigning.SignatureVersion);
+            request.Headers.TryAddWithoutValidation(BridgeRequestSigning.SignatureHeader, BridgeRequestSigning.CreateSignature(token, request.Method.Method, request.RequestUri!.AbsolutePath, timestamp, nonce, json));
+        }
         try
         {
             using var response = await clientFactory.CreateClient("mt5-terminal").SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
