@@ -31,7 +31,8 @@ internal sealed class BridgeHostApplication(
         get
         {
             var now = timeProvider.GetUtcNow();
-            return new(runtime.State, gateway.IsAvailable ? "Ready" : "Unavailable", BridgeHostProtocolVersion.TryParse(configuration.ProtocolVersion, out var version) ? version : BridgeProtocolVersion.Current, configuration.BridgeVersion, configuration.DemoOnly, lastHandshakeUtc, 0, TimeSpan.FromMilliseconds(1), now - startupUtc);
+            var terminal = gateway.Snapshot;
+            return new(runtime.State, terminal.ConnectionState.ToString(), BridgeHostProtocolVersion.TryParse(configuration.ProtocolVersion, out var version) ? version : BridgeProtocolVersion.Current, configuration.BridgeVersion, configuration.DemoOnly, lastHandshakeUtc, terminal.ReconnectCount, terminal.Latency, now - startupUtc);
         }
     }
 
@@ -133,7 +134,7 @@ internal sealed class BridgeHostApplication(
         return new(command, fields);
     }
 
-    private static string SerializeTerminalResponse(TerminalCommandResult result) => JsonSerializer.Serialize(new { success = result.Success, code = result.Code, message = result.Message, fields = result.Fields }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+    private static string SerializeTerminalResponse(TerminalCommandResult result) => JsonSerializer.Serialize(new { success = result.Success, code = result.Success ? result.Code : "TERMINAL_FAILURE", message = result.Success ? result.Message : "The terminal operation failed.", fields = result.Fields }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
     private static BridgeError MapError(string code) => code switch
     {
         "TERMINAL_UNAVAILABLE" => new(BridgeErrorCode.TerminalUnavailable, "The external terminal is unavailable.", true, true),
