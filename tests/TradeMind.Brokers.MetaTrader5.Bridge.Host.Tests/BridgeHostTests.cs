@@ -18,6 +18,41 @@ namespace TradeMind.Brokers.MetaTrader5.Bridge.Host.Tests;
 public sealed class BridgeHostTests
 {
     [Fact]
+    public async Task Root_endpoint_exposes_safe_service_status_mode_and_environment()
+    {
+        await using var factory = new BridgeHostFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/");
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("TradeMind.MetaTrader5.Bridge.Host", body, StringComparison.Ordinal);
+        Assert.Contains("Simulation", body, StringComparison.Ordinal);
+        Assert.Contains("Demo", body, StringComparison.Ordinal);
+        Assert.DoesNotContain("password", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("token", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("account number", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Terminal_health_exposes_connection_diagnostics_without_credentials()
+    {
+        await using var factory = new BridgeHostFactory();
+        using var client = factory.CreateClient();
+
+        var response = await client.GetAsync("/health/terminal");
+        var body = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("Connected", body, StringComparison.Ordinal);
+        Assert.Contains("Demo", body, StringComparison.Ordinal);
+        Assert.DoesNotContain("password", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("token", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("account number", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task Health_endpoints_expose_liveness_readiness_and_startup_without_sensitive_fields()
     {
         await using var factory = new BridgeHostFactory();

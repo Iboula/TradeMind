@@ -14,6 +14,13 @@ The real gateway uses the explicit states `Disconnected`, `Connecting`, `Authent
 
 The gateway performs a bounded heartbeat before each command. A lost heartbeat triggers a bounded, sequential reconnect loop with configured backoff. Order commands are never replayed after a transport failure. All operations await their child tasks and propagate the caller cancellation token.
 
+`GET /` reports only the service name, status, gateway mode and environment.
+`GET /health/terminal` reports the connection state, terminal build and
+heartbeat/reconnect diagnostics without credentials or account identifiers.
+When the real gateway cannot reach the configured terminal-side bridge, startup
+fails with an explicit unavailable-bridge diagnostic. The host does not pretend
+that a terminal account is connected.
+
 ## Terminal-side bridge contract
 
 The configured endpoint provides these neutral JSON operations:
@@ -25,7 +32,12 @@ The configured endpoint provides these neutral JSON operations:
 | `POST /terminal/v1/execute` | demo query/order command using normalized fields |
 | `POST /terminal/v1/disconnect` | graceful bridge disconnect |
 
-The terminal-side component is intentionally external to this repository. It must enforce the same demo-only contract and return normalized response fields. The host never logs request bodies, credentials, account identifiers, terminal packets or remote failure details.
+The terminal-side component is intentionally external to this repository. It
+must enforce the same demo-only contract and return normalized response fields.
+The host never logs request bodies, credentials, account identifiers, terminal
+packets or remote failure details. `Login`, `Password` and `Server` settings are
+not consumed by this host; authentication to the terminal account belongs to
+the external terminal-side bridge.
 
 ## Configuration and secrets
 

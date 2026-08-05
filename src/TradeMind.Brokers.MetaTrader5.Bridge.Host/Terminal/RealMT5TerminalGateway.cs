@@ -180,11 +180,13 @@ internal sealed class RealMT5TerminalGateway(
     {
         var descriptor = await discovery.DiscoverAsync(configuration.TerminalPath, cancellationToken).ConfigureAwait(false);
         ValidateDescriptor(descriptor);
+        log.LogInformation("Demo terminal discovered with build {TerminalBuild}, architecture {TerminalArchitecture}, running {IsRunning}.", descriptor.Build, descriptor.Architecture, descriptor.IsRunning);
         if (!descriptor.IsRunning)
         {
             if (!allowStart || !configuration.AutoStartTerminal) throw new InvalidOperationException("The configured demo terminal is not running.");
             await processController.StartAsync(descriptor.Path, cancellationToken).ConfigureAwait(false);
             ownsTerminalProcess = true;
+            log.LogInformation("Demo terminal process started by the gateway.");
             var deadline = timeProvider.GetUtcNow().AddSeconds(configuration.TerminalStartupTimeoutSeconds);
             while (!discovery.IsRunning(descriptor.Path))
             {
@@ -203,7 +205,11 @@ internal sealed class RealMT5TerminalGateway(
         var ping = await transport.PingAsync(timeout.Token).ConfigureAwait(false);
         if (!ping.Success) throw new InvalidOperationException("The demo terminal heartbeat could not be established.");
         var heartbeat = ping.HeartbeatUtc ?? timeProvider.GetUtcNow();
-        SetSnapshot(new(MT5TerminalConnectionState.Connected, string.IsNullOrWhiteSpace(handshake.TerminalVersion) ? descriptor.Version : handshake.TerminalVersion, handshake.TerminalBuild == 0 ? descriptor.Build : handshake.TerminalBuild, string.IsNullOrWhiteSpace(handshake.TerminalArchitecture) ? descriptor.Architecture : handshake.TerminalArchitecture, handshake.ProtocolVersion, handshake.AccountEnvironment, handshake.TradingEnabled, handshake.ReadOnly, timeProvider.GetElapsedTime(started), heartbeat, Snapshot.LastReconnectUtc, Snapshot.ReconnectCount));
+        var terminalVersion = string.IsNullOrWhiteSpace(handshake.TerminalVersion) ? descriptor.Version : handshake.TerminalVersion;
+        var terminalBuild = handshake.TerminalBuild == 0 ? descriptor.Build : handshake.TerminalBuild;
+        var terminalArchitecture = string.IsNullOrWhiteSpace(handshake.TerminalArchitecture) ? descriptor.Architecture : handshake.TerminalArchitecture;
+        SetSnapshot(new(MT5TerminalConnectionState.Connected, terminalVersion, terminalBuild, terminalArchitecture, handshake.ProtocolVersion, handshake.AccountEnvironment, handshake.TradingEnabled, handshake.ReadOnly, timeProvider.GetElapsedTime(started), heartbeat, Snapshot.LastReconnectUtc, Snapshot.ReconnectCount));
+        log.LogInformation("Demo terminal bridge handshake succeeded with protocol {ProtocolVersion}, terminal build {TerminalBuild}, account environment {AccountEnvironment}, read-only {ReadOnly}.", handshake.ProtocolVersion, terminalBuild, handshake.AccountEnvironment, handshake.ReadOnly);
     }
 
     private void EnsureRuntimeConfiguration()
@@ -220,7 +226,13 @@ internal sealed class RealMT5TerminalGateway(
 
     private void ValidateHandshake(TerminalBridgeHandshakeResult handshake)
     {
-        if (!handshake.Success) throw new InvalidOperationException("The demo terminal handshake failed.");
+        if (!handshake.Success)
+        {
+            var message = handshake.ErrorCode.Equals("TERMINAL_BRIDGE_UNAVAILABLE", StringComparison.OrdinalIgnoreCase)
+                ? "The terminal-side bridge is unavailable. Start the external bridge and verify its configured endpoint."
+                : "The terminal-side bridge rejected the demo handshake.";
+            throw new InvalidOperationException(message);
+        }
         if (!BridgeHostProtocolVersion.TryParse(configuration.ExpectedTerminalProtocolVersion, out var expected) || !BridgeHostProtocolVersion.TryParse(handshake.ProtocolVersion, out var actual) || !actual.IsCompatibleWith(expected)) throw new InvalidOperationException("The demo terminal protocol is not supported.");
         if (!handshake.DemoAccount || !handshake.AccountEnvironment.Equals("Demo", StringComparison.OrdinalIgnoreCase) || handshake.AccountEnvironment.Equals("Live", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("The connected account is not a demo account.");
         if (!handshake.TradingEnabled || handshake.ReadOnly) throw new InvalidOperationException("The demo account is not enabled for trading.");

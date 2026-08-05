@@ -64,6 +64,18 @@ public sealed class RealMT5TerminalGatewayTests
     }
 
     [Fact]
+    public async Task Real_gateway_reports_when_the_external_terminal_bridge_is_unavailable()
+    {
+        var gateway = CreateGateway(new FakeTransport { HandshakeErrorCode = "TERMINAL_BRIDGE_UNAVAILABLE" });
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => gateway.StartAsync(CancellationToken.None));
+
+        Assert.Contains("terminal-side bridge is unavailable", exception.InnerException?.Message ?? exception.Message, StringComparison.Ordinal);
+        Assert.Equal(MT5TerminalConnectionState.Faulted, gateway.Snapshot.ConnectionState);
+        Assert.False(gateway.IsAvailable);
+    }
+
+    [Fact]
     public async Task Real_gateway_rejects_trading_without_all_explicit_demo_guards()
     {
         var transport = new FakeTransport();
@@ -213,13 +225,14 @@ public sealed class RealMT5TerminalGatewayTests
         public int ExecuteCount { get; private set; }
         public bool FailNextPing { get; set; }
         public bool BlockExecution { get; set; }
+        public string? HandshakeErrorCode { get; set; }
         public bool ExecutionCancellationObserved { get; private set; }
 
         public Task<TerminalBridgeHandshakeResult> HandshakeAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             HandshakeCount++;
-            return Task.FromResult(new TerminalBridgeHandshakeResult(true, "", "1.0", "terminal-5000", 5000, "x64", "Demo", true, true, false, "demo-account", ["orders", "positions"]));
+            return Task.FromResult(new TerminalBridgeHandshakeResult(string.IsNullOrWhiteSpace(HandshakeErrorCode), HandshakeErrorCode ?? "", "1.0", "terminal-5000", 5000, "x64", "Demo", true, true, false, "demo-account", ["orders", "positions"]));
         }
 
         public Task<TerminalBridgePingResult> PingAsync(CancellationToken cancellationToken)

@@ -20,7 +20,7 @@ internal sealed class HttpMT5TerminalTransport(
     {
         var response = await SendAsync<TerminalBridgeHandshakeResponse>("terminal/v1/handshake", new { protocolVersion = configuration.ExpectedTerminalProtocolVersion }, cancellationToken).ConfigureAwait(false);
         return response is null
-            ? new(false, "TERMINAL_UNAVAILABLE", string.Empty, string.Empty, 0, string.Empty, string.Empty, false, false, false, string.Empty, [])
+            ? new(false, "TERMINAL_BRIDGE_UNAVAILABLE", string.Empty, string.Empty, 0, string.Empty, string.Empty, false, false, false, string.Empty, [])
             : new(response.Success, response.ErrorCode ?? "", response.ProtocolVersion ?? "", response.TerminalVersion ?? "", response.TerminalBuild, response.TerminalArchitecture ?? "", response.AccountEnvironment ?? "", response.DemoAccount, response.TradingEnabled, response.ReadOnly, response.AccountId ?? "", response.Capabilities ?? []);
     }
 
