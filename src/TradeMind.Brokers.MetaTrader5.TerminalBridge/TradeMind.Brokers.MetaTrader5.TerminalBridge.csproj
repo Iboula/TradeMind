@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>TradeMind.Brokers.MetaTrader5.TerminalBridge</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>TradeMind.Brokers.MetaTrader5.TerminalBridge</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Brokers.MetaTrader5.Bridge.Contracts\TradeMind.Brokers.MetaTrader5.Bridge.Contracts.csproj" />
+  </ItemGroup>
+</Project>
