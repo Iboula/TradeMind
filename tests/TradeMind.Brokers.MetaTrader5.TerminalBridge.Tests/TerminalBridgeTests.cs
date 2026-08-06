@@ -157,6 +157,35 @@ public sealed class TerminalBridgeTests
         Assert.True(ping.Body.Success, ping.Raw);
     }
 
+    [Fact]
+    public async Task Real_read_only_commands_round_trip_without_write_operations()
+    {
+        if (!string.Equals(Environment.GetEnvironmentVariable("MT5_REAL_TESTS"), "true", StringComparison.OrdinalIgnoreCase)) return;
+        var endpoint = Environment.GetEnvironmentVariable("MT5_TERMINAL_BRIDGE_ENDPOINT");
+        var token = Environment.GetEnvironmentVariable("MT5_TERMINAL_BRIDGE_TOKEN");
+        if (string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(token)) return;
+
+        using var client = new HttpClient { BaseAddress = new Uri(endpoint) };
+        var handshake = await SendSignedAsync<TerminalHandshakeResponse>(client, HttpMethod.Post, "/terminal/v1/handshake", "{\"protocolVersion\":\"1.0\"}", token: token);
+        Assert.True(handshake.Body.Success);
+        Assert.Equal("Demo", handshake.Body.AccountEnvironment);
+
+        var commands = new (string Name, string Body)[]
+        {
+            ("heartbeat", "{\"command\":\"heartbeat\",\"fields\":{}}"),
+            ("get-account", "{\"command\":\"get-account\",\"fields\":{}}"),
+            ("get-instrument", "{\"command\":\"get-instrument\",\"fields\":{\"instrument\":\"EURUSD\"}}"),
+            ("get-orders", "{\"command\":\"get-orders\",\"fields\":{}}"),
+            ("get-positions", "{\"command\":\"get-positions\",\"fields\":{}}")
+        };
+
+        foreach (var command in commands)
+        {
+            var result = await SendSignedAsync<TerminalExecuteResponse>(client, HttpMethod.Post, "/terminal/v1/execute", command.Body, token: token);
+            Assert.True(result.Body.Success, $"The real read command '{command.Name}' failed with code '{result.Body.Code}'.");
+        }
+    }
+
     private static async Task RegisterDemoAgentAsync(HttpClient client)
     {
         var response = await PostAgentAsync(client, "/terminal/v1/agent/poll", new AgentPollRequest("1.0", "MT5", 6090, "x64", true, "Demo", true, false, "demo-account", ["account.read", "instrument.read", "orders.read", "positions.read"]));
