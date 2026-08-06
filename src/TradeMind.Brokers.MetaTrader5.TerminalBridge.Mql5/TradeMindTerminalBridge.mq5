@@ -58,7 +58,8 @@ void ExecuteCommand(string commandId, string command, string request)
    if(command == "get-account" || command == "get-accounts")
      {
       string item = StringFormat("{\"accountId\":\"%I64d\",\"environment\":\"%s\",\"accountType\":\"Demo\",\"currency\":\"%s\",\"balance\":%.8f,\"equity\":%.8f}", AccountInfoInteger(ACCOUNT_LOGIN), AccountEnvironment(), AccountInfoString(ACCOUNT_CURRENCY), AccountInfoDouble(ACCOUNT_BALANCE), AccountInfoDouble(ACCOUNT_EQUITY));
-      SendResult(commandId, true, "ACCOUNT", "Account returned", StringFormat("{\"items\":[%s]}", item));
+      string items = StringFormat("[%s]", item);
+      SendResult(commandId, true, "ACCOUNT", "Account returned", StringFormat("{\"items\":\"%s\"}", JsonEscape(items)));
       return;
      }
    if(command == "get-instrument")
@@ -73,17 +74,17 @@ void ExecuteCommand(string commandId, string command, string request)
       int digits = (int)SymbolInfoInteger(symbol, SYMBOL_DIGITS);
       double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
       string item = StringFormat("{\"instrument\":\"%s\",\"assetClass\":\"%s\",\"marketStatus\":\"%s\",\"priceScale\":%d,\"point\":%.8f}", symbol, "Unknown", "Open", digits, point);
-      SendResult(commandId, true, "INSTRUMENT", "Instrument returned", StringFormat("{\"instrument\":%s}", item));
+      SendResult(commandId, true, "INSTRUMENT", "Instrument returned", StringFormat("{\"instrument\":\"%s\"}", JsonEscape(item)));
       return;
      }
    if(command == "get-orders")
      {
-      SendResult(commandId, true, "ORDERS", "Orders returned", StringFormat("{\"items\":%s}", OrdersJson()));
+      SendResult(commandId, true, "ORDERS", "Orders returned", StringFormat("{\"items\":\"%s\"}", JsonEscape(OrdersJson())));
       return;
      }
    if(command == "get-positions")
      {
-      SendResult(commandId, true, "POSITIONS", "Positions returned", StringFormat("{\"items\":%s}", PositionsJson()));
+      SendResult(commandId, true, "POSITIONS", "Positions returned", StringFormat("{\"items\":\"%s\"}", JsonEscape(PositionsJson())));
       return;
      }
    SendResult(commandId, false, "UNKNOWN", "The terminal command is not supported", "{}");
@@ -144,6 +145,15 @@ string PositionsJson()
       result += StringFormat("{\"positionId\":\"%I64u\",\"instrument\":\"%s\",\"status\":\"Open\"}", ticket, PositionGetString(POSITION_SYMBOL));
      }
    return(result + "]");
+  }
+
+string JsonEscape(string value)
+  {
+   StringReplace(value, "\\", "\\\\");
+   StringReplace(value, "\"", "\\\"");
+   StringReplace(value, "\r", "\\r");
+   StringReplace(value, "\n", "\\n");
+   return(value);
   }
 
 string JsonString(string json, string key)
