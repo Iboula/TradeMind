@@ -100,7 +100,7 @@ internal sealed class BridgeHostApplication(
                 return Results.Json(liveResponse, statusCode: StatusCodes.Status403Forbidden);
             }
             var result = await gateway.ExecuteAsync(command, deadline.Token).ConfigureAwait(false);
-            var response = new BridgeTransportResponse(request.ProtocolVersion, metadata, SerializeTerminalResponse(result), result.Success ? null : MapError(result.Code));
+            var response = new BridgeTransportResponse(request.ProtocolVersion, metadata, SerializeTerminalResponse(result), result.Success || IsTerminalResultCode(result.Code) ? null : MapError(result.Code));
             idempotency.Store(request.Metadata.IdempotencyKeyHash, new(request.Metadata.NormalizedRequestHash, response));
             if (!result.Success) metrics.IncrementCounter(TelemetryMetricNames.Mt5Failures, 1, Dimensions(operationName, "Rejected"));
             return Results.Ok(response);
@@ -134,7 +134,9 @@ internal sealed class BridgeHostApplication(
         return new(command, fields);
     }
 
-    private static string SerializeTerminalResponse(TerminalCommandResult result) => JsonSerializer.Serialize(new { success = result.Success, code = result.Success ? result.Code : "TERMINAL_FAILURE", message = result.Success ? result.Message : "The terminal operation failed.", fields = result.Fields }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+    private static string SerializeTerminalResponse(TerminalCommandResult result) => JsonSerializer.Serialize(new { success = result.Success, code = result.Success ? result.Code : PublicTerminalCode(result.Code), message = result.Success ? result.Message : "The demo terminal rejected the requested operation.", fields = result.Fields }, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+    private static bool IsTerminalResultCode(string code) => code is "ORDER_REJECTED" or "INVALID_VOLUME" or "INVALID_STOPS" or "MARKET_CLOSED" or "INSUFFICIENT_MARGIN" or "NO_CONNECTION" or "DEMO_ONLY" or "DEMO_EXECUTION_REQUIRED" or "LIVE_MODE_FORBIDDEN" or "DEMO_CONFIRMATION_REQUIRED" or "EXECUTION_GUARDS_REQUIRED" or "DUPLICATE_EXECUTION" or "CLEANUP_FAILED" or "TIMEOUT" or "CANCELLED" or "INVALID_REQUEST" or "INVALID_QUANTITY" or "POSITION_LIMIT" or "POSITION_NOT_FOUND" or "ORDER_NOT_FOUND";
+    private static string PublicTerminalCode(string code) => IsTerminalResultCode(code) ? code : "TERMINAL_FAILURE";
     private static BridgeError MapError(string code) => code switch
     {
         "TERMINAL_UNAVAILABLE" => new(BridgeErrorCode.TerminalUnavailable, "The external terminal is unavailable.", true, true),

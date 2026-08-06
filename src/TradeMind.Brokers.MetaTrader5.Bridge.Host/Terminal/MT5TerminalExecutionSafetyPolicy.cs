@@ -7,9 +7,11 @@ internal sealed record MT5TerminalSafetyDecision(bool Allowed, string Code, stri
 
 internal sealed class MT5TerminalExecutionSafetyPolicy
 {
-    public MT5TerminalSafetyDecision Validate(TerminalCommand command, MT5TerminalGatewaySnapshot snapshot, DateTimeOffset now, TimeSpan heartbeatTimeout)
+    public MT5TerminalSafetyDecision Validate(TerminalCommand command, MT5TerminalGatewaySnapshot snapshot, DateTimeOffset now, TimeSpan heartbeatTimeout, bool writeTestsEnabled = false)
     {
         if (command.Command is not ("submit-order" or "modify-order" or "cancel-order" or "close-position")) return MT5TerminalSafetyDecision.Accept();
+        if (!writeTestsEnabled) return new(false, "LIVE_MODE_FORBIDDEN", "Demo write tests are disabled.");
+        if (command.Command is not ("submit-order" or "close-position")) return new(false, "LIVE_MODE_FORBIDDEN", "Only the bounded demo order smoke test is supported.");
         if (command.Fields.TryGetValue("mode", out var mode) && mode.Equals("Live", StringComparison.OrdinalIgnoreCase)) return new(false, "LIVE_MODE_FORBIDDEN", "Live execution is disabled.");
         if (!command.Fields.TryGetValue("mode", out mode) || !mode.Equals("Demo", StringComparison.OrdinalIgnoreCase)) return new(false, "DEMO_CONFIRMATION_REQUIRED", "Demo mode must be explicit.");
         if (!snapshot.ConnectionState.Equals(MT5TerminalConnectionState.Connected)) return new(false, "TERMINAL_UNAVAILABLE", "The demo terminal is not connected.");

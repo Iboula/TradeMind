@@ -118,6 +118,42 @@ public sealed class TerminalBridgeTests
     }
 
     [Fact]
+    public async Task Demo_market_write_requires_the_explicit_gate_and_round_trips_to_the_agent()
+    {
+        await using var factory = new TerminalBridgeFactory(enableWriteTests: true);
+        using var client = factory.CreateClient();
+        await RegisterDemoAgentAsync(client);
+
+        var fields = new Dictionary<string, string>
+        {
+            ["mode"] = "Demo",
+            ["demo_confirmation"] = "true",
+            ["risk_approved"] = "true",
+            ["trading_plan_valid"] = "true",
+            ["execution_session_valid"] = "true",
+            ["permission"] = "true",
+            ["capability"] = "true",
+            ["heartbeat_valid"] = "true",
+            ["account_id"] = "demo-account",
+            ["client_order_id"] = "smoke-order",
+            ["instrument"] = "EURUSD",
+            ["side"] = "Buy",
+            ["order_type"] = "Market",
+            ["quantity"] = "0.01",
+            ["time_in_force"] = "Day"
+        };
+        var executeTask = SendSignedAsync<TerminalExecuteResponse>(client, HttpMethod.Post, "/terminal/v1/execute", JsonSerializer.Serialize(new { command = "submit-order", fields }));
+        var poll = await PollUntilCommandAsync(client);
+        Assert.Equal("submit-order", poll.Command!.Command);
+
+        await SendAgentResultAsync(client, "/terminal/v1/agent/result", new AgentResultRequest(poll.Command.Id, true, "ORDER_SUBMITTED", "Demo order accepted", new Dictionary<string, string> { ["order"] = "{}" }));
+        var result = await executeTask;
+
+        Assert.True(result.Body.Success);
+        Assert.Equal("ORDER_SUBMITTED", result.Body.Code);
+    }
+
+    [Fact]
     public async Task Duplicate_nonce_is_rejected_without_replaying_the_request()
     {
         await using var factory = new TerminalBridgeFactory();
@@ -194,6 +230,18 @@ public sealed class TerminalBridgeTests
 
     private static async Task<AgentPollResponse> PollAgentAsync(HttpClient client) => await PostAgentAsync(client, "/terminal/v1/agent/poll", new AgentPollRequest("1.0", "MT5", 6090, "x64", true, "Demo", true, false, "demo-account", []));
 
+    private static async Task<AgentPollResponse> PollUntilCommandAsync(HttpClient client)
+    {
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            var response = await PollAgentAsync(client);
+            if (response.Command is not null) return response;
+            await Task.Delay(25);
+        }
+
+        throw new InvalidOperationException("The terminal agent did not receive the queued command.");
+    }
+
     private static async Task<AgentPollResponse> PostAgentAsync(HttpClient client, string path, AgentPollRequest request)
     {
         using var message = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(request) };
@@ -232,6 +280,9 @@ public sealed class TerminalBridgeTests
     {
         public const string BridgeToken = "bridge-test-token";
         public const string AgentToken = "agent-test-token";
+        private readonly bool enableWriteTests;
+
+        public TerminalBridgeFactory(bool enableWriteTests = false) => this.enableWriteTests = enableWriteTests;
 
         protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
         {
@@ -239,6 +290,7 @@ public sealed class TerminalBridgeTests
             builder.UseSetting("TradeMind:Brokers:MetaTrader5:TerminalBridge:Urls", "http://localhost:5001");
             builder.UseSetting("TradeMind:Brokers:MetaTrader5:TerminalBridge:TokenConfigurationKey", "BridgeTestToken");
             builder.UseSetting("TradeMind:Brokers:MetaTrader5:TerminalBridge:AgentTokenConfigurationKey", "AgentTestToken");
+            builder.UseSetting("TradeMind:Brokers:MetaTrader5:TerminalBridge:EnableWriteTests", enableWriteTests.ToString());
             builder.ConfigureAppConfiguration((_, configuration) => configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["BridgeTestToken"] = BridgeToken, ["AgentTestToken"] = AgentToken }));
         }
     }

@@ -87,13 +87,24 @@ internal static class MT5ErrorMapper
         var category = response.Code switch
         {
             "ORDER_REJECTED" => BrokerErrorCategory.RejectedByBroker,
+            "INVALID_VOLUME" => BrokerErrorCategory.InvalidQuantity,
+            "INVALID_STOPS" => BrokerErrorCategory.InvalidStops,
+            "MARKET_CLOSED" => BrokerErrorCategory.MarketClosed,
+            "INSUFFICIENT_MARGIN" => BrokerErrorCategory.InsufficientMargin,
+            "NO_CONNECTION" => BrokerErrorCategory.ConnectorUnavailable,
+            "DEMO_ONLY" or "DEMO_EXECUTION_REQUIRED" or "LIVE_MODE_FORBIDDEN" or "DEMO_CONFIRMATION_REQUIRED" or "EXECUTION_GUARDS_REQUIRED" => BrokerErrorCategory.Authorization,
+            "DUPLICATE_EXECUTION" => BrokerErrorCategory.DuplicateRequest,
+            "CLEANUP_FAILED" => BrokerErrorCategory.ReconciliationRequired,
+            "TIMEOUT" => BrokerErrorCategory.Timeout,
+            "CANCELLED" => BrokerErrorCategory.Cancelled,
+            "INVALID_REQUEST" or "INVALID_QUANTITY" or "POSITION_LIMIT" => BrokerErrorCategory.Validation,
             "ORDER_NOT_FOUND" or "POSITION_NOT_FOUND" => BrokerErrorCategory.AccountUnavailable,
             "INSTRUMENT_NOT_FOUND" => BrokerErrorCategory.InstrumentUnavailable,
             "UNKNOWN_COMMAND" => BrokerErrorCategory.UnsupportedCapability,
             _ => BrokerErrorCategory.ProtocolFailure
         };
         var message = operation is null ? response.Message : $"The MT5 {operation} operation failed.";
-        return new BrokerError(response.Code, category, message, category is BrokerErrorCategory.ProtocolFailure, false, response.Code,
+        return new BrokerError(response.Code, category, message, category is BrokerErrorCategory.ProtocolFailure or BrokerErrorCategory.ConnectorUnavailable or BrokerErrorCategory.Timeout, category == BrokerErrorCategory.ReconciliationRequired, response.Code,
             new BrokerTraceReference(context.CorrelationId, null, context.ExecutionSessionId), now);
     }
 }

@@ -31,6 +31,8 @@ public sealed class TerminalBridgeOptions
     public int Mql5PollTimeoutSeconds { get; set; } = 25;
     public int Mql5PollIntervalSeconds { get; set; } = 1;
     public bool EnableWriteTests { get; set; }
+    public string WriteTestSymbol { get; set; } = "EURUSD";
+    public decimal WriteTestMinimumVolume { get; set; } = 0.01m;
 }
 
 public sealed class TerminalBridgeOptionsValidator : IValidateOptions<TerminalBridgeOptions>
@@ -58,6 +60,8 @@ public sealed class TerminalBridgeOptionsValidator : IValidateOptions<TerminalBr
         if (options.SupportedTerminalArchitecture is not ("x64" or "x86")) errors.Add("SupportedTerminalArchitecture must be x64 or x86.");
         if (options.Mql5PollTimeoutSeconds is < 1 or > 120) errors.Add("Mql5PollTimeoutSeconds must be between 1 and 120.");
         if (options.Mql5PollIntervalSeconds is < 1 or > 30) errors.Add("Mql5PollIntervalSeconds must be between 1 and 30.");
+        if (string.IsNullOrWhiteSpace(options.WriteTestSymbol) || options.WriteTestSymbol.Length > 32) errors.Add("WriteTestSymbol is required and must be short.");
+        if (options.WriteTestMinimumVolume <= 0) errors.Add("WriteTestMinimumVolume must be positive.");
         if (endpoint?.Scheme == "http" && !options.AllowInsecureDemoTransport) errors.Add("HTTP requires explicit local demo opt-in.");
         return errors.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(errors);
     }

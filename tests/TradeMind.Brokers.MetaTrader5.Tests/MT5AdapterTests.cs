@@ -8,8 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using TradeMind.Brokers.Application.Abstractions;
+using TradeMind.Brokers.Application.Execution;
 using TradeMind.Brokers.Domain;
 using TradeMind.Brokers.MetaTrader5.Bridge;
+using TradeMind.Brokers.MetaTrader5.Bridge.Client.Configuration;
+using TradeMind.Brokers.MetaTrader5.Bridge.Client.DependencyInjection;
 using TradeMind.Brokers.MetaTrader5.Configuration;
 using TradeMind.Brokers.MetaTrader5.Connection;
 using TradeMind.Brokers.MetaTrader5.DependencyInjection;
@@ -120,6 +123,85 @@ public sealed class MT5AdapterTests
         Assert.Equal(BrokerOrderStatus.Cancelled, cancelled.Order!.Status);
         Assert.Null(closed.Error);
         Assert.Equal(BrokerOrderStatus.Filled, closed.Execution!.Status);
+    }
+
+    [Fact]
+    public async Task Opt_in_real_demo_order_executes_once_and_cleans_up_without_logging_account_details()
+    {
+        if (!string.Equals(Environment.GetEnvironmentVariable("MT5_REAL_TESTS"), "true", StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(Environment.GetEnvironmentVariable("MT5_REAL_WRITE_TESTS"), "true", StringComparison.OrdinalIgnoreCase) ||
+            !string.Equals(Environment.GetEnvironmentVariable("MT5_REAL_DEMO_CONFIRMATION"), "I_CONFIRM_ONE_DEMO_ORDER", StringComparison.Ordinal)) return;
+
+        var endpoint = Environment.GetEnvironmentVariable("MT5_BRIDGE_HOST_ENDPOINT");
+        if (string.IsNullOrWhiteSpace(endpoint)) return;
+
+        var mt5Configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [$"{MT5Options.SectionName}:Mode"] = "Demo",
+            [$"{MT5Options.SectionName}:AllowDemo"] = "true",
+            [$"{MT5Options.SectionName}:AllowLive"] = "false",
+            [$"{MT5Options.SectionName}:TimeoutSeconds"] = "30",
+            [$"{MT5Options.SectionName}:ReconnectAttempts"] = "0"
+        }).Build();
+        var bridgeConfiguration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            [$"{MT5BridgeClientOptions.SectionName}:Endpoint"] = endpoint,
+            [$"{MT5BridgeClientOptions.SectionName}:AuthenticationMode"] = nameof(BridgeAuthenticationMode.MutualTls),
+            [$"{MT5BridgeClientOptions.SectionName}:AllowLive"] = "false",
+            [$"{MT5BridgeClientOptions.SectionName}:RequireTls"] = "true",
+            [$"{MT5BridgeClientOptions.SectionName}:RequestTimeoutSeconds"] = "30",
+            [$"{MT5BridgeClientOptions.SectionName}:HandshakeTimeoutSeconds"] = "30"
+        }).Build();
+        await using var provider = CreateRealProvider(mt5Configuration, bridgeConfiguration);
+        var connector = provider.GetRequiredService<IBrokerConnector>();
+        var context = new BrokerExecutionContext(true, "demo-smoke-test", "Test", "demo-tenant", "demo-org", [BrokerPermissionNames.ExecuteDemo], "demo-session", "demo-correlation");
+
+        var health = await connector.GetHealthAsync(context, CancellationToken.None);
+        Assert.Equal(BrokerHealthStatus.Healthy, health.Health.Status);
+        var accounts = await connector.GetAccountsAsync(context, CancellationToken.None);
+        var account = Assert.Single(accounts);
+        Assert.Equal(BrokerEnvironment.Test, account.Environment);
+        Assert.True(account.TradingEnabled);
+        Assert.False(account.ReadOnly);
+        var instrument = await connector.GetInstrumentAsync(context, new BrokerInstrumentQuery("EURUSD"), CancellationToken.None);
+        Assert.NotNull(instrument);
+        Assert.Equal("EURUSD", instrument!.Instrument, ignoreCase: true);
+        Assert.Equal(BrokerMarketStatus.Open, instrument.MarketStatus);
+        var existingOrders = await connector.GetOrdersAsync(context, new BrokerOrderQuery(), CancellationToken.None);
+        var existingPositions = await connector.GetPositionsAsync(context, new BrokerPositionQuery(), CancellationToken.None);
+        Assert.Empty(existingOrders);
+        Assert.Empty(existingPositions);
+
+        var clientOrderId = "tm-demo-smoke-" + Guid.NewGuid().ToString("N");
+        var request = new BrokerOrderRequest(new("demo-execution-" + Guid.NewGuid().ToString("N")), "demo-session", connector.Descriptor.ConnectorId, account.AccountId, clientOrderId, "EURUSD", BrokerOrderSide.Buy, BrokerOrderType.Market, instrument.MinimumQuantity, null, null, null, [], BrokerTimeInForce.Day, null, "demo-smoke-" + Guid.NewGuid().ToString("N"), "demo-correlation", "demo-tenant", "demo-org", "demo-smoke-test", "demo-plan", "demo-risk", new Dictionary<string, string> { ["demo_confirmation"] = "true" }, DateTimeOffset.UtcNow);
+        BrokerPositionId? positionId = null;
+        try
+        {
+            var submission = await connector.SubmitOrderAsync(context, request, CancellationToken.None);
+            Assert.Null(submission.Error);
+            Assert.NotNull(submission.Order);
+            Assert.NotNull(submission.Execution);
+            Assert.Equal(BrokerOrderStatus.Filled, submission.Order!.Status);
+            Assert.Equal(request.Quantity, submission.Execution!.FilledQuantity);
+            positionId = submission.Execution.PositionId;
+            Assert.NotNull(positionId);
+
+            var positionsAfterFill = await connector.GetPositionsAsync(context, new BrokerPositionQuery("EURUSD"), CancellationToken.None);
+            Assert.Single(positionsAfterFill);
+            Assert.Equal(request.Quantity, positionsAfterFill[0].Quantity);
+        }
+        finally
+        {
+            if (positionId is not null)
+            {
+                var cleanup = await connector.ClosePositionAsync(context, new BrokerPositionCloseRequest(positionId, null), CancellationToken.None);
+                Assert.Null(cleanup.Error);
+                Assert.NotNull(cleanup.Execution);
+            }
+
+            var residualPositions = await connector.GetPositionsAsync(context, new BrokerPositionQuery("EURUSD"), CancellationToken.None);
+            Assert.Empty(residualPositions);
+        }
     }
 
     [Fact]
@@ -242,6 +324,17 @@ public sealed class MT5AdapterTests
         services.AddSingleton<RecordingMetrics>();
         services.AddSingleton<ITradeMindMetrics>(provider => provider.GetRequiredService<RecordingMetrics>());
         services.AddTradeMindMetaTrader5(configuration);
+        return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+    }
+
+    private static ServiceProvider CreateRealProvider(IConfiguration mt5Configuration, IConfiguration bridgeConfiguration)
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<ITradeMindTelemetry, RecordingTelemetry>();
+        services.AddSingleton<ITradeMindMetrics, RecordingMetrics>();
+        services.AddTradeMindMetaTrader5(mt5Configuration);
+        services.AddTradeMindMetaTrader5BridgeClient(bridgeConfiguration);
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 

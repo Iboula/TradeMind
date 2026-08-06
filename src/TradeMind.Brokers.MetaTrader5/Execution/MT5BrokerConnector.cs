@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TradeMind.Brokers.Application.Abstractions;
+using TradeMind.Brokers.Application.Execution;
 using TradeMind.Brokers.Domain;
 using TradeMind.Brokers.MetaTrader5.Configuration;
 using TradeMind.Brokers.MetaTrader5.Connection;
@@ -67,15 +68,25 @@ public sealed class MT5BrokerConnector(
         ArgumentNullException.ThrowIfNull(request);
         if (configuration.Mode.Equals(nameof(BrokerExecutionMode.Live), StringComparison.OrdinalIgnoreCase) || configuration.AllowLive)
             return new(null, null, Error("LIVE_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Live MT5 execution is disabled.", context, request.ExecutionId));
+        if (request.StopLoss is not null || request.TakeProfits.Count > 0)
+            return new(null, null, Error("INVALID_STOPS", BrokerErrorCategory.Validation, "The demo smoke test does not support stop or target parameters.", context, request.ExecutionId));
         var fields = new Dictionary<string, string>
         {
+            ["mode"] = configuration.Mode,
             ["account_id"] = request.AccountId.Value,
             ["client_order_id"] = request.ClientOrderId,
             ["instrument"] = request.Instrument,
             ["side"] = request.Side.ToString(),
             ["order_type"] = request.OrderType.ToString(),
             ["quantity"] = request.Quantity.ToString(System.Globalization.CultureInfo.InvariantCulture),
-            ["time_in_force"] = request.TimeInForce.ToString()
+            ["time_in_force"] = request.TimeInForce.ToString(),
+            ["demo_confirmation"] = IsTrue(request.Metadata, "demo_confirmation") ? "true" : "false",
+            ["risk_approved"] = !string.IsNullOrWhiteSpace(request.RiskAssessmentId) ? "true" : "false",
+            ["trading_plan_valid"] = !string.IsNullOrWhiteSpace(request.TradingPlanId) ? "true" : "false",
+            ["execution_session_valid"] = string.Equals(context.ExecutionSessionId, request.ExecutionSessionId, StringComparison.Ordinal) ? "true" : "false",
+            ["permission"] = context.HasPermission(BrokerPermissionNames.ExecuteDemo) ? "true" : "false",
+            ["capability"] = Descriptor.Capabilities.HasFlag(BrokerCapability.SubmitMarketOrders) ? "true" : "false",
+            ["heartbeat_valid"] = "true"
         };
         if (request.RequestedPrice is { } requestedPrice) fields["requested_price"] = requestedPrice.ToString(System.Globalization.CultureInfo.InvariantCulture);
         var response = await SendAsync("SubmitOrder", "submit-order", fields, cancellationToken).ConfigureAwait(false);
@@ -206,6 +217,8 @@ public sealed class MT5BrokerConnector(
     {
         if (!response.Success) throw new MT5ProtocolException(response.Code, $"The MT5 {operation} operation failed.");
     }
+
+    private static bool IsTrue(IReadOnlyDictionary<string, string> values, string key) => values.TryGetValue(key, out var value) && value.Equals("true", StringComparison.OrdinalIgnoreCase);
 
     private static BrokerConnectorDescriptor CreateDescriptor(MT5Options options)
     {

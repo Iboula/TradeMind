@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.Extensions.Options;
 using TradeMind.Brokers.MetaTrader5.TerminalBridge.Configuration;
 using TradeMind.Brokers.MetaTrader5.TerminalBridge.Protocol;
@@ -12,6 +13,7 @@ public sealed class TerminalBridgeApplication(
     ILogger<TerminalBridgeApplication> logger)
 {
     private static readonly string[] ReadOnlyCommands = ["get-accounts", "get-account", "get-instrument", "get-orders", "get-positions", "heartbeat"];
+    private static readonly string[] DemoWriteCommands = ["submit-order", "close-position"];
     private readonly TerminalBridgeOptions configuration = options.Value;
     private readonly SemaphoreSlim concurrencyGate = new(options.Value.MaxConcurrentRequests, options.Value.MaxConcurrentRequests);
 
@@ -38,8 +40,12 @@ public sealed class TerminalBridgeApplication(
         var fields = NormalizeFields(request.Fields);
         if (!ReadOnlyCommands.Contains(command, StringComparer.Ordinal))
         {
-            logger.LogWarning("A terminal write operation was rejected because Phase 1 is read-only.");
-            return Failure("LIVE_MODE_FORBIDDEN", "Write operations are disabled in Phase 1.");
+            var writeDecision = ValidateDemoWrite(command, fields);
+            if (!writeDecision.Allowed)
+            {
+                logger.LogWarning("A terminal write operation was rejected by the demo safety gate with code {Code}.", writeDecision.Code);
+                return Failure(writeDecision.Code, writeDecision.Message);
+            }
         }
         if (!IsReady(agent.Snapshot)) return Failure("TERMINAL_NOT_READY", "The terminal agent is not ready.");
         if (command == "heartbeat") return new(true, "HEARTBEAT", "Heartbeat acknowledged", new Dictionary<string, string> { ["heartbeat_at_utc"] = timeProvider.GetUtcNow().ToString("O") });
@@ -88,6 +94,25 @@ public sealed class TerminalBridgeApplication(
 
     private bool IsReady(TerminalAgentSnapshot snapshot) => configuration.Enabled && configuration.DemoOnly && !configuration.AllowLive && snapshot.IsReady(timeProvider.GetUtcNow(), TimeSpan.FromSeconds(configuration.AgentHeartbeatTimeoutSeconds));
 
+    private DemoWriteDecision ValidateDemoWrite(string command, IReadOnlyDictionary<string, string> fields)
+    {
+        if (!configuration.EnableWriteTests) return new(false, "LIVE_MODE_FORBIDDEN", "Demo write tests are disabled.");
+        if (!DemoWriteCommands.Contains(command, StringComparer.Ordinal)) return new(false, "LIVE_MODE_FORBIDDEN", "Only the bounded demo order smoke test is supported.");
+        if (fields.TryGetValue("mode", out var mode) && mode.Equals("Live", StringComparison.OrdinalIgnoreCase)) return new(false, "LIVE_MODE_FORBIDDEN", "Live execution is disabled.");
+        if (!RequiredTrue(fields, "demo_confirmation") || !RequiredTrue(fields, "risk_approved") || !RequiredTrue(fields, "trading_plan_valid") || !RequiredTrue(fields, "execution_session_valid") || !RequiredTrue(fields, "permission") || !RequiredTrue(fields, "capability") || !RequiredTrue(fields, "heartbeat_valid"))
+            return new(false, "EXECUTION_GUARDS_REQUIRED", "The demo execution guards were not satisfied.");
+        if (!fields.TryGetValue("mode", out mode) || !mode.Equals("Demo", StringComparison.OrdinalIgnoreCase)) return new(false, "DEMO_CONFIRMATION_REQUIRED", "Demo mode must be explicit.");
+        if (command == "close-position") return Required(fields, "position_id") ? DemoWriteDecision.Accept() : new(false, "INVALID_REQUEST", "A position id is required for cleanup.");
+        if (!fields.TryGetValue("instrument", out var instrument) || !instrument.Equals(configuration.WriteTestSymbol, StringComparison.OrdinalIgnoreCase)) return new(false, "INVALID_REQUEST", "The demo smoke test is restricted to the configured symbol.");
+        if (!fields.TryGetValue("order_type", out var orderType) || !orderType.Equals("Market", StringComparison.OrdinalIgnoreCase)) return new(false, "INVALID_REQUEST", "Only one market order is permitted.");
+        if (!fields.TryGetValue("quantity", out var quantityText) || !decimal.TryParse(quantityText, NumberStyles.Number, CultureInfo.InvariantCulture, out var quantity) || quantity != configuration.WriteTestMinimumVolume) return new(false, "INVALID_QUANTITY", "The demo smoke test requires the configured minimum volume.");
+        if (!Required(fields, "account_id") || !Required(fields, "client_order_id")) return new(false, "INVALID_REQUEST", "The demo order identifiers are required.");
+        return DemoWriteDecision.Accept();
+    }
+
+    private static bool RequiredTrue(IReadOnlyDictionary<string, string> fields, string name) => fields.TryGetValue(name, out var value) && value.Equals("true", StringComparison.OrdinalIgnoreCase);
+    private static bool Required(IReadOnlyDictionary<string, string> fields, string name) => fields.TryGetValue(name, out var value) && !string.IsNullOrWhiteSpace(value);
+
     private static TerminalHandshakeResponse HandshakeFailure(string code) => new(false, code, "1.0", string.Empty, 0, string.Empty, "Demo", false, false, true, string.Empty, []);
     private static TerminalExecuteResponse Failure(string code, string message) => new(false, code, message, new Dictionary<string, string>());
 
@@ -102,5 +127,10 @@ public sealed class TerminalBridgeApplication(
             normalized[field.Key.Trim()] = field.Value;
         }
         return normalized;
+    }
+
+    private sealed record DemoWriteDecision(bool Allowed, string Code, string Message)
+    {
+        public static DemoWriteDecision Accept() => new(true, string.Empty, string.Empty);
     }
 }

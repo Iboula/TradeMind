@@ -44,14 +44,17 @@ account number or raw terminal payload is logged or committed.
 
 ## Demo-only behavior
 
-The service rejects live environments, non-Demo agent reports, unsupported
-protocol/build/architecture values and all write commands. Phase 1 supports
-only account, instrument, orders, positions and heartbeat reads. There is no
-order submission, modification, cancellation or position close path.
+The service rejects live environments, non-Demo agent reports and unsupported
+protocol/build/architecture values. Reads cover account, instrument, orders,
+positions and heartbeat. Sprint 32 adds only a bounded Demo write path for
+one EURUSD market order at minimum volume and its cleanup close. Modification,
+cancellation, pending orders, partial close, scaling and all Live operations
+remain rejected.
 
-Phase 2 write tests are intentionally not enabled. Any future write test must
-require both `MT5_REAL_TESTS=true` and `MT5_REAL_WRITE_TESTS=true`, an explicit
-Demo confirmation and deterministic cleanup.
+The write path is disabled by default and requires both `MT5_REAL_TESTS=true`
+and `MT5_REAL_WRITE_TESTS=true` in the dedicated real test, an explicit Demo
+confirmation, `EnableWriteTests=true` in both bridge services, a writable Demo
+account and deterministic cleanup. See the [real Demo order runbook](real-demo-order-smoke-test.md).
 
 ## Windows deployment
 
