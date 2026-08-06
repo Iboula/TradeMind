@@ -24,7 +24,8 @@ The following must all be true before the test is allowed to write:
 - the EA is attached to the VT Markets Demo terminal and reports a writable
   Demo account;
 - `MT5_BRIDGE_HOST_ENDPOINT` points to the local Bridge Host, normally
-  `https://localhost:7443`;
+  `https://localhost:65172` when using the preserved Development launch
+  profile;
 - the EURUSD account has no open order and no open position before the test;
 - the operator has explicitly confirmed that one Demo order may be sent.
 
@@ -35,15 +36,31 @@ packets.
 
 ## Configure local services
 
-Set local User Secrets, never repository files:
+Set local User Secrets, never repository files. The complete `BridgeHost`
+section is intentional: once one key under this section exists, the host no
+longer applies the legacy configuration fallback.
 
 ```powershell
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:TerminalBridge:EnableWriteTests" "true" --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:GatewayMode" "Real" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:Environment" "Demo" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:AccountEnvironment" "Demo" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:DemoOnly" "true" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:AllowLive" "false" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:RequireTls" "true" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalPath" "C:\Program Files\VT Markets (Pty) MT5 Terminal\terminal64.exe" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalBridgeEndpoint" "https://localhost:5001/" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalBridgeTokenConfigurationKey" "MT5_TERMINAL_BRIDGE_TOKEN" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:EnableWriteTests" "true" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "MT5_TERMINAL_BRIDGE_TOKEN" "<existing local bridge token>" --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge
+dotnet user-secrets set "MT5_TERMINAL_AGENT_TOKEN" "<same local value as the EA AgentToken input>" --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge
+dotnet user-secrets set "MT5_TERMINAL_BRIDGE_TOKEN" "<existing local bridge token>" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 ```
 
-Keep the existing bridge and agent tokens in User Secrets. The EA input
+The bridge token must also be available to the Bridge Host through its
+configured secret provider. The agent token must be present in the
+TerminalBridge configuration and must exactly match the EA input. Keep the
+values local and never paste them into the repository. The EA input
 `BridgeUrl` remains `https://localhost:5001`, and that URL must be present in
 the MT5 WebRequest allow-list. The Host targets the TerminalBridge endpoint;
 the TradeMind adapter targets the Bridge Host endpoint.
@@ -59,7 +76,7 @@ flags and run only the dedicated test:
 $env:MT5_REAL_TESTS = "true"
 $env:MT5_REAL_WRITE_TESTS = "true"
 $env:MT5_REAL_DEMO_CONFIRMATION = "I_CONFIRM_ONE_DEMO_ORDER"
-$env:MT5_BRIDGE_HOST_ENDPOINT = "https://localhost:7443"
+$env:MT5_BRIDGE_HOST_ENDPOINT = "https://localhost:65172"
 dotnet test .\tests\TradeMind.Brokers.MetaTrader5.Tests\TradeMind.Brokers.MetaTrader5.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~Opt_in_real_demo_order"
 ```
 
