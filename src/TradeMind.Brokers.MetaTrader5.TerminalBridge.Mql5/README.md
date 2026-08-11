@@ -7,7 +7,7 @@ the TradeMind .NET solution and never references Core projects.
 
 Configuration is supplied as EA inputs. The agent token must be entered from
 a local secret store and must never be committed. The terminal must allow
-`https://localhost:5001` in its WebRequest settings.
+`https://127.0.0.1:5001` in its WebRequest settings.
 
 The EA reports only a demo account. Sprint 32 adds one explicitly gated Demo
 write path: a single EURUSD market order at the broker-reported minimum

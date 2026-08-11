@@ -7,7 +7,7 @@ using TradeMind.Brokers.MetaTrader5.TerminalBridge.Security;
 using TradeMind.Brokers.MetaTrader5.TerminalBridge.Terminal;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("https://localhost:5001");
+builder.WebHost.UseUrls("https://127.0.0.1:5001");
 builder.WebHost.ConfigureKestrel(server => server.Limits.MaxRequestBodySize = 64 * 1024);
 builder.Services.AddOptions<TerminalBridgeOptions>()
     .Bind(builder.Configuration.GetSection(TerminalBridgeOptions.SectionName))

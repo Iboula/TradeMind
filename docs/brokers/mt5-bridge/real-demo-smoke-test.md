@@ -57,22 +57,14 @@ In MT5 open **Tools > Options > Expert Advisors**, enable **Allow WebRequest
 for listed URL**, add exactly:
 
 ```text
-https://localhost:5001
+https://127.0.0.1:5001
 ```
 
 Do not add a wildcard or an HTTP endpoint. Restart the terminal or reload the
 EA after changing this setting.
 
-On the current VT Markets terminal build, the URL editor rejects the
-`localhost` entry when the explicit port is present. In that environment add
-the loopback equivalent instead:
-
-```text
-https://127.0.0.1:5001
-```
-
-Set the EA `BridgeUrl` to the same accepted value. The bridge remains HTTPS
-and loopback-only; this is not a network exposure or a live-broker endpoint.
+Set the EA `BridgeUrl` to this exact value. The bridge remains HTTPS and
+loopback-only; this is not a network exposure or a live-broker endpoint.
 
 ## Start and verify the Bridge
 
@@ -85,11 +77,11 @@ $env:MT5_TERMINAL_AGENT_TOKEN = '<local secret, not committed>'
 dotnet run --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge -c Release --no-build
 ```
 
-The service listens on `https://localhost:5001`. Verify the unauthenticated
+The service listens on `https://127.0.0.1:5001`. Verify the unauthenticated
 health endpoint first:
 
 ```powershell
-Invoke-RestMethod https://localhost:5001/health
+Invoke-RestMethod https://127.0.0.1:5001/health
 ```
 
 Handshake and ping use the Host transport contract, including Bearer
@@ -102,14 +94,20 @@ client or its contract tests, not by copying a secret into a command line.
 In Navigator > Expert Advisors, attach `TradeMindTerminalBridge` to a demo
 chart. Set:
 
-- `BridgeUrl` to `https://localhost:5001`, or to `https://127.0.0.1:5001` when
-  the VT Markets URL editor rejects the explicit `localhost` port;
+- `BridgeUrl` to `https://127.0.0.1:5001`;
 - `AgentToken` to the local agent token through the EA input dialog;
 - `PollIntervalSeconds` to `1`.
 
 The Bridge health response must move from `not-ready` to `ready`. The agent
 poll establishes the terminal snapshot; the first handshake and ping then
 confirm protocol `1.0`, x64 architecture and demo environment.
+
+If the service log shows `401` for `POST /terminal/v1/agent/poll` while health
+continues to report `agentConnected=false`, the WebRequest route is working
+but the agent token is missing or does not match. Configure the
+`MT5_TERMINAL_AGENT_TOKEN` User Secret for the TerminalBridge project with the
+same local value entered in the EA `AgentToken` input, restart the service,
+and reload the EA. Never print or commit the value.
 
 ## Read-only checks
 

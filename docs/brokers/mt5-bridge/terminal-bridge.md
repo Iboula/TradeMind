@@ -21,7 +21,7 @@ The real read-only path additionally requires:
 
 - MetaTrader 5 x64 build within the configured support range;
 - the EA compiled in MetaEditor and attached to a chart;
-- `https://localhost:5001` allowed in MT5 WebRequest settings;
+- `https://127.0.0.1:5001` allowed in MT5 WebRequest settings;
 - a Demo account already authenticated by the terminal;
 - bridge and agent tokens supplied through local secrets or EA inputs.
 

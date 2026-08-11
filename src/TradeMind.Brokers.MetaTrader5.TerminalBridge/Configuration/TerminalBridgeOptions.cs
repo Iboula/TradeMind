@@ -8,7 +8,7 @@ public sealed class TerminalBridgeOptions
     public const string SectionName = "TradeMind:Brokers:MetaTrader5:TerminalBridge";
 
     public bool Enabled { get; set; } = true;
-    public string Urls { get; set; } = "https://localhost:5001";
+    public string Urls { get; set; } = "https://127.0.0.1:5001";
     public string ProtocolVersion { get; set; } = "1.0";
     public string TerminalVersion { get; set; } = "mql5-agent";
     public bool DemoOnly { get; set; } = true;

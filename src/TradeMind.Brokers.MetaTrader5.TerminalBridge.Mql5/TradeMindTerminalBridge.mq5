@@ -1,7 +1,7 @@
 #property strict
 #property version   "2.0"
 
-input string BridgeUrl = "https://localhost:5001";
+input string BridgeUrl = "https://127.0.0.1:5001";
 input string AgentToken = "";
 input int PollIntervalSeconds = 1;
 

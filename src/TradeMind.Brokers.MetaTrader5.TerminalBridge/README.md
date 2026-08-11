@@ -3,7 +3,7 @@
 This process is the external terminal-side HTTP bridge required by
 `HttpMT5TerminalTransport`. It is independent from the analytical Core,
 the Bridge Host and persistence. By default it binds to
-`https://localhost:5001` and accepts demo-only traffic.
+`https://127.0.0.1:5001` and accepts demo-only traffic.
 
 ## Real MT5 mechanism
 
