@@ -44,7 +44,7 @@ Start-Process $metaEditor -ArgumentList "/compile:$experts\TradeMindTerminalBrid
 The compiler result is recorded in:
 
 ```text
-%APPDATA%\MetaQuotes\Terminal\9BB124B7D418C7FB69DF2865535BA9BF\MQL5\Experts\TradeMindTerminalBridge.log
+%APPDATA%\MetaQuotes\Terminal\9BB124B7D418C7FB69DF2865535BA9BF\MQL5\Experts\compile.log
 ```
 
 The expected result is `0 errors, 0 warnings`, with the generated
@@ -74,11 +74,15 @@ from the local secret store or environment without echoing their values:
 ```powershell
 $env:MT5_TERMINAL_BRIDGE_TOKEN = '<local secret, not committed>'
 $env:MT5_TERMINAL_AGENT_TOKEN = '<local secret, not committed>'
+$env:ASPNETCORE_ENVIRONMENT = 'Development'
 dotnet run --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge -c Release --no-build
 ```
 
-The service listens on `https://127.0.0.1:5001`. Verify the unauthenticated
-health endpoint first:
+The service listens on `https://localhost:5001`; its local binding accepts the
+IPv4 loopback used by the EA. Use `https://127.0.0.1:5001` for the EA and
+WebRequest allow-list, and `https://localhost:5001` for the .NET Bridge Host
+because the development certificate is issued for `localhost`. Verify the
+unauthenticated health endpoint first:
 
 ```powershell
 Invoke-RestMethod https://127.0.0.1:5001/health

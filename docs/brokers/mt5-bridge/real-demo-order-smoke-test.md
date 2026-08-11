@@ -49,7 +49,7 @@ dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:DemoOnly" "tru
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:AllowLive" "false" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:RequireTls" "true" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalPath" "C:\Program Files\VT Markets (Pty) MT5 Terminal\terminal64.exe" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
-dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalBridgeEndpoint" "https://127.0.0.1:5001/" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
+dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalBridgeEndpoint" "https://localhost:5001/" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:TerminalBridgeTokenConfigurationKey" "MT5_TERMINAL_BRIDGE_TOKEN" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "TradeMind:Brokers:MetaTrader5:BridgeHost:EnableWriteTests" "true" --project .\src\TradeMind.Brokers.MetaTrader5.Bridge.Host
 dotnet user-secrets set "MT5_TERMINAL_BRIDGE_TOKEN" "<existing local bridge token>" --project .\src\TradeMind.Brokers.MetaTrader5.TerminalBridge
@@ -62,7 +62,9 @@ configured secret provider. The agent token must be present in the
 TerminalBridge configuration and must exactly match the EA input. Keep the
 values local and never paste them into the repository. The EA input
 `BridgeUrl` is `https://127.0.0.1:5001`, and that exact URL must be present in
-the MT5 WebRequest allow-list. The Host targets the TerminalBridge endpoint;
+the MT5 WebRequest allow-list. The Bridge Host targets
+`https://localhost:5001` because the local .NET development certificate is
+issued for `localhost`; both endpoints remain loopback-only.
 the TradeMind adapter targets the Bridge Host endpoint.
 
 ## Run the real test
