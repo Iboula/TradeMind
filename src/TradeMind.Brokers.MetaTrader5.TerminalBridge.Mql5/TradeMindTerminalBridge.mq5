@@ -119,9 +119,9 @@ void SubmitDemoMarketOrder(string commandId, string request)
    string side = JsonString(request, "side");
    string orderType = JsonString(request, "order_type");
    double volume = StringToDouble(JsonString(request, "quantity"));
-   if(symbol != "EURUSD" || (side != "Buy" && side != "Sell") || orderType != "Market")
+   if(StringLen(symbol) == 0 || (side != "Buy" && side != "Sell") || orderType != "Market")
      {
-      SendResult(commandId, false, "INVALID_REQUEST", "Only a EURUSD market order is supported", "{}");
+      SendResult(commandId, false, "INVALID_REQUEST", "Only a Demo market order with a valid instrument is supported", "{}");
       return;
      }
    if(!SymbolSelect(symbol, true) || !IsMinimumVolume(symbol, volume))

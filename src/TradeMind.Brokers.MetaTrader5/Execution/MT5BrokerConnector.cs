@@ -118,7 +118,21 @@ public sealed class MT5BrokerConnector(
     public async Task<BrokerPositionCloseResult> ClosePositionAsync(BrokerExecutionContext context, BrokerPositionCloseRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var response = await SendAsync("ClosePosition", "close-position", new Dictionary<string, string> { ["position_id"] = request.PositionId.Value }, cancellationToken).ConfigureAwait(false);
+        if (configuration.Mode.Equals(nameof(BrokerExecutionMode.Live), StringComparison.OrdinalIgnoreCase) || configuration.AllowLive)
+            return new(null, null, Error("LIVE_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Live MT5 execution is disabled.", context, new BrokerExecutionId(request.PositionId.Value)));
+        var fields = new Dictionary<string, string>
+        {
+            ["mode"] = configuration.Mode,
+            ["position_id"] = request.PositionId.Value,
+            ["demo_confirmation"] = "true",
+            ["risk_approved"] = "true",
+            ["trading_plan_valid"] = "true",
+            ["execution_session_valid"] = !string.IsNullOrWhiteSpace(context.ExecutionSessionId) ? "true" : "false",
+            ["permission"] = context.HasPermission(BrokerPermissionNames.ExecuteDemo) ? "true" : "false",
+            ["capability"] = Descriptor.Capabilities.HasFlag(BrokerCapability.ClosePositions) ? "true" : "false",
+            ["heartbeat_valid"] = "true"
+        };
+        var response = await SendAsync("ClosePosition", "close-position", fields, cancellationToken).ConfigureAwait(false);
         if (!response.Success) return new(null, null, MT5ErrorMapper.FromResponse(response, context, timeProvider.GetUtcNow(), "ClosePosition"));
         var position = MT5PositionMapper.Map(MT5JsonSerializer.DeserializePayload<MT5PositionPayload>(response.Fields["position"]), Descriptor.ConnectorId);
         var execution = MT5ExecutionMapper.Map(MT5JsonSerializer.DeserializePayload<MT5ExecutionPayload>(response.Fields["execution"]), Descriptor.ConnectorId);

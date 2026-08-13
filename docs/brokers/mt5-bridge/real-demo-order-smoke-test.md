@@ -1,9 +1,11 @@
 # MT5 real Demo order smoke test
 
 This runbook describes the only supported write path in Sprint 32. It submits
-one EURUSD market order at the broker-reported minimum volume through the
-TradeMind broker connector, verifies the resulting order, deal and position,
-then closes the position and verifies that no position remains.
+one market order for the locally selected `MT5_REAL_TEST_SYMBOL` at the
+broker-reported minimum volume through the TradeMind broker connector,
+verifies the resulting order, deal and position, then closes the position and
+verifies that no position remains. The validated local symbol is
+`XAUUSD-VIP`; the test never falls back to `EURUSD`.
 
 The path is deliberately Demo-only. `AllowLive` remains `false` in the
 TerminalBridge, Bridge Host, bridge client and MT5 adapter. No pending order,
@@ -26,7 +28,8 @@ The following must all be true before the test is allowed to write:
 - `MT5_BRIDGE_HOST_ENDPOINT` points to the local Bridge Host, normally
   `https://localhost:65172` when using the preserved Development launch
   profile;
-- the EURUSD account has no open order and no open position before the test;
+- `MT5_REAL_TEST_SYMBOL=XAUUSD-VIP`;
+- the selected symbol has no open position or pending order before the test;
 - the operator has explicitly confirmed that one Demo order may be sent.
 
 The confirmation value is a local runtime guard, not a secret. Do not put it
@@ -78,14 +81,17 @@ flags and run only the dedicated test:
 $env:MT5_REAL_TESTS = "true"
 $env:MT5_REAL_WRITE_TESTS = "true"
 $env:MT5_REAL_DEMO_CONFIRMATION = "I_CONFIRM_ONE_DEMO_ORDER"
+$env:MT5_REAL_TEST_SYMBOL = "XAUUSD-VIP"
 $env:MT5_BRIDGE_HOST_ENDPOINT = "https://localhost:65172"
 dotnet test .\tests\TradeMind.Brokers.MetaTrader5.Tests\TradeMind.Brokers.MetaTrader5.Tests.csproj -c Release --no-build --filter "FullyQualifiedName~Opt_in_real_demo_order"
 ```
 
-The test reads the account and EURUSD instrument before submitting. It uses
-the instrument's `MinimumQuantity`, sends a single market order, checks a
-filled order and execution, checks one position, closes that position, and
-finally reads positions again. A cleanup failure is a critical incident:
+The test reads the account and selected instrument before submitting. It
+verifies the broker-reported trading specification and free margin, uses the
+instrument's `MinimumQuantity`, sends a single market order, checks a filled
+order and execution, verifies idempotent replay and conflict handling without
+a second external order, closes that position, and finally reads positions
+and pending orders again. A cleanup failure is a critical incident:
 stop further execution, preserve the safe error code, and resolve the
 remaining Demo position manually before rerunning anything.
 
@@ -93,7 +99,7 @@ The test is a no-op when either real-test flag or the exact confirmation is
 missing. It must never be enabled in GitHub Actions or a normal full-suite
 run. `AllowLive=true`, a Live account, a read-only account, a missing
 heartbeat, missing plan/risk/session/permission/capability guards, a non-market
-order, a non-EURUSD symbol, or a non-minimum volume is rejected before the EA
+order, an empty symbol, or a non-minimum volume is rejected before the EA
 receives a write command.
 
 ## Error interpretation
