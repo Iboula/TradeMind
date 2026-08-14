@@ -118,8 +118,8 @@ public sealed class MT5BrokerConnector(
     public async Task<BrokerPositionCloseResult> ClosePositionAsync(BrokerExecutionContext context, BrokerPositionCloseRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        if (configuration.Mode.Equals(nameof(BrokerExecutionMode.Live), StringComparison.OrdinalIgnoreCase) || configuration.AllowLive)
-            return new(null, null, Error("LIVE_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Live MT5 execution is disabled.", context, new BrokerExecutionId(request.PositionId.Value)));
+        var guardError = ValidateCloseGuards(context, request);
+        if (guardError is not null) return new(null, null, guardError);
         var fields = new Dictionary<string, string>
         {
             ["mode"] = configuration.Mode,
@@ -137,6 +137,41 @@ public sealed class MT5BrokerConnector(
         var position = MT5PositionMapper.Map(MT5JsonSerializer.DeserializePayload<MT5PositionPayload>(response.Fields["position"]), Descriptor.ConnectorId);
         var execution = MT5ExecutionMapper.Map(MT5JsonSerializer.DeserializePayload<MT5ExecutionPayload>(response.Fields["execution"]), Descriptor.ConnectorId);
         return new(position, execution, null);
+    }
+
+    private BrokerError? ValidateCloseGuards(BrokerExecutionContext context, BrokerPositionCloseRequest request)
+    {
+        var executionId = new BrokerExecutionId(request.PositionId.Value);
+        if (configuration.Mode.Equals(nameof(BrokerExecutionMode.Live), StringComparison.OrdinalIgnoreCase) || configuration.AllowLive)
+            return Error("LIVE_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Live MT5 execution is disabled.", context, executionId);
+        if (!configuration.Mode.Equals(nameof(BrokerExecutionMode.Demo), StringComparison.OrdinalIgnoreCase)
+            && !configuration.Mode.Equals(nameof(BrokerExecutionMode.Simulation), StringComparison.OrdinalIgnoreCase))
+            return Error("DEMO_EXECUTION_REQUIRED", BrokerErrorCategory.Authorization, "A Demo or Simulation execution mode is required.", context, executionId);
+        if (configuration.Mode.Equals(nameof(BrokerExecutionMode.Demo), StringComparison.OrdinalIgnoreCase) && !configuration.AllowDemo)
+            return Error("DEMO_DISABLED", BrokerErrorCategory.Authorization, "Demo execution is disabled.", context, executionId);
+        if (string.IsNullOrWhiteSpace(context.ConfirmationToken))
+            return Error("DEMO_CONFIRMATION_REQUIRED", BrokerErrorCategory.Authorization, "Explicit Demo confirmation is required.", context, executionId);
+        if (string.IsNullOrWhiteSpace(context.ExecutionSessionId))
+            return Error("EXECUTION_SESSION_REQUIRED", BrokerErrorCategory.Validation, "A valid execution session is required.", context, executionId);
+        var permission = configuration.Mode.Equals(nameof(BrokerExecutionMode.Demo), StringComparison.OrdinalIgnoreCase)
+            ? BrokerPermissionNames.ExecuteDemo
+            : BrokerPermissionNames.ExecuteSimulation;
+        if (!context.HasPermission(permission))
+            return Error("FORBIDDEN", BrokerErrorCategory.Authorization, "The execution permission is missing.", context, executionId);
+        if (!Descriptor.Capabilities.HasFlag(BrokerCapability.ClosePositions))
+            return Error("UNSUPPORTED_CAPABILITY", BrokerErrorCategory.UnsupportedCapability, "Position closing is not supported.", context, executionId);
+        var snapshot = connection.Snapshot;
+        if (snapshot.ConnectionState != MT5ConnectionState.Connected)
+            return Error("TERMINAL_UNAVAILABLE", BrokerErrorCategory.ConnectorUnavailable, "The MT5 connection is not ready.", context, executionId);
+        var expectedEnvironment = configuration.Mode.Equals(nameof(BrokerExecutionMode.Demo), StringComparison.OrdinalIgnoreCase) ? "Demo" : "Simulation";
+        if (!snapshot.AccountEnvironment.Equals(expectedEnvironment, StringComparison.OrdinalIgnoreCase) || snapshot.ReadOnly || !snapshot.TradingEnabled)
+            return Error("DEMO_EXECUTION_REQUIRED", BrokerErrorCategory.Authorization, "The connected account is not an eligible writable Demo account.", context, executionId);
+        if (!snapshot.Heartbeat || snapshot.LastHeartbeat is null)
+            return Error("HEARTBEAT_INVALID", BrokerErrorCategory.ConnectorUnavailable, "A recent MT5 heartbeat is required.", context, executionId);
+        var heartbeatAge = timeProvider.GetUtcNow() - snapshot.LastHeartbeat.Value;
+        if (heartbeatAge < TimeSpan.Zero || heartbeatAge > TimeSpan.FromSeconds(Math.Max(1, configuration.HeartbeatSeconds * 2)))
+            return Error("HEARTBEAT_INVALID", BrokerErrorCategory.ConnectorUnavailable, "The MT5 heartbeat is stale.", context, executionId);
+        return null;
     }
 
     public async Task<IReadOnlyList<BrokerOrder>> GetOrdersAsync(BrokerExecutionContext context, BrokerOrderQuery query, CancellationToken cancellationToken)

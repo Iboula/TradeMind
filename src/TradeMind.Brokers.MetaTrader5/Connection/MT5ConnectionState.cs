@@ -20,4 +20,7 @@ public sealed record MT5ConnectionSnapshot(
     int ReconnectCount,
     MT5ConnectionState ConnectionState,
     DateTimeOffset? LastHeartbeat,
-    DateTimeOffset? LastReconnect);
+    DateTimeOffset? LastReconnect,
+    string AccountEnvironment = "Unknown",
+    bool TradingEnabled = false,
+    bool ReadOnly = true);

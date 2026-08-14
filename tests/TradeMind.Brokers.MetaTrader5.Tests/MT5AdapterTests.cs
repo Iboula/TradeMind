@@ -122,6 +122,7 @@ public sealed class MT5AdapterTests
         var modified = await connector.ModifyOrderAsync(context, new BrokerOrderModificationRequest(submission.Order!.OrderId, 2m, 1.08m, null, null), CancellationToken.None);
         var cancelled = await connector.CancelOrderAsync(context, new BrokerOrderCancellationRequest(modified.Order!.OrderId, "test"), CancellationToken.None);
         var market = await connector.SubmitOrderAsync(context, Request(connector.Descriptor.ConnectorId, BrokerOrderType.Market, "client-close"), CancellationToken.None);
+        await connector.GetHealthAsync(context, CancellationToken.None);
         var closed = await connector.ClosePositionAsync(context, new BrokerPositionCloseRequest(market.Execution!.PositionId!, null), CancellationToken.None);
 
         Assert.Null(modified.Error);
@@ -142,9 +143,10 @@ public sealed class MT5AdapterTests
         await using var connector = new MT5BrokerConnector(
             Options.Create(options), connectionFactory, protocol, new MT5HealthService(heartbeat), new MT5ReconnectPolicy(options), new MT5RetryPolicy(options),
             new RecordingTelemetry(), new RecordingMetrics(), TimeProvider.System, NullLogger<MT5BrokerConnector>.Instance);
+        await connector.GetHealthAsync(new BrokerExecutionContext(true, "actor-1", "User", "tenant-1", "org-1", [BrokerPermissionNames.ExecuteDemo], "session-1", "corr-1", "demo-confirmation"), CancellationToken.None);
 
         var result = await connector.ClosePositionAsync(
-            new BrokerExecutionContext(true, "actor-1", "User", "tenant-1", "org-1", [BrokerPermissionNames.ExecuteDemo], "session-1", "corr-1"),
+            new BrokerExecutionContext(true, "actor-1", "User", "tenant-1", "org-1", [BrokerPermissionNames.ExecuteDemo], "session-1", "corr-1", "demo-confirmation"),
             new BrokerPositionCloseRequest(new BrokerPositionId("position-1"), null), CancellationToken.None);
 
         Assert.Null(result.Error);
@@ -203,7 +205,7 @@ public sealed class MT5AdapterTests
         var connector = provider.GetRequiredService<IBrokerConnector>();
         var executionService = provider.GetRequiredService<IBrokerExecutionService>();
         var executionSessionId = "demo-session-" + Guid.NewGuid().ToString("N");
-        var context = new BrokerExecutionContext(true, "demo-smoke-test", "Test", "demo-tenant", "demo-org", [BrokerPermissionNames.ExecuteDemo], executionSessionId, "demo-correlation");
+        var context = new BrokerExecutionContext(true, "demo-smoke-test", "Test", "demo-tenant", "demo-org", [BrokerPermissionNames.ExecuteDemo], executionSessionId, "demo-correlation", Environment.GetEnvironmentVariable("MT5_REAL_DEMO_CONFIRMATION"));
 
         var health = await connector.GetHealthAsync(context, CancellationToken.None);
         Assert.Equal(BrokerHealthStatus.Healthy, health.Health.Status);
@@ -452,7 +454,7 @@ public sealed class MT5AdapterTests
         return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 
-    private static BrokerExecutionContext Context() => new(true, "actor-1", "User", "tenant-1", "org-1", [], "session-1", "corr-1");
+    private static BrokerExecutionContext Context() => new(true, "actor-1", "User", "tenant-1", "org-1", [BrokerPermissionNames.ExecuteSimulation], "session-1", "corr-1", "simulation-confirmation");
 
     private static BrokerOrderRequest Request(BrokerConnectorId connectorId, BrokerOrderType orderType, string clientOrderId, decimal? requestedPrice = null) =>
         new(new("execution-" + clientOrderId), "session-1", connectorId, new("mt5-demo-account"), clientOrderId, "EURUSD", BrokerOrderSide.Buy,
@@ -460,6 +462,7 @@ public sealed class MT5AdapterTests
 
     private sealed class TestBridge : IMT5Bridge
     {
+        private readonly TaskCompletionSource<bool> openRelease = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public bool FailFirstOpen { get; init; }
         public bool BlockOpen { get; init; }
         public int OpenCalls { get; private set; }
@@ -469,7 +472,7 @@ public sealed class MT5AdapterTests
         {
             OpenCalls++;
             if (FailFirstOpen && OpenCalls == 1) throw new InvalidOperationException("first connection failed");
-            if (BlockOpen) await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            if (BlockOpen) await openRelease.Task.WaitAsync(cancellationToken);
         }
 
         public Task AuthenticateAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -484,6 +487,7 @@ public sealed class MT5AdapterTests
         public Task<MT5Response> ExecuteAsync(IMT5Connection connection, MT5Request request, CancellationToken cancellationToken)
         {
             Request = request;
+            if (request.Command == "heartbeat") return Task.FromResult(new MT5Response(true, "HEARTBEAT", "Heartbeat acknowledged"));
             const string position = "{\"positionId\":\"position-1\",\"accountId\":\"account-1\",\"instrument\":\"XAUUSD-VIP\",\"side\":\"Buy\",\"quantity\":1,\"averagePrice\":2000,\"openedAtUtc\":\"2026-08-13T22:00:00Z\",\"updatedAtUtc\":\"2026-08-13T22:00:00Z\"}";
             const string execution = "{\"executionId\":\"execution-1\",\"orderId\":\"order-1\",\"accountId\":\"account-1\",\"status\":\"Filled\",\"filledQuantity\":1,\"averagePrice\":2000,\"occurredAtUtc\":\"2026-08-13T22:00:01Z\",\"positionId\":\"position-1\"}";
             return Task.FromResult(new MT5Response(true, "POSITION_CLOSED", "Position closed", new Dictionary<string, string> { ["position"] = position, ["execution"] = execution }));
