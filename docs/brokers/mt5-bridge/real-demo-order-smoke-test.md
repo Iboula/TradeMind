@@ -119,3 +119,60 @@ Use MT5 manually to confirm the Demo position state, then close it through the
 approved Demo-only path. Keep only redacted status codes, counts and UTC
 timestamps in the report. Never commit the generated `.ex5`, terminal logs,
 tokens or account details.
+
+## Emergency procedure
+
+This procedure applies when a Demo order was accepted but the expected cleanup
+or reconciliation result is missing. It is intentionally operator-led and does
+not attempt automatic position closure.
+
+1. Stop all further execution immediately. Do not rerun the test, resubmit the
+   order, or start another write-capable process.
+2. Preserve the original error code, correlation identifier, execution session
+   identifier and UTC timestamps. Redact credentials, server names, account
+   numbers, tokens and raw terminal packets.
+3. Inspect the Demo terminal manually in read-only mode and determine whether
+   the order, deal or position still exists. Record only the classification and
+   count in the incident evidence.
+4. Keep the broker safety state blocked when a cleanup failure or unknown
+   position is reported. Restore it only after an operator has reconciled the
+   terminal state and confirmed that no residual position or pending order is
+   present.
+5. Close a residual Demo position manually through the approved Demo-only
+   procedure, then repeat the read-only orders and positions checks. Do not
+   enable Live mode as a recovery measure.
+
+The lifecycle service preserves the original reconciliation failure. A cleanup
+failure is critical, blocks subsequent writes, emits bounded telemetry and
+requires explicit operator review. Orphan detection is read-only and
+classifies positions as `Known`, `Orphaned`, `Unreconciled`, `Stale` or
+`UnknownExternal`; it never auto-closes a position.
+
+### A. Position remains open
+
+Disable further writes, inspect the Demo terminal manually, close the position
+manually if required, verify that the position disappears from a read-only
+positions query, and record the incident using redacted evidence.
+
+### B. Heartbeat lost
+
+Stop execution and keep only safe reads where available. Restart the EA or the
+bridge, verify a fresh heartbeat, and reconcile orders and positions before
+resuming any Demo write.
+
+### C. TerminalBridge unavailable
+
+Do not retry `SubmitOrder` blindly. Wait for the bridge to recover, query by
+client order identifier, reconcile the terminal state, and only then decide
+whether the original request is already complete.
+
+### D. Cleanup failure
+
+Treat the result as critical, preserve the original failure, block subsequent
+writes, and follow the manual intervention procedure in this section. Resume
+only after the residual position and pending-order checks are clear.
+
+### E. Unknown external position
+
+Never auto-close it. Mark it `UnknownExternal` or `Unreconciled`, keep writes
+blocked, and require explicit operator review before any manual Demo action.
