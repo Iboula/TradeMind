@@ -1,5 +1,7 @@
 # Architecture Decision Records
 
+ADR-0022 documents the independent Live Trading Safety Gate, scoped kill switches, risk guards, execution quarantine, read-only recovery, PostgreSQL distributed locking and the fail-closed production-readiness posture.
+
 TradeMind uses Architecture Decision Records to capture decisions that shape the system over time.
 
 An ADR should be added or updated when a decision affects architecture, persistence, module boundaries, deployment, security, or provider strategy. ADRs are not task notes; they explain durable choices and their consequences.
