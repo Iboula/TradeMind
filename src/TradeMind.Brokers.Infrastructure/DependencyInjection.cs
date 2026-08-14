@@ -24,6 +24,7 @@ public static class BrokersInfrastructureDependencyInjection
         services.AddSingleton<InMemoryBrokerConnector>();
         services.AddSingleton<IBrokerConnector>(provider => provider.GetRequiredService<InMemoryBrokerConnector>());
         services.AddSingleton<IBrokerReconciliationService, BrokerReconciliationService>();
+        services.AddSingleton<IBrokerOrphanPositionDetector, BrokerOrphanPositionDetector>();
         services.AddHealthChecks().AddCheck<BrokerConnectorHealthCheck>("broker-connectors", tags: ["ready"]);
 
         var persistence = configuration.GetSection("TradeMind:Brokers:Persistence").Get<BrokerPersistenceOptions>();

@@ -3,7 +3,10 @@ using TradeMind.Brokers.Application.Abstractions;
 
 namespace TradeMind.Brokers.Infrastructure.Health;
 
-public sealed class BrokerConnectorHealthCheck(IBrokerConnectorRegistry registry) : IHealthCheck
+public sealed class BrokerConnectorHealthCheck(
+    IBrokerConnectorRegistry registry,
+    IBrokerOrphanPositionDetector? orphanPositionDetector = null,
+    IBrokerExecutionSafetyState? safetyState = null) : IHealthCheck
 {
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
@@ -25,6 +28,33 @@ public sealed class BrokerConnectorHealthCheck(IBrokerConnectorRegistry registry
                 TradeMind.Brokers.Domain.BrokerHealthStatus.Degraded => HealthCheckResult.Degraded(health.Health.Message),
                 _ => HealthCheckResult.Unhealthy(health.Health.Message)
             });
+
+            if (orphanPositionDetector is not null && safetyState is not null)
+            {
+                try
+                {
+                    var readContext = new TradeMind.Brokers.Domain.BrokerExecutionContext(false, null, null, null, null, [], null, null);
+                    var accounts = await connector.GetAccountsAsync(readContext, cancellationToken).ConfigureAwait(false);
+                    foreach (var account in accounts)
+                    {
+                        var report = await orphanPositionDetector.DetectAsync(readContext, descriptor.ConnectorId, account.AccountId, [], cancellationToken).ConfigureAwait(false);
+                        if (report.HasUnsafePositions)
+                        {
+                            safetyState.Block("BROKER_POSITION_REVIEW_REQUIRED", "Broker positions require explicit reconciliation before new writes.");
+                            results.Add(HealthCheckResult.Unhealthy("Broker positions require explicit operator review."));
+                        }
+                    }
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch
+                {
+                    safetyState.MarkDegraded("BROKER_POSITION_CHECK_FAILED", "Broker position readiness could not be verified.");
+                    results.Add(HealthCheckResult.Degraded("Broker position readiness could not be verified."));
+                }
+            }
         }
 
         if (results.Any(item => item.Status == HealthStatus.Unhealthy)) return HealthCheckResult.Unhealthy("A configured broker connector is unhealthy.");
