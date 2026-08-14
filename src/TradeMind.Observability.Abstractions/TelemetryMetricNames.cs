@@ -45,6 +45,16 @@ public static class TelemetryMetricNames
     public const string BrokerOrphanPositionsDetected = "trademind.brokers.orphan_positions_detected";
     public const string BrokerExecutionBlocked = "trademind.brokers.execution_blocked";
     public const string BrokerCleanupFailures = "trademind.brokers.cleanup_failures";
+    public const string LiveGateDenied = "trademind.brokers.live_gate_denied";
+    public const string LiveGateBlocked = "trademind.brokers.live_gate_blocked";
+    public const string EmergencyStops = "trademind.brokers.emergency_stops";
+    public const string QuarantinedExecutions = "trademind.brokers.quarantined_executions";
+    public const string RecoveryRuns = "trademind.brokers.recovery_runs";
+    public const string RecoveryMismatches = "trademind.brokers.recovery_mismatches";
+    public const string OrphanPositions = "trademind.brokers.orphan_positions";
+    public const string DistributedLockConflicts = "trademind.brokers.distributed_lock_conflicts";
+    public const string ExecutionUnknown = "trademind.brokers.execution_unknown";
+    public const string RiskGuardRejections = "trademind.brokers.risk_guard_rejections";
     public const string Mt5Connections = "trademind.mt5.connections";
     public const string Mt5Reconnects = "trademind.mt5.reconnects";
     public const string Mt5Latency = "trademind.mt5.latency";

@@ -17,7 +17,8 @@ public enum BrokerExecutionResultStatus
     Rejected,
     Failed,
     Conflict,
-    InProgress
+    InProgress,
+    ExecutionUnknown
 }
 
 public sealed record BrokerExecutionResult(

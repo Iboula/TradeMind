@@ -15,4 +15,10 @@ public interface IBrokerIdempotencyStore
         string requestHash,
         Func<CancellationToken, Task<BrokerExecutionResult>> operation,
         CancellationToken cancellationToken);
+
+    Task MarkExecutionUnknownAsync(
+        string key,
+        string requestHash,
+        BrokerExecutionResult result,
+        CancellationToken cancellationToken);
 }

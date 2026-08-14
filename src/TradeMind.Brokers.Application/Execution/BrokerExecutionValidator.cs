@@ -3,6 +3,7 @@ using TradeMind.AI.RiskEngine.Domain;
 using TradeMind.AI.TradingPlans.Domain;
 using TradeMind.Brokers.Application.Abstractions;
 using TradeMind.Brokers.Application.Options;
+using TradeMind.Brokers.Application.LiveSafety;
 using TradeMind.Brokers.Domain;
 
 namespace TradeMind.Brokers.Application.Execution;
@@ -10,7 +11,8 @@ namespace TradeMind.Brokers.Application.Execution;
 public sealed class BrokerExecutionValidator(
     IBrokerAuthorizationPolicy authorizationPolicy,
     IBrokerClock clock,
-    IOptions<BrokerOptions> options)
+    IOptions<BrokerOptions> options,
+    ILiveTradingSafetyGate? liveSafetyGate = null)
 {
     public async Task<BrokerEligibilityResult> ValidateAsync(
         BrokerExecutionContext context,
@@ -67,6 +69,44 @@ public sealed class BrokerExecutionValidator(
         if (!connector.Descriptor.Capabilities.HasFlag(capability)) return Reject("UNSUPPORTED_CAPABILITY", BrokerErrorCategory.UnsupportedCapability, "The connector does not support this order operation.", context, request);
         if (request.StopLoss is not null && !connector.Descriptor.Capabilities.HasFlag(BrokerCapability.StopLoss)) return Reject("STOP_LOSS_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Stop loss is not supported.", context, request);
         if (request.TakeProfits.Count > 0 && !connector.Descriptor.Capabilities.HasFlag(BrokerCapability.TakeProfit)) return Reject("TAKE_PROFIT_UNSUPPORTED", BrokerErrorCategory.UnsupportedCapability, "Take profit is not supported.", context, request);
+
+        if (command.RequestedMode == BrokerExecutionMode.Live && liveSafetyGate is not null)
+        {
+            var liveDecision = await liveSafetyGate.EvaluateAsync(new LiveTradingSafetyRequest(
+                context.TenantId!,
+                connector.Descriptor.ConnectorId.Value,
+                account.AccountId.Value,
+                request.Instrument,
+                request.ExecutionSessionId,
+                allowLive: true,
+                liveSafetyEnabled: true,
+                account.Environment,
+                connector.Descriptor.SupportsLive,
+                account.Environment == BrokerEnvironment.Production,
+                tenantAuthorized: true,
+                actorAuthorized: context.HasPermission(BrokerPermissionNames.ExecuteLive),
+                command.RiskAssessment?.Status is RiskAssessmentStatus.Succeeded or RiskAssessmentStatus.PartiallySucceeded && command.RiskAssessment.Verdict is RiskVerdict.Approved or RiskVerdict.Reduced,
+                command.TradingPlan?.Status is TradingPlanStatus.Succeeded or TradingPlanStatus.PartiallySucceeded && command.TradingPlan.Type == TradingPlanType.ExecutableCandidate,
+                workspaceClear: false,
+                reconciliationClean: false,
+                hasOrphanPositions: true,
+                heartbeatFresh: false,
+                brokerHealthy: false,
+                idempotencyAvailable: true,
+                distributedLockAvailable: false,
+                operatorConfirmed: !string.IsNullOrWhiteSpace(context.ConfirmationToken),
+                activationWindowValid: false,
+                killSwitchDisabled: true,
+                dualConfirmationComplete: false,
+                drawdownWithinLimit: false,
+                exposureWithinLimit: false,
+                configurationEnvironment: "Production"), cancellationToken).ConfigureAwait(false);
+            if (!liveDecision.IsAllowed)
+            {
+                var cause = liveDecision.Causes.FirstOrDefault();
+                return Reject(cause?.Code ?? "LIVE_SAFETY_BLOCKED", BrokerErrorCategory.Authorization, cause?.Message ?? "Live execution is blocked by the independent safety gate.", context, request);
+            }
+        }
 
         return BrokerEligibilityResult.Success();
     }

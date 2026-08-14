@@ -13,6 +13,9 @@ public sealed class BrokerDbContext(DbContextOptions<BrokerDbContext> options) :
     public DbSet<BrokerAuditEntity> Audit => Set<BrokerAuditEntity>();
     public DbSet<BrokerReconciliationEntity> Reconciliations => Set<BrokerReconciliationEntity>();
     public DbSet<BrokerReconciliationMismatchEntity> ReconciliationMismatches => Set<BrokerReconciliationMismatchEntity>();
+    public DbSet<BrokerKillSwitchEntity> KillSwitches => Set<BrokerKillSwitchEntity>();
+    public DbSet<BrokerExecutionQuarantineEntity> ExecutionQuarantines => Set<BrokerExecutionQuarantineEntity>();
+    public DbSet<BrokerPositionOwnershipEntity> PositionOwnership => Set<BrokerPositionOwnershipEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -141,6 +144,54 @@ public sealed class BrokerDbContext(DbContextOptions<BrokerDbContext> options) :
             entity.Property(item => item.Reference).HasColumnName("reference").HasMaxLength(256).IsRequired();
             entity.Property(item => item.Description).HasColumnName("description").HasMaxLength(512).IsRequired();
             entity.HasIndex(item => item.ReconciliationId).HasDatabaseName("ix_broker_reconciliation_items_run");
+        });
+        modelBuilder.Entity<BrokerKillSwitchEntity>(entity =>
+        {
+            entity.ToTable("broker_kill_switches");
+            entity.HasKey(item => item.Key).HasName("pk_broker_kill_switches");
+            entity.Property(item => item.Key).HasColumnName("key").HasMaxLength(320);
+            entity.Property(item => item.Scope).HasColumnName("scope").HasMaxLength(32).IsRequired();
+            entity.Property(item => item.Value).HasColumnName("value").HasMaxLength(256).IsRequired();
+            entity.Property(item => item.State).HasColumnName("state").HasMaxLength(32).IsRequired();
+            entity.Property(item => item.ChangedBy).HasColumnName("changed_by").HasMaxLength(128);
+            entity.Property(item => item.ChangedAtUtc).HasColumnName("changed_at_utc");
+            entity.Property(item => item.Reason).HasColumnName("reason").HasMaxLength(512).IsRequired();
+            entity.HasIndex(item => new { item.Scope, item.Value }).IsUnique().HasDatabaseName("ux_broker_kill_switch_scope_value");
+        });
+        modelBuilder.Entity<BrokerExecutionQuarantineEntity>(entity =>
+        {
+            entity.ToTable("broker_execution_quarantine");
+            entity.HasKey(item => item.ExecutionId).HasName("pk_broker_execution_quarantine");
+            entity.Property(item => item.ExecutionId).HasColumnName("execution_id").HasMaxLength(128);
+            entity.Property(item => item.TenantId).HasColumnName("tenant_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.BrokerId).HasColumnName("broker_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.AccountId).HasColumnName("account_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.Instrument).HasColumnName("instrument").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.Reason).HasColumnName("reason").HasMaxLength(64).IsRequired();
+            entity.Property(item => item.State).HasColumnName("state").HasMaxLength(32).IsRequired();
+            entity.Property(item => item.ChangedAtUtc).HasColumnName("changed_at_utc");
+            entity.Property(item => item.ChangedBy).HasColumnName("changed_by").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.Explanation).HasColumnName("explanation").HasMaxLength(512).IsRequired();
+            entity.HasIndex(item => new { item.TenantId, item.State }).HasDatabaseName("ix_broker_quarantine_tenant_state");
+        });
+        modelBuilder.Entity<BrokerPositionOwnershipEntity>(entity =>
+        {
+            entity.ToTable("broker_position_ownership");
+            entity.HasKey(item => item.PositionId).HasName("pk_broker_position_ownership");
+            entity.Property(item => item.PositionId).HasColumnName("position_id").HasMaxLength(128);
+            entity.Property(item => item.ExecutionSessionId).HasColumnName("execution_session_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.BrokerExecutionId).HasColumnName("broker_execution_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.TradingPlanId).HasColumnName("trading_plan_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.RiskAssessmentId).HasColumnName("risk_assessment_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.TenantId).HasColumnName("tenant_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.BrokerAccountId).HasColumnName("broker_account_id").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.Symbol).HasColumnName("symbol").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.Direction).HasColumnName("direction").HasMaxLength(16).IsRequired();
+            entity.Property(item => item.OpenedAtUtc).HasColumnName("opened_at_utc");
+            entity.Property(item => item.Source).HasColumnName("source").HasMaxLength(128).IsRequired();
+            entity.Property(item => item.ReconciliationState).HasColumnName("reconciliation_state").HasMaxLength(64).IsRequired();
+            entity.Property(item => item.ConcurrencyVersion).HasColumnName("concurrency_version").IsConcurrencyToken();
+            entity.HasIndex(item => new { item.TenantId, item.BrokerAccountId, item.Symbol }).HasDatabaseName("ix_broker_position_ownership_tenant_account_symbol");
         });
     }
 }
