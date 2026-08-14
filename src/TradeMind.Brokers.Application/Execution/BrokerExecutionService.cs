@@ -77,10 +77,12 @@ public sealed class BrokerExecutionService(
                 return recovered;
             }
 
-            var timeout = Rejected(request, Error(request, BrokerErrorCategory.Timeout, "The broker operation timed out and requires reconciliation.", true, true));
-            await executionRecordWriter.WriteAsync(command, timeout with { Status = BrokerExecutionResultStatus.Failed }, CancellationToken.None).ConfigureAwait(false);
+            var timeout = Rejected(request, Error(request, BrokerErrorCategory.Timeout, "The broker operation timed out and its outcome is unknown; reconciliation is required and no retry is permitted.", true, true)) with { Status = BrokerExecutionResultStatus.ExecutionUnknown };
+            await idempotencyStore.MarkExecutionUnknownAsync(idempotencyKey, requestHash, timeout, CancellationToken.None).ConfigureAwait(false);
+            metrics.IncrementCounter(TelemetryMetricNames.ExecutionUnknown, 1, Dimensions("ExecutionUnknown"));
+            await executionRecordWriter.WriteAsync(command, timeout, CancellationToken.None).ConfigureAwait(false);
             await WriteAuditAsync(context, request, command.RequestedMode, timeout, CancellationToken.None).ConfigureAwait(false);
-            return timeout with { Status = BrokerExecutionResultStatus.Failed };
+            return timeout;
         }
         finally
         {

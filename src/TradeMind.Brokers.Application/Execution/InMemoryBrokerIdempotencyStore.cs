@@ -56,5 +56,17 @@ public sealed class InMemoryBrokerIdempotencyStore : IBrokerIdempotencyStore
         }
     }
 
+    public Task MarkExecutionUnknownAsync(string key, string requestHash, BrokerExecutionResult result, CancellationToken cancellationToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestHash);
+        ArgumentNullException.ThrowIfNull(result);
+        cancellationToken.ThrowIfCancellationRequested();
+        var entry = _entries.GetOrAdd(key, _ => new Entry(requestHash));
+        if (!string.Equals(entry.RequestHash, requestHash, StringComparison.Ordinal)) return Task.CompletedTask;
+        entry.Completion.TrySetResult(result with { Status = BrokerExecutionResultStatus.ExecutionUnknown });
+        return Task.CompletedTask;
+    }
+
     private static BrokerExecutionResult Conflict() => new(new BrokerExecutionId("idempotency-conflict"), BrokerExecutionResultStatus.Conflict, null, null, new BrokerError("IDEMPOTENCY_CONFLICT", BrokerErrorCategory.Conflict, "The idempotency key is associated with a different request.", false, false, null, new BrokerTraceReference(null, null, null), DateTimeOffset.UnixEpoch), "SubmitOrder", DateTimeOffset.UnixEpoch);
 }
