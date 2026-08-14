@@ -7,9 +7,11 @@ the TradeMind .NET solution and never references Core projects.
 
 Configuration is supplied as EA inputs. The agent token must be entered from
 a local secret store and must never be committed. The terminal must allow
-`https://localhost:5001` in its WebRequest settings.
+`https://127.0.0.1:5001` in its WebRequest settings.
 
-The EA reports only a demo account and rejects write commands in its current
-Phase 1 implementation. The source is provided for an explicit terminal-side
-deployment; CI cannot compile or execute MQL5 and therefore does not claim a
-real MT5 connection.
+The EA reports only a demo account. Sprint 32 adds one explicitly gated Demo
+write path: a single EURUSD market order at the broker-reported minimum
+volume and a matching position close for cleanup. Pending orders, modification,
+cancellation, partial close, scaling and all Live operations remain rejected.
+The source is provided for an explicit terminal-side deployment; CI cannot
+compile or execute MQL5 and therefore does not claim a real MT5 connection.

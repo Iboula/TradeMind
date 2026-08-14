@@ -34,11 +34,12 @@ $env:MT5_REAL_TESTS = "true"
 
 The example value above is instructional only and must never be committed as a credential.
 
-The opt-in real test is read-only: it starts the gateway, performs the external
-bridge handshake and heartbeat, then stops. No real order test is present. Any
-future write test must require both `MT5_REAL_TESTS=true` and
-`MT5_REAL_WRITE_TESTS=true`; without the second flag it must not submit, modify,
-cancel or close anything.
+The normal opt-in real test is read-only. Sprint 32 also defines a separate
+Demo write test that requires both `MT5_REAL_TESTS=true` and
+`MT5_REAL_WRITE_TESTS=true`, the exact local confirmation
+`MT5_REAL_DEMO_CONFIRMATION=I_CONFIRM_ONE_DEMO_ORDER`, and explicit
+`EnableWriteTests=true` in both local bridge services. Without every guard it
+must not submit or close anything. See [the real Demo order runbook](real-demo-order-smoke-test.md).
 
 ## Environment variable names
 

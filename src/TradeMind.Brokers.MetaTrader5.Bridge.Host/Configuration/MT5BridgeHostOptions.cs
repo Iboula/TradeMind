@@ -37,6 +37,7 @@ public sealed class MT5BridgeHostOptions
     public int MaximumSupportedTerminalBuild { get; set; } = 99999;
     public string SupportedTerminalArchitecture { get; set; } = "x64";
     public string ExpectedTerminalProtocolVersion { get; set; } = "1.0";
+    public bool EnableWriteTests { get; set; }
 }
 
 internal static class MT5BridgeHostOptionsCompatibility

@@ -90,6 +90,20 @@ public sealed class RealMT5TerminalGatewayTests
     }
 
     [Fact]
+    public async Task Real_gateway_rejects_demo_writes_when_write_tests_are_disabled()
+    {
+        var transport = new FakeTransport();
+        var gateway = CreateGateway(transport, writeTestsEnabled: false);
+        await gateway.StartAsync(CancellationToken.None);
+
+        var result = await gateway.ExecuteAsync(new TerminalCommand("submit-order", ExecutionFields("Demo")), CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Equal("LIVE_MODE_FORBIDDEN", result.Code);
+        Assert.Equal(0, transport.ExecuteCount);
+    }
+
+    [Fact]
     public async Task Real_gateway_rejects_live_mode_even_when_other_guards_are_present()
     {
         var transport = new FakeTransport();
@@ -164,7 +178,7 @@ public sealed class RealMT5TerminalGatewayTests
         await gateway.StopAsync(CancellationToken.None);
     }
 
-    private static RealMT5TerminalGateway CreateGateway(FakeTransport transport, int reconnectAttempts = 2)
+    private static RealMT5TerminalGateway CreateGateway(FakeTransport transport, int reconnectAttempts = 2, bool writeTestsEnabled = true)
     {
         var options = new MT5BridgeHostOptions
         {
@@ -177,7 +191,8 @@ public sealed class RealMT5TerminalGatewayTests
             ReconnectMaximumAttempts = reconnectAttempts,
             ReconnectBackoffMilliseconds = 0,
             TerminalHeartbeatTimeoutSeconds = 1,
-            TerminalStartupTimeoutSeconds = 1
+            TerminalStartupTimeoutSeconds = 1,
+            EnableWriteTests = writeTestsEnabled
         };
         return new RealMT5TerminalGateway(
             Options.Create(options),

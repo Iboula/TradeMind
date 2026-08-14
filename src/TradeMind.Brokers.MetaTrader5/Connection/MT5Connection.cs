@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using TradeMind.Brokers.MetaTrader5.Bridge;
 using TradeMind.Brokers.MetaTrader5.Configuration;
+using TradeMind.Brokers.Domain;
 
 namespace TradeMind.Brokers.MetaTrader5.Connection;
 
@@ -32,7 +33,8 @@ public sealed class MT5Connection(
         {
             lock (stateLock)
             {
-                return new MT5ConnectionSnapshot(bridge.BridgeVersion, "1.0", "simulation-terminal", latency, heartbeat, reconnectCount, state, lastHeartbeat, lastReconnect);
+                var environment = options.Mode.Equals(nameof(BrokerExecutionMode.Demo), StringComparison.OrdinalIgnoreCase) ? "Demo" : "Simulation";
+                return new MT5ConnectionSnapshot(bridge.BridgeVersion, "1.0", "simulation-terminal", latency, heartbeat, reconnectCount, state, lastHeartbeat, lastReconnect, environment, true, false);
             }
         }
     }

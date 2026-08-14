@@ -80,7 +80,7 @@ internal sealed class RealMT5TerminalGateway(
         if (command.Command.Equals("heartbeat", StringComparison.Ordinal)) return await PingAsync(cancellationToken).ConfigureAwait(false);
         if (!IsAvailable) return Failure("TERMINAL_UNAVAILABLE", "The demo terminal is unavailable.");
         if (!await EnsureHeartbeatAsync(cancellationToken).ConfigureAwait(false)) return Failure("TERMINAL_UNAVAILABLE", "The demo terminal heartbeat is unavailable.");
-        var decision = safetyPolicy.Validate(command, Snapshot, timeProvider.GetUtcNow(), TimeSpan.FromSeconds(configuration.TerminalHeartbeatTimeoutSeconds));
+        var decision = safetyPolicy.Validate(command, Snapshot, timeProvider.GetUtcNow(), TimeSpan.FromSeconds(configuration.TerminalHeartbeatTimeoutSeconds), configuration.EnableWriteTests);
         if (!decision.Allowed) return Failure(decision.Code, decision.Message);
 
         var started = timeProvider.GetTimestamp();

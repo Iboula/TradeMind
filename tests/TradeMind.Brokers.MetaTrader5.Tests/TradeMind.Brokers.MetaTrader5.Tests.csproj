@@ -23,5 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TradeMind.Api\TradeMind.Api.csproj" />
     <ProjectReference Include="..\..\src\TradeMind.Brokers.MetaTrader5\TradeMind.Brokers.MetaTrader5.csproj" />
+    <ProjectReference Include="..\..\src\TradeMind.Brokers.MetaTrader5.Bridge.Client\TradeMind.Brokers.MetaTrader5.Bridge.Client.csproj" />
   </ItemGroup>
 </Project>

@@ -19,12 +19,14 @@ public static class BrokersApplicationDependencyInjection
         services.TryAddSingleton<IBrokerClock>(provider => new TimeProviderBrokerClock(provider.GetRequiredService<TimeProvider>()));
         services.TryAddSingleton<IBrokerConnectorRegistry, BrokerConnectorRegistry>();
         services.TryAddSingleton<IBrokerAuthorizationPolicy, BrokerAuthorizationPolicy>();
+        services.TryAddSingleton<IBrokerExecutionSafetyState, InMemoryBrokerExecutionSafetyState>();
         services.TryAddSingleton<IBrokerIdempotencyStore, InMemoryBrokerIdempotencyStore>();
         services.TryAddSingleton<IBrokerExecutionRecordWriter, NoOpBrokerExecutionRecordWriter>();
         services.TryAddSingleton<IBrokerReconciliationRecordWriter, NoOpBrokerReconciliationRecordWriter>();
         services.TryAddSingleton<IBrokerAuditWriter, NoOpBrokerAuditWriter>();
         services.AddSingleton<BrokerExecutionValidator>();
         services.AddSingleton<IBrokerExecutionService, BrokerExecutionService>();
+        services.AddSingleton<IBrokerExecutionLifecycleService, BrokerExecutionLifecycleService>();
         return services;
     }
 }

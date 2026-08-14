@@ -43,6 +43,10 @@ public sealed class TradeMindMetrics : ITradeMindMetrics
     private readonly Counter<long> _brokerReconciliationRuns = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerReconciliationRuns, "runs");
     private readonly Counter<long> _brokerReconciliationMismatches = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerReconciliationMismatches, "mismatches");
     private readonly Counter<long> _brokerIdempotencyHits = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerIdempotencyHits, "hits");
+    private readonly Counter<long> _brokerIdempotencyConflicts = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerIdempotencyConflicts, "conflicts");
+    private readonly Counter<long> _brokerOrphanPositionsDetected = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerOrphanPositionsDetected, "positions");
+    private readonly Counter<long> _brokerExecutionBlocked = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerExecutionBlocked, "blocks");
+    private readonly Counter<long> _brokerCleanupFailures = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.BrokerCleanupFailures, "failures");
     private readonly Histogram<double> _brokerOperationDuration = TradeMindMeter.Meter.CreateHistogram<double>(TelemetryMetricNames.BrokerOperationDuration, "s");
     private readonly Counter<long> _mt5Connections = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Connections, "connections");
     private readonly Counter<long> _mt5Reconnects = TradeMindMeter.Meter.CreateCounter<long>(TelemetryMetricNames.Mt5Reconnects, "reconnects");
@@ -118,6 +122,10 @@ public sealed class TradeMindMetrics : ITradeMindMetrics
         TelemetryMetricNames.BrokerReconciliationRuns => _brokerReconciliationRuns,
         TelemetryMetricNames.BrokerReconciliationMismatches => _brokerReconciliationMismatches,
         TelemetryMetricNames.BrokerIdempotencyHits => _brokerIdempotencyHits,
+        TelemetryMetricNames.BrokerIdempotencyConflicts => _brokerIdempotencyConflicts,
+        TelemetryMetricNames.BrokerOrphanPositionsDetected => _brokerOrphanPositionsDetected,
+        TelemetryMetricNames.BrokerExecutionBlocked => _brokerExecutionBlocked,
+        TelemetryMetricNames.BrokerCleanupFailures => _brokerCleanupFailures,
         TelemetryMetricNames.Mt5Connections => _mt5Connections,
         TelemetryMetricNames.Mt5Reconnects => _mt5Reconnects,
         TelemetryMetricNames.Mt5Requests => _mt5Requests,

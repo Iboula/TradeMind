@@ -201,7 +201,9 @@ public sealed class TelemetryContractTests
             TelemetryMetricNames.ExecutionSessionsCancelled, TelemetryMetricNames.ExecutionSessionsReplayRequests, TelemetryMetricNames.PipelineOperations,
             TelemetryMetricNames.PipelineFailures, TelemetryMetricNames.PaperTradingSimulations, TelemetryMetricNames.PaperTradingFailures,
             TelemetryMetricNames.OutboxMessagesCreated, TelemetryMetricNames.OutboxMessagesProcessed, TelemetryMetricNames.OutboxFailures,
-            TelemetryMetricNames.IdempotencyHits, TelemetryMetricNames.IdempotencyConflicts
+            TelemetryMetricNames.IdempotencyHits, TelemetryMetricNames.IdempotencyConflicts,
+            TelemetryMetricNames.BrokerIdempotencyConflicts, TelemetryMetricNames.BrokerOrphanPositionsDetected,
+            TelemetryMetricNames.BrokerExecutionBlocked, TelemetryMetricNames.BrokerCleanupFailures
         })
             metrics.IncrementCounter(name, 1, dimensions);
         foreach (var name in new[]
