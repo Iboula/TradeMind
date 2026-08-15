@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

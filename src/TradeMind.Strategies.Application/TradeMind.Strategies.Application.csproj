@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TradeMind.AI.Context.Domain\TradeMind.AI.Context.Domain.csproj" />
+    <ProjectReference Include="..\TradeMind.Market.Abstractions\TradeMind.Market.Abstractions.csproj" />
+    <ProjectReference Include="..\TradeMind.Strategies.Domain\TradeMind.Strategies.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
